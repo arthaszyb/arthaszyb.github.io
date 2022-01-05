@@ -1,3 +1,15 @@
+---
+layout:     post
+title:      社会学家沈奕斐：今天爱情婚姻那么难，是因为我们“双标”和“既要又要”
+subtitle:   
+date:       2019-12-13
+author:     下弦月
+header-img: img/post-bg-ios9-web.jpg
+catalog: 	 true
+tags:
+    - 人生
+    - 感情
+---
 # 社会学家沈奕斐：今天爱情婚姻那么难，是因为我们“双标”和“既要又要”
 
 * 文艺圈
