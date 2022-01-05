@@ -1,10 +1,10 @@
 # Site settings
 title: Lionado's Blog
-SEOTitle: Lionado的博客 | BY yau
+SEOTitle: Lionado's Blog BY Lionado Juma
 header-img: img/post-bg-desk.jpg
 email: arthaszyb@gmail.com
 description: "I would rather die than keep silent."
-keyword: "Blog, yau的博客 yau, iOS, Apple, iPhone"
+keyword: "Blog, Freedom, Tech, Live, iOS, Apple, iPhone"
 url: "https://arthaszyb.github.io/"          # your host, for absolute URL
 baseurl: ""      # for example, '/blog' if your blog hosted on 'host/blog'
 github_repo: "https://github.com/arthaszyb/arthaszyb.github.io.git" # you code repository
