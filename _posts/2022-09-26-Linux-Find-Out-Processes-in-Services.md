@@ -13,8 +13,9 @@ tags:
 
 >Find out running processes by listing all TCP service ports with lsof command. It's usefull while the machine is planning to be shutdown.
 
-# Script
-```s
+### Script content
+```
+
 #!/bin/bash
 #查看服务进程
 allp=$(netstat -nlp|grep -E "tcp|udp"|awk '{print $4}'|cut -d: -f2)
@@ -25,4 +26,5 @@ done
 grep -v TsysAgent /tmp/ser.txt_tmp|grep -v sshd |grep -v rsync|sort -u >/tmp/ser.txt
 rm -rf /tmp/ser.txt_tmp
 cat /tmp/ser.txt
+
 ```
