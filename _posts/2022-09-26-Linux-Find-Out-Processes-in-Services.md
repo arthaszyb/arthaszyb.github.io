@@ -26,5 +26,4 @@ done
 grep -v TsysAgent /tmp/ser.txt_tmp|grep -v sshd |grep -v rsync|sort -u >/tmp/ser.txt
 rm -rf /tmp/ser.txt_tmp
 cat /tmp/ser.txt
-
 ```
