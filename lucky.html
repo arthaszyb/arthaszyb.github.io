@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>算命程序</title>
+<style>
+body {
+  font-family: '宋体', '楷体', serif;
+  background: url('https://pic.616pic.com/bg_w1180/00/02/98/mVnv6yaPSm.jpg!/fw/1120') no-repeat center center fixed;
+  background-size: cover;
+  color: #880000;
+}
+
+#fortune {
+  font-size: 36px;
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #aa0000;
+  padding: 30px;
+  border: 3px solid #ffd700;
+  margin: 20px;
+  text-align: center;
+  border-radius: 10px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+#drawButton {
+  display: block;
+  width: 220px;
+  padding: 15px;
+  margin: 20px auto;
+  font-size: 24px;
+  cursor: pointer;
+  background-color: #aa0000;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  box-shadow: 0 4px #880000;
+  transition: all 0.3s ease;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-20px);
+  }
+  60% {
+    transform: translateY(-10px);
+  }
+}
+
+#drawButton:hover {
+  background-color: #ff0000;
+  box-shadow: 0 2px #880000;
+  transform: translateY(2px);
+}
+
+#history {
+  margin: 20px;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #880000;
+  border: 3px solid #ffd700;
+  border-radius: 10px;
+}
+
+.historyItem {
+  margin: 10px 0;
+  padding: 5px;
+  border-bottom: 1px dashed #aa0000;
+  transition: all 0.3s ease;
+}
+
+.historyItem:hover {
+  background-color: #ffe0e0;
+  padding-left: 10px;
+}
+</style>
+</head>
+<body>
+
+<div id="fortune">按下按钮开始抽签</div>
+<button id="drawButton" onclick="toggleDrawing()">开始抽签</button>
+<div id="history"></div>
+
+<script>
+// 命运签数组
+const fortunes = [
+  { text: "大吉大利，今天真是你的幸运日！", rank: "上上签" },
+  { text: "小心，今天可能会有不测风云。", rank: "下签" },
+  { text: "财运亨通，可能会有意外之财。", rank: "上签" },
+  { text: "健康需要注意，别忘了适量运动。", rank: "中签" },
+  { text: "爱情甜蜜，可能会有一个美好的邂逅。", rank: "上签" },
+  { text: "事业有成，工作上可能会有好消息。", rank: "上上签" },
+  { text: "学业进步，今天是充实知识的好日子。", rank: "上签" },
+  { text: "旅行吉祥，是出去走走的好时机。", rank: "上上签" },
+  { text: "今日宜静不宜动，适合思考人生。", rank: "中签" },
+  { text: "机遇就在眼前，抓住它！", rank: "上签" },
+  { text: "出门有踩到狗屎的可能！", rank: "下签" },
+  { text: "退一步海阔天空，何不向前看？", rank: "中签" },
+  { text: "小心头顶上飞过去的鸟", rank: "下签" },
+  { text: "今天最好不要忽略你经过的彩票站", rank: "上上签" }
+];
+
+let intervalId = null;
+let currentFortune = null;
+
+function updateFortune() {
+  const index = Math.floor(Math.random() * fortunes.length);
+  currentFortune = fortunes[index];
+  document.getElementById('fortune').textContent = currentFortune.rank + ': ' + currentFortune.text;
+}
+
+function toggleDrawing() {
+  const button = document.getElementById('drawButton');
+  if (intervalId) {
+    clearInterval(intervalId);
+    intervalId = null;
+    button.textContent = '重新抽签';
+    addHistory(currentFortune);
+  } else {
+    updateFortune();
+    intervalId = setInterval(updateFortune, 200);
+    button.textContent = '停止抽签';
+  }
+}
+
+function addHistory(fortune) {
+  const historyDiv = document.getElementById('history');
+  const newHistoryItem = document.createElement('div');
+  newHistoryItem.textContent = fortune.rank + ': ' + fortune.text;
+  newHistoryItem.className = 'historyItem';
+  historyDiv.prepend(newHistoryItem);
+}
+
+window.onload = toggleDrawing;
+
+</script>
+
+</body>
+</html>
