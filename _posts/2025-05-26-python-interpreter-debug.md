@@ -6,10 +6,6 @@ tags: [python, debug, ai, cursor, macos, pyenv, venv, 经验]
 description: "一次系统迁移后，Cursor Python 插件卡死的极客式排查与 AI 协作全过程纪实。"
 ---
 
-当然可以！下面是极客风格、完整还原你与 AI 交互全过程的技术记录文档，详细体现每一步建议、排查、分析与协作，突出“人与 AI 协作 Debug”的极客精神。
-
----
-
 # 终极 Debug 纪实：AI 与极客联手击破 Cursor Python 解释器卡死谜案
 
 ## 背景设定
