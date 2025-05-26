@@ -1,15 +1,9 @@
 ---
-layout:     post
-title:      Xcode Debug 大全
-subtitle:   iOS开发中利用 Xcode 各种调试Bug方法
-date:       2016-10-18
-author:     BY
-header-img: img/post-bg-ios9-web.jpg
-catalog: true
-tags:
-    - iOS
-    - 开发技巧
-    - Debug
+title: "Xcode Debug 大全"
+date: 2016-10-18
+categories: [iOS, Debug]
+tags: [iOS, 开发技巧, Debug]
+description: "iOS开发中利用 Xcode 各种调试Bug方法，涵盖断点、全局断点、条件断点等实用技巧。"
 ---
 
 
