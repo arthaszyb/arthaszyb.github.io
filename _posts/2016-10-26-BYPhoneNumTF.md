@@ -1,9 +1,14 @@
 ---
-title: "BYPhoneNumTF"
-date: 2017-02-04
-categories: [iOS, 轮子]
-tags: [iOS, 轮子, TextField]
-description: "一个支持自动格式化的电话号码输入框，支持分隔、输入限制等功能，适用于 iOS 开发。"
+layout:     post
+title:      BYPhoneNumTF
+subtitle:   一个电话号码格式的文本框
+date:       2017-02-04
+author:     BY
+header-img: img/post-bg-ios9-web.jpg
+catalog: true
+tags:
+    - iOS
+    - 轮子
 ---
 
 >**BYPhoneNumTF** 一个电话号码格式的文本框
