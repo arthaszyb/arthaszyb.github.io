@@ -2,7 +2,28 @@
 layout: page
 description: "Thinking will not overcome fear but action will."
 ---
+<h1 class="page-heading">Blog</h1>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="{{ site.description }}">
+<meta name="keywords" content="{{ site.keyword }}">
+<meta name="theme-color" content="{{ site.chrome-tab-theme-color }}">
+<meta name="author" content="{{ site.author }}">
 <meta name="google-site-verification" content="qAcw6OnQC87_3yCq1m_U7oSSKtmNiXSAF4CnEIvhyB8" />
+<!-- Page Header -->
+<header class="intro-header" style="background-image: url('{{ site.baseurl }}/img/post-bg-rwd.jpg')">
+    <div class="header-mask"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <h1>Blog</h1>
+                    <h2 class="subheading">Thinking will not overcome fear but action will.</h2>
+                    <span class="meta">Posted by {{ site.author }} on {{ site.date | date: "%B %-d, %Y" }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
 
 {% for post in paginator.posts %}
 <div class="post-preview">
