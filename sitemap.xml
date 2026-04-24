@@ -3,12 +3,37 @@ layout: null
 ---
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>{{ site.url }}{{ site.baseurl }}/</loc>
+    <lastmod>{{ site.time | date: "%Y-%m-%d" }}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  {% for page in site.pages %}
+  {% unless page.sitemap == false or page.robots contains 'noindex' or page.url == '/404.html' %}
+  <url>
+    <loc>{{ site.url }}{{ page.url | replace:'index.html','' | prepend: site.baseurl }}</loc>
+    <lastmod>{{ site.time | date: "%Y-%m-%d" }}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  {% endunless %}
+  {% endfor %}
   {% for post in site.posts %}
   <url>
     <loc>{{ site.url }}{{ post.url }}</loc>
     <lastmod>{{ post.date | date: "%Y-%m-%d" }}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+  </url>
+  {% endfor %}
+  {% assign html_static_docs = site.static_files | where_exp: "item", "item.path contains '/html/' and item.extname == '.html' and item.name != 'index.html'" %}
+  {% for doc in html_static_docs %}
+  <url>
+    <loc>{{ site.url }}{{ doc.path }}</loc>
+    <lastmod>{{ doc.modified_time | date: "%Y-%m-%d" }}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   {% endfor %}
 </urlset>

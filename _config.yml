@@ -1,17 +1,20 @@
 # Site settings
-title: Lionado's Blog
-SEOTitle: Lionado's Blog BY Lionado Juma
+title: Sean Zhou Notes
+SEOTitle: Sean Zhou Notes | arthaszyb
 header-img: img/post-bg-desk.jpg
 email: arthaszyb@gmail.com
-description: "I would rather die than keep silent."
-keyword: "Blog, Freedom, Tech, Live, iOS, Apple, iPhone"
-url: "https://arthaszyb.github.io/"          # your host, for absolute URL
+description: "Technical notes on SRE, Linux, infrastructure, observability, Kubernetes, and engineering practice by Sean Zhou."
+keyword: "Sean Zhou, arthaszyb, SRE, Linux, Kubernetes, observability, infrastructure, engineering notes"
+url: "https://arthaszyb.github.io"          # your host, for absolute URL
 baseurl: ""      # for example, '/blog' if your blog hosted on 'host/blog'
 github_repo: "https://github.com/arthaszyb/arthaszyb.github.io.git" # you code repository
+lang: "zh-CN"
+timezone: "Asia/Singapore"
+author: "Sean Zhou"
 
 # Sidebar settings
 sidebar: true                           # whether or not using Sidebar.
-sidebar-about-description: "Goals determine what you going to be!"
+sidebar-about-description: "SRE notes, infrastructure docs, and technical essays."
 sidebar-avatar: https://images.chinatimes.com/newsphoto/2019-04-05/900/20190405001520.jpg      # use absolute URL, seeing it's used in both `/` and `/about/`
 
 
@@ -61,12 +64,12 @@ kramdown:
 
 # Gitalk
 gitalk:
-  enable: true    #是否开启Gitalk评论
-  clientID: f2c84e7629bb1446c1a4                            #生成的clientID
-  clientSecret: ca6d6139d1e1b8c43f8b2e19492ddcac8b322d0d    #生成的clientSecret
-  repo: qiubaiying.github.io    #仓库名称
-  owner: qiubaiying    #github用户名
-  admin: qiubaiying
+  enable: false    #是否开启Gitalk评论
+  clientID:                             #生成的clientID
+  clientSecret:                         #生成的clientSecret
+  repo: arthaszyb.github.io    #仓库名称
+  owner: arthaszyb    #github用户名
+  admin: arthaszyb
   distractionFreeMode: true #是否启用类似FB的阴影遮罩
 
 
@@ -74,11 +77,11 @@ gitalk:
 
 # Analytics settings
 # Baidu Analytics
-ba_track_id: b50bf2b12b5338a1845e33832976fd68
+# ba_track_id: 
 
 # Google Analytics
-ga_track_id: 'UA-90855596-1'            # Format: UA-xxxxxx-xx
-ga_domain: auto               # 默认的是 auto, 这里我是自定义了的域名，你如果没有自己的域名，需要改成auto
+# ga_track_id:             # Format: UA-xxxxxx-xx
+# ga_domain: auto               # 默认的是 auto, 这里我是自定义了的域名，你如果没有自己的域名，需要改成auto
 
 
 
@@ -101,9 +104,6 @@ friends: [
     {
         title: "WY",
         href: "http://arthaszyb.com"
-    },{
-        title: "简书·BY",
-        href: "http://www.jianshu.com/u/e7199gfrd"
     },{
         title: "Apple",
         href: "https://apple.com"
