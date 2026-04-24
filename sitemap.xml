@@ -27,7 +27,7 @@ layout: null
     <priority>0.8</priority>
   </url>
   {% endfor %}
-  {% assign html_static_docs = site.static_files | where_exp: "item", "item.path contains '/html/' and item.extname == '.html' and item.name != 'index.html'" %}
+  {% assign html_static_docs = site.static_files | where_exp: "item", "item.path contains '/html/'" | where_exp: "item", "item.extname == '.html'" | where_exp: "item", "item.name != 'index.html'" %}
   {% for doc in html_static_docs %}
   <url>
     <loc>{{ site.url }}{{ doc.path }}</loc>

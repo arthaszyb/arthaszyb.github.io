@@ -3,8 +3,8 @@ layout: page
 title: "HTML Docs"
 description: "Standalone HTML documents published directly from the repository."
 ---
-{% assign html_static_docs = site.static_files | where_exp: "item", "item.path contains '/html/' and item.extname == '.html' and item.name != 'index.html'" | sort: "path" %}
-{% assign html_page_docs = site.pages | where_exp: "item", "item.url contains '/html/' and item.url != '/html/' and item.name != 'index.html'" | sort: "url" %}
+{% assign html_static_docs = site.static_files | where_exp: "item", "item.path contains '/html/'" | where_exp: "item", "item.extname == '.html'" | where_exp: "item", "item.name != 'index.html'" | sort: "path" %}
+{% assign html_page_docs = site.pages | where_exp: "item", "item.url contains '/html/'" | where_exp: "item", "item.url != '/html/'" | where_exp: "item", "item.name != 'index.html'" | sort: "url" %}
 
 <div class="doc-callout">
   <div>
