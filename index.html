@@ -1,77 +1,134 @@
 ---
 layout: page
-title: "Home"
-description: "Technical notes on SRE, Linux, Kubernetes, observability, infrastructure, and engineering practice."
+title: "Blog"
+description: "Long-form notes on systems, infrastructure, AI tooling, and engineering practice."
+kicker: "Home"
+wrap_content: false
 ---
-{% assign html_static_docs = site.static_files | where_exp: "item", "item.path contains '/html/'" | where_exp: "item", "item.extname == '.html'" | where_exp: "item", "item.name != 'index.html'" %}
-{% assign html_page_docs = site.pages | where_exp: "item", "item.url contains '/html/'" | where_exp: "item", "item.url != '/html/'" | where_exp: "item", "item.name != 'index.html'" %}
-{% assign html_doc_count = html_static_docs.size | plus: html_page_docs.size %}
+{% assign featured_post = paginator.posts.first %}
 
-<section class="home-intro">
-    <div class="home-intro-copy">
-        <h2>只保留有效内容，不再保留旧模板示例文章。</h2>
-        <p>这个站点现在专注于三类内容：从 Evernote 迁移过来的长期技术档案、2023 年以来新增的原创文章，以及放在 <code>/html/</code> 目录下的原生 HTML 文档。内容方向以 Linux、基础设施、SRE、脚本、可观测性、网络和工程实践为主。</p>
-        <div class="home-stats">
-            <div class="home-stat">
-                <strong>{{ site.posts | size }}</strong>
-                <span>Total posts</span>
-            </div>
-            <div class="home-stat">
-                <strong>{{ site.tags | size }}</strong>
-                <span>Topics</span>
-            </div>
-            <div class="home-stat">
-                <strong>{{ paginator.total_posts | default: site.posts.size }}</strong>
-                <span>Indexed entries</span>
-            </div>
-            <div class="home-stat">
-                <strong>{{ html_doc_count }}</strong>
-                <span>HTML docs</span>
-            </div>
+<section class="home-overview content-panel">
+    <div class="home-overview-copy">
+        <h2>持续整理值得长期保存的技术笔记、问题分析和工程思考。</h2>
+        <p>内容以 Linux、基础设施、调试、网络、可观测性、数据库、AI 工具和工程实践为主，首页只呈现读者真正关心的内容，不再展示模板历史或站点维护细节。</p>
+    </div>
+    <div class="home-overview-stats">
+        <div class="home-stat">
+            <strong>{{ site.posts | size }}</strong>
+            <span>Articles</span>
+        </div>
+        <div class="home-stat">
+            <strong>{{ site.categories | size }}</strong>
+            <span>Topics</span>
+        </div>
+        <div class="home-stat">
+            <strong>{{ site.posts.last.date | date: "%Y" }}-{{ site.posts.first.date | date: "%Y" }}</strong>
+            <span>Writing span</span>
+        </div>
+        <div class="home-stat">
+            <strong>{{ site.posts.first.date | date: "%Y-%m-%d" }}</strong>
+            <span>Latest update</span>
         </div>
     </div>
-    <aside class="home-intro-aside">
-        <h3>Archive scope</h3>
-        <p>Imported Evernote notebooks are preserved as historical records, newer posts stay visible as the current writing stream, and standalone HTML documents now ship from the same repo under <a href="{{ site.baseurl }}/html/">HTML Docs</a>.</p>
-    </aside>
 </section>
 
-<section class="doc-callout">
-    <div>
-        <h3>HTML Docs Pipeline</h3>
-        <p>Drop raw <code>.html</code> files into <code>/html/</code> and GitHub Pages will publish them directly. If an HTML file includes Jekyll front matter, it can also use the same layouts and site metadata as Markdown pages.</p>
+{% if featured_post %}
+<section class="spotlight-panel content-panel">
+    <div class="section-heading">
+        <div>
+            <span class="section-kicker">Featured</span>
+            <h2>最新发布</h2>
+        </div>
     </div>
-    <a class="doc-callout-link" href="{{ site.baseurl }}/html/">Browse HTML Docs</a>
-</section>
-
-<section class="post-list">
-{% for post in paginator.posts %}
-    <article class="post-card">
-        {% if post.categories and post.categories.first %}
-        <div class="post-card-category">{{ post.categories.first }}</div>
+    <article class="spotlight-card">
+        {% if featured_post.categories and featured_post.categories.first %}
+        <div class="post-card-category">{{ featured_post.categories.first }}</div>
         {% endif %}
-        <h2 class="post-card-title">
-            <a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
-        </h2>
+        <h3 class="spotlight-title">
+            <a href="{{ featured_post.url | prepend: site.baseurl }}">{{ featured_post.title }}</a>
+        </h3>
         <div class="post-card-meta">
-            <span>{{ post.date | date: "%B %-d, %Y" }}</span>
-            <span>{{ post.author | default: site.author }}</span>
+            <span>{{ featured_post.date | date: "%B %-d, %Y" }}</span>
+            {% if featured_post.categories and featured_post.categories.size > 1 %}
+            <span>{{ featured_post.categories | size }} topics</span>
+            {% endif %}
         </div>
-        <p class="post-card-summary">
-            {{ post.description | default: post.content | strip_html | truncate: 220 }}
+        <p class="spotlight-summary">
+            {{ featured_post.description | default: featured_post.content | strip_html | truncate: 300 }}
         </p>
-        {% if post.tags and post.tags.size > 0 %}
-        <div class="post-card-tags">
-            {% for tag in post.tags limit: 6 %}
-            <a class="tag-chip" href="{{ site.baseurl }}/tags/#{{ tag }}">{{ tag }}</a>
-            {% endfor %}
-        </div>
-        {% endif %}
+        <a class="primary-link" href="{{ featured_post.url | prepend: site.baseurl }}">Read article</a>
     </article>
-{% endfor %}
+</section>
+{% endif %}
+
+<section class="content-panel">
+    <div class="section-heading">
+        <div>
+            <span class="section-kicker">Latest</span>
+            <h2>近期文章</h2>
+        </div>
+    </div>
+    <div class="post-grid">
+    {% for post in paginator.posts offset: 1 limit: 6 %}
+        <article class="post-card">
+            {% if post.categories and post.categories.first %}
+            <div class="post-card-category">{{ post.categories.first }}</div>
+            {% endif %}
+            <h3 class="post-card-title">
+                <a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+            </h3>
+            <div class="post-card-meta">
+                <span>{{ post.date | date: "%Y-%m-%d" }}</span>
+                {% if post.categories and post.categories.size > 1 %}
+                <span>{{ post.categories | size }} topics</span>
+                {% endif %}
+            </div>
+            <p class="post-card-summary">
+                {{ post.description | default: post.content | strip_html | truncate: 180 }}
+            </p>
+        </article>
+    {% endfor %}
+    </div>
 </section>
 
-<!-- Pager -->
+<section class="content-panel">
+    <div class="section-heading">
+        <div>
+            <span class="section-kicker">Explore</span>
+            <h2>按主题浏览</h2>
+        </div>
+    </div>
+    <div class="topic-grid">
+        <a class="topic-card" href="{{ site.baseurl }}/works/#topic-RedHat">
+            <strong>RedHat</strong>
+            <span>{{ site.categories['RedHat'] | size }} 篇</span>
+        </a>
+        <a class="topic-card" href="{{ site.baseurl }}/works/#topic-shell">
+            <strong>Shell</strong>
+            <span>{{ site.categories['shell'] | size }} 篇</span>
+        </a>
+        <a class="topic-card" href="{{ site.baseurl }}/works/#topic-python">
+            <strong>Python</strong>
+            <span>{{ site.categories['python'] | size }} 篇</span>
+        </a>
+        <a class="topic-card" href="{{ site.baseurl }}/works/#topic-docker">
+            <strong>Docker</strong>
+            <span>{{ site.categories['docker'] | size }} 篇</span>
+        </a>
+        <a class="topic-card" href="{{ site.baseurl }}/works/#topic-监控告警">
+            <strong>监控告警</strong>
+            <span>{{ site.categories['监控告警'] | size }} 篇</span>
+        </a>
+        <a class="topic-card" href="{{ site.baseurl }}/works/#topic-AI">
+            <strong>AI</strong>
+            <span>{{ site.categories['AI'] | size }} 篇</span>
+        </a>
+    </div>
+    <div class="section-footer">
+        <a class="primary-link" href="{{ site.baseurl }}/works/">Browse all works</a>
+    </div>
+</section>
+
 {% if paginator.total_pages > 1 %}
 <ul class="pager">
     {% if paginator.previous_page %}

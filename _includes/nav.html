@@ -5,12 +5,10 @@
             <span class="site-brand-subtitle">{{ site.description }}</span>
         </a>
         <div class="site-nav-links">
-            <a class="site-nav-link{% if page.url == '/' %} is-current{% endif %}" href="{{ site.baseurl }}/">Archive</a>
-            <a class="site-nav-link{% if page.url == '/html/' %} is-current{% endif %}" href="{{ site.baseurl }}/html/">HTML Docs</a>
-            <a class="site-nav-link{% if page.url == '/tags/' %} is-current{% endif %}" href="{{ site.baseurl }}/tags/">Topics</a>
+            <a class="site-nav-link{% if page.url == '/' %} is-current{% endif %}" href="{{ site.baseurl }}/">Home</a>
+            <a class="site-nav-link{% if page.url == '/works/' or page.url == '/tags/' %} is-current{% endif %}" href="{{ site.baseurl }}/works/">Works</a>
             <a class="site-nav-link{% if page.url == '/about/' %} is-current{% endif %}" href="{{ site.baseurl }}/about/">About</a>
             <a class="site-nav-link" href="{{ site.baseurl }}/feed.xml">RSS</a>
-            <a class="site-nav-link" href="https://github.com/{{ site.github_username }}">GitHub</a>
         </div>
     </nav>
 </div>

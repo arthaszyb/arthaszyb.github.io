@@ -1,33 +1,10 @@
 ---
-title: Tags
-layout: page
-description: Browse the archive by topic, notebook source, and recurring technical theme.
+layout: default
+permalink: /tags/
+robots: noindex,nofollow
+sitemap: false
 ---
-
-<section class="tag-index">
-    <h2 class="tag-index-title">Topic Index</h2>
-    <div class="tag-cloud">
-        {% for tag in site.tags %}
-        <a href="#{{ tag[0] }}">{{ tag[0] }} · {{ tag[1].size }}</a>
-        {% endfor %}
-    </div>
+<meta http-equiv="refresh" content="0; url={{ site.baseurl }}/works/">
+<section class="content-panel redirect-panel">
+    <p>Topics 页面已迁移到 <a href="{{ site.baseurl }}/works/">Works</a>。</p>
 </section>
-
-{% for tag in site.tags %}
-<section class="tag-block" id="{{ tag[0] }}">
-    <h3 class="tag-block-title">{{ tag[0] }}</h3>
-    <div class="tag-post-list">
-        {% for post in tag[1] %}
-        <article class="tag-post-item">
-            <a href="{{ post.url | prepend: site.baseurl }}"><strong>{{ post.title }}</strong></a>
-            <div class="post-card-meta">
-                <span>{{ post.date | date: "%Y-%m-%d" }}</span>
-                {% if post.categories and post.categories.first %}
-                <span>{{ post.categories.first }}</span>
-                {% endif %}
-            </div>
-        </article>
-        {% endfor %}
-    </div>
-</section>
-{% endfor %}

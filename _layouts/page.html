@@ -3,15 +3,22 @@ layout: default
 ---
 
 <section class="hero-panel">
-    <span class="hero-kicker">Page</span>
+    <span class="hero-kicker">{{ page.kicker | default: "Section" }}</span>
     <h1 class="hero-title">{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}</h1>
     <p class="hero-description">{{ page.description | default: site.description }}</p>
+    {% if page.hero_meta %}
     <div class="hero-meta">
-        <span>Curated and maintained on GitHub Pages</span>
-        <span>{{ site.author }}</span>
+        {% for item in page.hero_meta %}
+        <span>{{ item }}</span>
+        {% endfor %}
     </div>
+    {% endif %}
 </section>
 
+{% if page.wrap_content == false %}
+{{ content }}
+{% else %}
 <section class="content-panel page-content">
     {{ content }}
 </section>
+{% endif %}

@@ -1,0 +1,74 @@
+---
+layout: page
+title: "Works"
+description: "Browse all writing by topic and date."
+kicker: "Works"
+wrap_content: false
+---
+{% assign sorted_categories = site.categories | sort %}
+
+<section class="content-panel">
+    <div class="section-heading">
+        <div>
+            <span class="section-kicker">Index</span>
+            <h2>全部作品</h2>
+        </div>
+    </div>
+    <p>按主题浏览全部文章。这里优先按内容主题聚合，而不是按写作时的内部目录或发布格式拆分。</p>
+    <div class="home-overview-stats">
+        <div class="home-stat">
+            <strong>{{ site.posts | size }}</strong>
+            <span>Total posts</span>
+        </div>
+        <div class="home-stat">
+            <strong>{{ sorted_categories | size }}</strong>
+            <span>Topics</span>
+        </div>
+        <div class="home-stat">
+            <strong>{{ site.posts.first.date | date: "%Y" }}</strong>
+            <span>Latest year</span>
+        </div>
+        <div class="home-stat">
+            <strong>{{ site.posts.last.date | date: "%Y" }}</strong>
+            <span>Earliest year</span>
+        </div>
+    </div>
+</section>
+
+<section class="content-panel tag-index">
+    <div class="section-heading">
+        <div>
+            <span class="section-kicker">Topics</span>
+            <h2>主题索引</h2>
+        </div>
+    </div>
+    <div class="tag-cloud">
+        {% for category in sorted_categories %}
+        {% assign topic_id = category[0] | replace: ' ', '-' | replace: '[', '' | replace: ']', '' | replace: '&', '' | replace: '+', '-' | replace: '/', '-' | replace: '.', '-' %}
+        <a href="#topic-{{ topic_id }}">{{ category[0] }} · {{ category[1].size }}</a>
+        {% endfor %}
+    </div>
+</section>
+
+{% for category in sorted_categories %}
+{% assign topic_id = category[0] | replace: ' ', '-' | replace: '[', '' | replace: ']', '' | replace: '&', '' | replace: '+', '-' | replace: '/', '-' | replace: '.', '-' %}
+<section class="content-panel topic-section" id="topic-{{ topic_id }}">
+    <div class="topic-section-head">
+        <h3 class="topic-section-title">{{ category[0] }}</h3>
+        <div class="post-meta-pill">{{ category[1].size }} 篇</div>
+    </div>
+    <div class="tag-post-list">
+        {% for post in category[1] %}
+        <article class="topic-post-item">
+            <a href="{{ post.url | prepend: site.baseurl }}"><strong>{{ post.title }}</strong></a>
+            <div class="topic-post-meta">
+                <span>{{ post.date | date: "%Y-%m-%d" }}</span>
+                {% if post.description %}
+                <span>{{ post.description | strip_html | truncate: 120 }}</span>
+                {% endif %}
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+{% endfor %}

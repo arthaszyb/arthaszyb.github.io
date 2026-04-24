@@ -1,7 +1,7 @@
 {
-  "name": "BY Blog",
-  "short_name": "BY Blog",
-  "description": "A personal blog by engineer",
+  "name": "Sean Jho",
+  "short_name": "Sean Jho",
+  "description": "Technical notes on systems, tools, and engineering practice",
   "icons": [{
     "src": "icons/pwa_icon_128.png",
     "sizes": "128x128",
@@ -11,8 +11,8 @@
     "sizes": "512x512",
     "type": "image/png"
   }],
-  "background_color": "#fff",
-  "theme_color": "#000",
+  "background_color": "#f7f3eb",
+  "theme_color": "#f2ecdf",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait"

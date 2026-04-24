@@ -10,15 +10,14 @@ layout: default
     {% endif %}
     <div class="hero-meta">
         <span>{{ page.date | date: "%B %-d, %Y" }}</span>
-        <span>{{ page.author | default: site.author }}</span>
-        {% if page.tags and page.tags.size > 0 %}
-        <span>{{ page.tags.size }} topics</span>
+        {% if page.categories and page.categories.size > 0 %}
+        <span>{{ page.categories | size }} topics</span>
         {% endif %}
     </div>
-    {% if page.tags and page.tags.size > 0 %}
+    {% if page.categories and page.categories.size > 0 %}
     <div class="post-tags" style="margin-top: 18px;">
-        {% for tag in page.tags %}
-        <a class="tag-chip" href="{{ site.baseurl }}/tags/#{{ tag }}">{{ tag }}</a>
+        {% for category in page.categories %}
+        <a class="tag-chip" href="{{ site.baseurl }}/works/#topic-{{ category | replace: ' ', '-' | replace: '[', '' | replace: ']', '' | replace: '&', '' | replace: '+', '-' | replace: '/', '-' | replace: '.', '-' }}">{{ category }}</a>
         {% endfor %}
     </div>
     {% endif %}
