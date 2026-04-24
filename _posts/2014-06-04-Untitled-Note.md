@@ -3,7 +3,7 @@ title: "PS1的设置"
 date: 2014-06-04 16:59:16 +0000
 categories: ["RedHat"]
 tags: ["Pages"]
-description: "4:59 PM export PS1=\"\[\e[31;1m\]`hostname`_\[\e[31;1m\]\u\[\e[0m\]@\[\e[32;1m\]`/sbin/ifconfig em1|grep \"inet addr:\"|cut -d: -f 2|cut -d\" \" -f1`\[\e[0m\]:\[\e[3"
+description: "PS1 prompt customization notes for hostname, user, IP address, and working directory display."
 ---
 
 <!DOCTYPE html>
