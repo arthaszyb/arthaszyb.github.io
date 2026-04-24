@@ -1,7 +1,7 @@
 ---
 title: "windows下查看文件md5"
 date: 2014-11-11 12:50:28 +0000
-categories: ["Winodws (Evernote import on 2016-08-28T23-50-24)"]
+categories: ["Windows"]
 tags: ["Pages"]
 description: "windows 下查看文件 md5 12:50 PM certutil -hashfile yourfilename MD5 已使用 Microsoft OneNote 2016 创建。"
 ---

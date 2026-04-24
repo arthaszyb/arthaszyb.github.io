@@ -609,7 +609,6 @@ en-note.peso,en-note.peso *{box-sizing:border-box}en-note.peso{word-wrap:break-w
       <meta itemprop="created" content="20180321T093817Z">
       <meta itemprop="updated" content="20180321T093823Z">
       <note-attributes>
-        <meta itemprop="author" content="arthaszyb@hotmail.com">
         <meta itemprop="source" content="desktop.win">
         <meta itemprop="source-url" content="http://blog.sina.com.cn/s/blog_bc4fefe70102w20c.html">
         <meta itemprop="source-application" content="evernote.win32">

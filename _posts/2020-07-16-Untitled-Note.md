@@ -609,7 +609,6 @@ en-note.peso,en-note.peso *{box-sizing:border-box}en-note.peso{word-wrap:break-w
       <meta itemprop="created" content="20200716T043158Z">
       <meta itemprop="updated" content="20260424T031015Z">
       <note-attributes>
-        <meta itemprop="author" content="arthaszyb@hotmail.com">
         <meta itemprop="source" content="desktop.win">
         <meta itemprop="source-url" content="https://zhuanlan.zhihu.com/p/36976698">
         <meta itemprop="source-application" content="yinxiang.win32">

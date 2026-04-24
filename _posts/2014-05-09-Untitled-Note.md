@@ -1,7 +1,7 @@
 ---
 title: "windows下nginx+php"
 date: 2014-05-09 09:16:28 +0000
-categories: ["Winodws (Evernote import on 2016-08-28T23-50-24)"]
+categories: ["Windows"]
 tags: ["Pages"]
 description: "9:16 AM 取消注释 extension_dir= ext php_mysql php_mysqli 已使用 Microsoft OneNote 2016 创建。"
 ---
