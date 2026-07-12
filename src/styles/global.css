@@ -346,6 +346,13 @@ pre code {
   display: block;
 }
 
+.post-shell article {
+  /* Long unbroken strings (bare URLs, file paths) in migrated content must
+     wrap instead of stretching the layout and causing page-level horizontal
+     scroll on narrow viewports. */
+  overflow-wrap: anywhere;
+}
+
 .post-meta-line {
   color: var(--fg-muted);
   font-size: 0.88rem;
@@ -434,6 +441,20 @@ pre code {
 @media (max-width: 1023px) {
   .toc-aside {
     display: none;
+  }
+
+  /* Safety net: some migrated content has raw HTML tables (turndown-plugin-gfm
+     keeps complex multi-row-per-cell tables as native <table> rather than
+     lossy markdown) whose auto table-layout can compute an intrinsic content
+     width wider than the viewport even though the table itself has its own
+     overflow-x: auto. That inner scroll container doesn't reliably stop the
+     width from being counted toward the page's own scrollWidth in all
+     browsers, which lets the whole page be dragged sideways. Since nothing
+     below 1024px relies on position: sticky (the sticky TOC is desktop-only,
+     see above), clipping overflow-x here is safe and keeps each table's own
+     horizontal scrollbar as the only way to see its extra-wide cells. */
+  body {
+    overflow-x: hidden;
   }
 }
 

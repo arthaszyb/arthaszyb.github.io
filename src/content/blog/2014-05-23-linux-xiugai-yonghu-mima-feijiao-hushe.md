@@ -2,8 +2,7 @@
 title: linux 修改用户密码+非交互设置密码
 date: '2014-05-23'
 description: >-
-  修改本地用户密码： 1、交互配置本地用户： 以root用\8h"@： passwd <username Changing passWord for user
-  dewang.
+  Linux 本地/远程用户密码修改方法汇总：交互式 passwd、非交互 passwd --stdin / chpasswd，以及配合 expect 脚本的自动化修改。
 category: linux
 tags:
   - ssh

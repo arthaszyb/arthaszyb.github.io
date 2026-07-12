@@ -22,6 +22,8 @@ http://blog.csdn.net/shadowyelling/article/details/7684714
 首先看看Left Join 与Right Join 与 Inner Join 与 Full Join对表进行操作后得到的结果。
 在数据库中新建两张表，并插入要测试的数据。
 新建表：
+
+```sql
 USE [Test]
 GO
 /******
@@ -52,6 +54,8 @@ CREATE TABLE [dbo].[SAL](
 [ENAME] [nchar](10) COLLATE Chinese_PRC_CI_AS NOT NULL,
 [SALARY] [money] NULL
 ) ON [PRIMARY]
+```
+
 插入数据得到的表：
 EMP表：
 SAL表：

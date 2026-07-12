@@ -2,9 +2,7 @@
 title: 自动调整linux系统时间和时区与Internet时间同步
 date: '2018-03-12'
 description: >-
-  原创上善若水AV2013-09-26 12:00:03评论(0)17414人阅读 调整linux系统时间和时区与Internet时间同步
-  简要分为以下3个方法： 一、修改时区 <table<tbody<tr style="max-width:100%;
-  font-family:Consolas, "Bitstream
+  调整 Linux 系统时间和时区、并与 Internet 时间同步的 3 种方法：修改时区、配置新时间、通过 ntpdate 计划任务或手动校准实现网络对时。
 category: linux
 tags:
   - crontab
