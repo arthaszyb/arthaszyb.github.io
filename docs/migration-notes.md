@@ -104,3 +104,25 @@
 2. `2020-07-16-...bios-uefi-mbr...md`（原 `external-image`）：引用的知乎图床外链 `https://pic3.zhimg.com/80/v2-0f9d14100058feff6e180da5623c3aca_720w.jpg` 未验证是否还能访问，建议站长确认后决定是下载自托管还是删除引用。
 3. 约 30 篇文章（"–" 替代 "--"）和个别"单词中间断行"的文章，代码块显示效果不够干净，不阻塞发布，有余力时可以人工挑几篇质量差的重新润色。
 4. `2017-11-21-无标题页.md` 和 `2018-04-30-HDFS的几种访问方式...md` 两篇本质上是空笔记（原始 Evernote 里就基本没内容），是否要从站点里下线（设 `draft: true`）由站长决定；脚本没有替用户做这个判断，原样保留发布。
+
+---
+
+## Phase 3 — 部署切换与仓库清理
+
+### 技术偏差记录
+
+1. **页面数不是方案/任务描述里预期的 505，而是 506。** 用 `git worktree` 单独检出 Phase 2 完成时的提交（`e00ad5a`，未做任何 Phase 3 改动）跑了一次 `npm run build` 做基线对照，结果同样是 506 个页面（`[build] 506 page(s) built`，Pagefind 索引也是 506 页）。也就是说 506 是 Phase 2 结束时就已经存在的真实页面数，Phase 3 没有增删任何 `src/content/blog/` 或 `src/pages/` 下的内容/路由，页面数在清理前后完全一致。「505」大概率是上游交接时的口误或约数，不代表本阶段有页面丢失或多产出，记录于此以免后续阶段误以为是回归。
+
+2. **`img/` 整目录（约 50 个文件，均为 Hux 主题背景图/头像/favicon）确认零引用后整体删除。** 全仓库（`src/`、`public/`、`astro.config.mjs`、`package.json`、`docs/`）grep `img/` 无命中；`favicon` 只在 `src/layouts/BaseLayout.astro` 命中，且指向的是 `public/favicon.svg`（Phase 1 已有的新 favicon），与旧 `img/favicon.ico`/`img/apple-touch-icon.png` 无关；`about` 页（`src/pages/about/index.astro`）是纯文字页，没有头像图。因此没有需要「保留并迁移到 public/」的文件，方案 3.2 里「img/ 中仅保留仍被引用的文件」这一步的结果是全部清空。
+
+3. **两篇迁移后的正文里字面出现 `/css/`、`/js/` 等旧站路径**（`2018-02-06-oncall-xiaogong-juqian-duandai-majie-du.md`），核实是文章内容本身在讲解/复现另一个网站的 HTML/CSS 引用路径（教学示例），与本仓库已删除的 `css/`/`js/` 目录无关，未做任何改动。
+
+4. `.github/workflows/pages.yml` 按方案 3.1 替换为 `withastro/action@v3`，未额外加 `actions/configure-pages`/`upload-pages-artifact` 步骤——`withastro/action` 内部已经处理 install + `npm run build`（含 Pagefind）+ 产物打包，行为与旧 Jekyll workflow 里手动拼接的步骤等价，只是收敛成一步。
+
+### Phase 3 验证结果摘要
+
+- `git rm` 删除 `_layouts/`、`_includes/`、`_config.yml`、根目录 Jekyll 页面（`index.html`/`works.html`/`tags.html`/`about.html`/`lucky.html`/`404.html`/`offline.html`）、`feed.xml`、`feed.xsl`、`sitemap.xml`、根 `robots.txt`、`css/`、`js/`、`less/`、`fonts/`、`Gruntfile.js`、`sw.js`、`pwa/`、`_posts/`（398 篇原始笔记，已在 Phase 2 迁移进 `src/content/blog/`）、`assets/`（`evernote/` 图片已复制进 `public/images/legacy/`）、`img/`、`.travis.yml`、`codecov.yml`，共约 630+ 条 git 变更（绝大多数是 `_posts/`/`assets/evernote/` 下的逐篇/逐图删除）。
+- 新建 `public/robots.txt`（允许全部抓取，`Sitemap: https://arthaszyb.github.io/sitemap-index.xml`）。
+- `rm -rf .astro dist node_modules/.astro && npm run build`：0 error / 0 warning，506 页面，Pagefind 索引 506 页 21519 词；`git status` 确认仓库根目录只剩 Astro 工程结构 + `docs/` + `README.md`（加上 `.github/`、`LICENSE`、`.gitignore`）。
+- `package.json` 检查：`dependencies`/`devDependencies` 均为 Phase 1/2 引入的 Astro 生态包，无 Grunt 时代残留（`grunt`/`grunt-*` 全仓库 grep 零命中，`Gruntfile.js` 已删除）。
+- `README.md` 按新架构重写：技术栈、目录结构、本地开发命令、部署方式、写作新文章的 front matter 字段说明、`scripts/migrate-content.mjs` 的一次性工具性质说明。
