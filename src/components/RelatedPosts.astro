@@ -1,0 +1,23 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import PostCard from './PostCard.astro';
+
+interface Props {
+  posts: CollectionEntry<'blog'>[];
+}
+
+const { posts } = Astro.props;
+---
+
+{
+  posts.length > 0 && (
+    <section class="related-posts" aria-label="相关文章">
+      <h2>相关文章</h2>
+      <ul class="post-list">
+        {posts.map((post) => (
+          <PostCard post={post} />
+        ))}
+      </ul>
+    </section>
+  )
+}

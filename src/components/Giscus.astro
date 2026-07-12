@@ -1,0 +1,47 @@
+---
+import { giscus } from '../data/site';
+
+// Comments are opt-in: until the site owner enables GitHub Discussions
+// and installs the giscus app (see docs/migration-notes.md), this
+// component renders nothing at all — no script tag, no placeholder.
+---
+
+{
+  giscus.enabled && (
+    <section class="giscus-section" aria-label="评论">
+      <h2>评论</h2>
+      <div id="giscus-container">
+        <script
+          is:inline
+          src="https://giscus.app/client.js"
+          data-repo={giscus.repo}
+          data-repo-id={giscus.repoId}
+          data-category={giscus.category}
+          data-category-id={giscus.categoryId}
+          data-mapping={giscus.mapping}
+          data-strict={giscus.strict}
+          data-reactions-enabled={giscus.reactionsEnabled}
+          data-emit-metadata={giscus.emitMetadata}
+          data-input-position={giscus.inputPosition}
+          data-theme="light"
+          data-lang={giscus.lang}
+          crossorigin="anonymous"
+          async
+        />
+      </div>
+      <script is:inline>
+        (function () {
+          function sendMessage(message) {
+            var iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe || !iframe.contentWindow) return;
+            iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+          }
+          window.addEventListener('themechange', function (e) {
+            var theme = e.detail && e.detail.theme === 'dark' ? 'dark' : 'light';
+            sendMessage({ setConfig: { theme: theme } });
+          });
+        })();
+      </script>
+    </section>
+  )
+}

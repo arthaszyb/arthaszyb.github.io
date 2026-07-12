@@ -1,0 +1,30 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getPublishedPosts } from '../../lib/posts';
+
+export const getStaticPaths = (async ({ paginate }) => {
+  const posts = await getPublishedPosts();
+  return paginate(posts, { pageSize: 20 });
+}) satisfies GetStaticPaths;
+
+const { page } = Astro.props;
+---
+
+<BaseLayout title="文章" description="全部文章列表">
+  <div class="wrap-wide">
+    <h1>文章</h1>
+    <p class="kicker">第 {page.currentPage} / {page.lastPage} 页 · 共 {page.total} 篇</p>
+
+    <ul class="post-list">
+      {page.data.map((post) => <PostCard post={post} />)}
+    </ul>
+
+    <nav class="pager" aria-label="分页导航">
+      {page.url.prev && <a href={page.url.prev}>&larr; 上一页</a>}
+      {page.url.prev && page.url.next && <span>&nbsp;·&nbsp;</span>}
+      {page.url.next && <a href={page.url.next}>下一页 &rarr;</a>}
+    </nav>
+  </div>
+</BaseLayout>

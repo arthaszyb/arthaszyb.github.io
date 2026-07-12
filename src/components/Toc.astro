@@ -1,0 +1,51 @@
+---
+export interface TocHeading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  headings: TocHeading[];
+  variant: 'inline' | 'aside';
+}
+
+const { headings, variant } = Astro.props;
+
+// Only h2/h3 go into the TOC per the design spec.
+const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+{
+  items.length > 0 && variant === 'inline' && (
+    <details class="toc-inline">
+      <summary>目录</summary>
+      <nav aria-label="文章目录">
+        <ul>
+          {items.map((h) => (
+            <li class:list={{ 'toc-h3': h.depth === 3 }}>
+              <a href={`#${h.slug}`}>{h.text}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </details>
+  )
+}
+
+{
+  items.length > 0 && variant === 'aside' && (
+    <aside class="toc-aside" aria-label="文章目录">
+      <h2>目录</h2>
+      <nav>
+        <ul>
+          {items.map((h) => (
+            <li class:list={{ 'toc-h3': h.depth === 3 }}>
+              <a href={`#${h.slug}`}>{h.text}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </aside>
+  )
+}

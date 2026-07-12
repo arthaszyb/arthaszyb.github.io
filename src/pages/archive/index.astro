@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPublishedPosts, slugFromId } from '../../lib/posts';
+
+const posts = await getPublishedPosts(); // already sorted newest-first
+
+const byYear = new Map<number, typeof posts>();
+for (const post of posts) {
+  const year = post.data.date.getUTCFullYear();
+  if (!byYear.has(year)) byYear.set(year, []);
+  byYear.get(year)!.push(post);
+}
+const years = [...byYear.keys()].sort((a, b) => b - a);
+---
+
+<BaseLayout title="归档" description="按年份归档的全部文章">
+  <div class="wrap-wide">
+    <h1>归档</h1>
+    <p class="kicker">共 {posts.length} 篇</p>
+
+    {
+      years.map((year) => (
+        <section class="archive-year">
+          <h2>{year}</h2>
+          <ul class="archive-list">
+            {byYear.get(year)!.map((post) => (
+              <li>
+                <time datetime={post.data.date.toISOString().slice(0, 10)}>
+                  {post.data.date.toISOString().slice(0, 10)}
+                </time>
+                <a href={`/posts/${slugFromId(post.id)}/`}>{post.data.title}</a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))
+    }
+  </div>
+</BaseLayout>

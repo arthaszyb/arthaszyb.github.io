@@ -1,0 +1,46 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from './BaseLayout.astro';
+import Toc, { type TocHeading } from '../components/Toc.astro';
+import TagChips from '../components/TagChips.astro';
+import RelatedPosts from '../components/RelatedPosts.astro';
+import Giscus from '../components/Giscus.astro';
+import { categoryDisplayName } from '../data/categories';
+
+interface Props {
+  entry: CollectionEntry<'blog'>;
+  headings: TocHeading[];
+  related: CollectionEntry<'blog'>[];
+}
+
+const { entry, headings, related } = Astro.props;
+const { title, description, date, category, tags, minutesRead } = entry.data;
+const dateStr = date.toISOString().slice(0, 10);
+---
+
+<BaseLayout title={title} description={description} type="article" publishedTime={date}>
+  <div class="post-shell">
+    <article>
+      <h1>{title}</h1>
+      <p class="post-meta-line">
+        <time datetime={dateStr}>{dateStr}</time>
+        &nbsp;·&nbsp;
+        {minutesRead ?? 1} 分钟阅读
+        &nbsp;·&nbsp;
+        <a href={`/topics/${category}/`}>{categoryDisplayName(category)}</a>
+      </p>
+
+      <Toc headings={headings} variant="inline" />
+
+      <slot />
+
+      <TagChips tags={tags} />
+
+      <RelatedPosts posts={related} />
+
+      <Giscus />
+    </article>
+
+    <Toc headings={headings} variant="aside" />
+  </div>
+</BaseLayout>
