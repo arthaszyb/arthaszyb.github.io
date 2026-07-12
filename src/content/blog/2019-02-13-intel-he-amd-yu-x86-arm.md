@@ -1,24 +1,40 @@
 ---
-title: Intel和AMD 与 x86，ARM，MIPS有什么区别？
+title: Intel和AMD 与 x86、ARM、MIPS的区别
 date: '2019-02-13'
-description: >-
-  Intel和AMD 与 x86，ARM，MIPS有什么区别 作者：零度君 链接：
-  https://www.zhihu.com/question/63627218/answer/211243489 来源：知乎 著作权归作者所有。
-  商业转载请联系作者获得授权，非商业转载请注明出处。
+description: 对Intel和AMD两家公司与CPU架构（x86、ARM、MIPS）的关系进行梳理，说明各架构的设计思路和应用场景。
 category: ai
-tags:
-  - ssl-tls
+tags: []
 draft: false
+origin_url: https://www.zhihu.com/question/63627218/answer/211243489
 source: evernote-local-db
 lang: zh
 ---
-Intel和AMD 与 x86，ARM，MIPS有什么区别
-作者：零度君
-链接：
-https://www.zhihu.com/question/63627218/answer/211243489
-来源：知乎
-著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
-作为一个业余的计算机爱好者，稍微说一下我的理解
+## AMD和Intel
+
+AMD和Intel都是x86/x86-64架构CPU的主要厂商。Intel早期开发了x86架构，AMD获得授权也开发x86。Intel向64位过渡时推出ia64，但因与x86不兼容市场反应差。AMD率先推出x86的64位兼容版本（x86-64），后来Intel也获得授权并采用。由于AMD先推出，所以x86-64也称为amd64。
+
+除Intel和AMD外，还有VIA等少数公司有x86授权，但技术水平一般。
+
+## x86、ARM和MIPS
+
+早期CPU有两种设计思路：
+
+- **CISC（复杂指令集）**：CPU逻辑电路复杂，可直接硬件实现复杂指令。x86是CISC的代表。
+- **RISC（精简指令集）**：CPU设计简单，依靠简单指令组合完成复杂操作。ARM和MIPS是RISC典型代表。
+
+现代x86逐步引入RISC理念，通过指令模块化改进内部实现。x86主要产品有Intel的至强、酷睿等，AMD的锐龙等。
+
+## ARM架构
+
+ARM是RISC典型代表，但发展中引入了部分复杂指令。ARM专利在ARM公司，高通、三星、苹果等需获得授权。ARM贵在便宜低功耗。
+
+## MIPS架构
+
+MIPS是学院派CPU，授权门槛低，广泛用于嵌入式领域（如路由器）。最活跃的是中国的龙芯，其LoongISA架构是MIPS的扩展。
+
+## 性能对比
+
+目前MIPS和ARM的性能与x86差距较大，但ARM优势是功耗低，MIPS的纯计算能力较强。此外还有Power CPU（RISC）和Alpha架构（侧重超算，如申威）等。
 先说amd和intel
 amd和Intel这俩公司的渊源很深，早期时Intel先是自己搞了个x86架构，然后amd拿到了x86的授权也可以自己做x86了。接着intel向64位过渡的时候自己搞了个ia64（x64架构）但是因为和x86架构不兼容市场反应极差，amd率先搞了x86的64位兼容（32和64的混合架构）也就是后来的x86-64，后来Intel也拿到了生产这货的授权（i和a两家专利交叉的很严重），也搞了x86-64，因为amd先搞出来的所以x86-64也叫amd64
 目前amd和Intel是世界上最大的两家x86和x86-64的cpu厂家（intel比较给力，四分天下有其三）。除了这两家还有几家小的公司也有x86的授权，比如via，不过技术水平真的很一般。

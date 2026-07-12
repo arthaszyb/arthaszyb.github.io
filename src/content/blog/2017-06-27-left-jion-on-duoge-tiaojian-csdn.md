@@ -1,15 +1,11 @@
 ---
-title: left jion on(多个条件)-CSDN论坛-CSDN.NET-中国最大的IT技术社区
+title: left join on多个条件
 date: '2017-06-27'
-description: '星期二, 六月 27, 2017 12:42 上午 已剪辑自 : http://bbs.csdn.net/topics/391073783'
+description: CSDN论坛帖子，关于在SQL的LEFT JOIN中使用多个条件时的讨论。
 category: bigdata
 tags: []
-draft: false
+draft: true
+origin_url: http://bbs.csdn.net/topics/391073783
 source: evernote-local-db
 lang: zh
 ---
-星期二, 六月 27, 2017
-12:42 上午
-已剪辑自
-:
-http://bbs.csdn.net/topics/391073783

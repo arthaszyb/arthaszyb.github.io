@@ -1,26 +1,15 @@
 ---
 title: 分布式系统的CAP理论
 date: '2019-01-07'
-description: >-
-  2015-12-03 分类： 分布式 阅读(24427) 评论(6) 阿里大牛珍藏架构资料，点击链接免费获取 2000年7月，加州大学伯克利分校的Eric
-  Brewer教授在ACM PODC会议上提出CAP猜想。 2年后，麻省理工学院的Seth Gilbert和Nancy Lynch从理论上证明了CAP。
+description: CAP理论是分布式系统设计的基础，介绍一致性、可用性和分区容错性的定义、权衡方式及现实系统中的应用选择。
 category: ai
 tags:
-  - redis
-  - 存储
-  - 负载均衡
+  - 分布式
   - 高可用
-  - 集群
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-2015-12-03
-分类：
-分布式
-阅读(24427)
-评论(6)
-阿里大牛珍藏架构资料，点击链接免费获取
 2000年7月，加州大学伯克利分校的Eric Brewer教授在ACM PODC会议上提出CAP猜想。2年后，麻省理工学院的Seth Gilbert和Nancy Lynch从理论上证明了CAP。之后，CAP理论正式成为分布式计算领域的公认定理。
 无论你是一个系统架构师，还是一个普通开发，当你开发或者设计一个分布式系统的时候，CAP理论是无论如何也绕不过去的。本文就来介绍一下到底什么是CAP理论，如何证明CAP理论，以及CAP的权衡问题。
 CAP理论概述

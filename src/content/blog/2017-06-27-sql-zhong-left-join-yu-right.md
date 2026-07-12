@@ -1,61 +1,40 @@
 ---
-title: >-
-  SQL中Left Join 与Right Join 与 Inner Join 与 Full Join的区别 - shadowyelling的专栏 -
-  博客频道 - CSDN.NET
+title: SQL中Left Join、Right Join、Inner Join、Full Join的区别
 date: '2017-06-27'
-description: >-
-  星期二, 六月 27, 2017 12:41 上午 已剪辑自 :
-  http://blog.csdn.net/shadowyelling/article/details/7684714
-  版权声明：本文为博主原创文章，未经博主允许不得转载。
+description: 对SQL中四种JOIN操作的类型和执行结果进行对比说明，通过建表示例演示各种JOIN的差异。
 category: bigdata
-tags: []
+tags:
+  - sql-join
 draft: false
+origin_url: http://blog.csdn.net/shadowyelling/article/details/7684714
 source: evernote-local-db
 lang: zh
 ---
-星期二, 六月 27, 2017
-12:41 上午
-已剪辑自
-:
-http://blog.csdn.net/shadowyelling/article/details/7684714
-版权声明：本文为博主原创文章，未经博主允许不得转载。
-首先看看Left Join 与Right Join 与 Inner Join 与 Full Join对表进行操作后得到的结果。
-在数据库中新建两张表，并插入要测试的数据。
-新建表：
+SQL中常用的JOIN操作类型及其区别。
+
+## JOIN类型概览
+
+- **LEFT JOIN**：返回左表中所有记录，以及右表中符合连接条件的记录。
+- **RIGHT JOIN**：返回右表中所有记录，以及左表中符合连接条件的记录。
+- **INNER JOIN**：仅返回两表中都符合连接条件的记录。
+- **FULL JOIN**：返回两表中的所有记录（LEFT JOIN + RIGHT JOIN的并集）。
+
+## 示例表结构
+
+创建两个测试表EMP和SAL：
 
 ```sql
 USE [Test]
 GO
-/******
-对象
-: Table [dbo].[EMP]
-脚本日期
-: 06/22/2012 15:37:28 ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
 CREATE TABLE [dbo].[EMP](
-[ENAME] [nchar](10) COLLATE Chinese_PRC_CI_AS NOT NULL,
-[CITY] [nchar](10) COLLATE Chinese_PRC_CI_AS NULL
+  [ENAME] [nchar](10) COLLATE Chinese_PRC_CI_AS NOT NULL,
+  [CITY] [nchar](10) COLLATE Chinese_PRC_CI_AS NULL
 ) ON [PRIMARY]
-USE [Test]
-GO
-/******
-对象
-: Table [dbo].[SAL]
-脚本日期
-: 06/22/2012 15:38:04 ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
+
 CREATE TABLE [dbo].[SAL](
-[ENAME] [nchar](10) COLLATE Chinese_PRC_CI_AS NOT NULL,
-[SALARY] [money] NULL
+  [ENAME] [nchar](10) COLLATE Chinese_PRC_CI_AS NOT NULL,
+  [SALARY] [money] NULL
 ) ON [PRIMARY]
 ```
 
-插入数据得到的表：
-EMP表：
-SAL表：
+通过在这两表上执行不同的JOIN操作，可以观察各种JOIN方式的结果差异。
