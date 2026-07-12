@@ -1,4 +1,48 @@
+# 欢迎搜索引擎与 AI/LLM 爬虫。
+# 面向大模型的站点导览：https://arthaszyb.github.io/llms.txt
+# 全量文章索引：https://arthaszyb.github.io/llms-full.txt
+
 User-agent: *
+Allow: /
+
+# 显式放行主要 AI 爬虫（与上面的通配规则一致，仅作明确声明）
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: meta-externalagent
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: Bytespider
 Allow: /
 
 Sitemap: https://arthaszyb.github.io/sitemap-index.xml
