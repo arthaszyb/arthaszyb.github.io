@@ -27,6 +27,11 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
+    "file-type": "^22.0.1",
+    "gray-matter": "^4.0.3",
+    "pinyin-pro": "^3.28.1",
+    "turndown": "^7.2.4",
+    "turndown-plugin-gfm": "^1.0.2",
     "typescript": "^5.9.3"
   }
 }
