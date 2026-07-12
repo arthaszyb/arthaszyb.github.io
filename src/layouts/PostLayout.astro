@@ -18,7 +18,7 @@ const { title, description, date, category, tags, minutesRead } = entry.data;
 const dateStr = date.toISOString().slice(0, 10);
 ---
 
-<BaseLayout title={title} description={description} type="article" publishedTime={date}>
+<BaseLayout title={title} description={description} type="article" publishedTime={date} tags={tags}>
   <div class="post-shell">
     <article>
       <h1>{title}</h1>
