@@ -14,7 +14,7 @@ interface Props {
 }
 
 const { entry, headings, related } = Astro.props;
-const { title, description, date, category, tags, minutesRead } = entry.data;
+const { title, description, date, category, tags, minutesRead, origin_url } = entry.data;
 const dateStr = date.toISOString().slice(0, 10);
 ---
 
@@ -29,6 +29,15 @@ const dateStr = date.toISOString().slice(0, 10);
         &nbsp;·&nbsp;
         <a href={`/topics/${category}/`}>{categoryDisplayName(category)}</a>
       </p>
+
+      {
+        origin_url && (
+          <aside class="origin-note">
+            本文为摘录整理笔记，核心内容来自 <a href={origin_url} rel="nofollow external">原文</a>
+            ，摘要与整理为博主所加。
+          </aside>
+        )
+      }
 
       <Toc headings={headings} variant="inline" />
 
