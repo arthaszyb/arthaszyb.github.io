@@ -1,0 +1,27 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PostCard from '../../../components/PostCard.astro';
+import { getPublishedPosts } from '../../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  const tags = [...new Set(posts.flatMap((p) => p.data.tags))];
+  return tags.map((tag) => ({ params: { tag } }));
+}
+
+const { tag } = Astro.params;
+const allPosts = await getPublishedPosts();
+const posts = allPosts.filter((p) => p.data.tags.includes(tag!));
+---
+
+<BaseLayout title={`#${tag}`} description={`标签「${tag}」下的全部文章`}>
+  <div class="wrap-wide">
+    <p class="kicker">标签</p>
+    <h1>#{tag}</h1>
+    <p>{posts.length} 篇文章</p>
+    <ul class="post-list">
+      {posts.map((post) => <PostCard post={post} />)}
+    </ul>
+  </div>
+</BaseLayout>

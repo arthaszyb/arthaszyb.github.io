@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="搜索" description="全文搜索站内文章">
+  <div class="wrap-wide">
+    <h1>搜索</h1>
+    <p class="kicker">支持中文关键词，索引由 Pagefind 在构建时生成</p>
+
+    <div id="search" class="search-box"></div>
+  </div>
+
+  <link rel="stylesheet" href="/pagefind/pagefind-ui.css" />
+  <script is:inline src="/pagefind/pagefind-ui.js"></script>
+  <script is:inline>
+    window.addEventListener('DOMContentLoaded', function () {
+      if (typeof PagefindUI === 'undefined') return;
+      new PagefindUI({
+        element: '#search',
+        showSubResults: true,
+        showImages: false,
+      });
+    });
+  </script>
+</BaseLayout>
+
+<style is:global>
+  /* Restyle the Pagefind UI bundle to use the site's design tokens
+     instead of its default palette. */
+  #search {
+    --pagefind-ui-scale: 0.92;
+    --pagefind-ui-primary: var(--fg);
+    --pagefind-ui-text: var(--fg);
+    --pagefind-ui-background: var(--bg);
+    --pagefind-ui-border: var(--border);
+    --pagefind-ui-tag: var(--surface);
+    --pagefind-ui-font: var(--font-sans);
+  }
+</style>

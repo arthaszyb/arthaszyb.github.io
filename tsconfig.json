@@ -1,0 +1,23 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "include": [".astro/types.d.ts", "**/*"],
+  "exclude": [
+    "dist",
+    "node_modules",
+    "_posts",
+    "_layouts",
+    "_includes",
+    "assets",
+    "css",
+    "js",
+    "less",
+    "fonts",
+    "img",
+    "pwa",
+    "Gruntfile.js",
+    "sw.js"
+  ],
+  "compilerOptions": {
+    "strictNullChecks": true
+  }
+}

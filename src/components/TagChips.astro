@@ -1,0 +1,19 @@
+---
+interface Props {
+  tags: string[];
+}
+
+const { tags } = Astro.props;
+---
+
+{
+  tags.length > 0 && (
+    <p class="chip-row">
+      {tags.map((tag) => (
+        <a class="chip" href={`/tags/${tag}/`}>
+          #{tag}
+        </a>
+      ))}
+    </p>
+  )
+}

@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { site } from '../../data/site';
+---
+
+<BaseLayout
+  title="About"
+  description="About Sean Jho, a writer focused on systems, infrastructure, tooling, and engineering practice."
+>
+  <div class="wrap">
+    <p class="kicker">About</p>
+    <h1>About</h1>
+
+    <p><strong>Sean Jho</strong> 是这个站点使用的署名。这里主要写系统、基础设施、调试、数据库、网络、AI 工具以及工程实践相关内容。</p>
+
+    <p>写作偏好是长期可检索、可复用、能在几年后依然有价值的内容，而不是只针对短期热点的信息流。</p>
+
+    <p>站内文章的形式会比较自由，但前端只面向读者呈现内容本身，不展示内部维护流程或发布方式。</p>
+
+    <p>联系邮箱：<a href={`mailto:${site.email}`}>{site.email}</a></p>
+
+    <p>GitHub：<a href={site.github}>arthaszyb</a></p>
+  </div>
+</BaseLayout>
