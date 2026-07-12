@@ -1,31 +1,58 @@
 ---
-title: Linux查看进程运行的完整路径方法
+title: Linux 查看进程运行的完整路径方法
 date: '2014-05-27'
-description: >-
-  2013年12月16日 ⁄ CentOS, Linux ⁄ 共 278字 ⁄ 字号 小 中 大 ⁄ 暂无评论 ⁄ 阅读 899 次
-  通过ps及top命令查看进程信息时，只能查到相对路径，查不到的进程的详细信息，如绝对路径等。
+description: "通过 /proc 文件系统查看 Linux 进程的详细信息：进程完整路径、运行目录、命令行参数、环境变量、打开的文件等。"
 category: linux
-tags: []
+tags:
+  - linux-admin
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-2013年12月16日 ⁄ [CentOS](http://lovesoo.org/category/linux/centos), [Linux](http://lovesoo.org/category/linux) ⁄ 共 278字 ⁄ 字号 小 中 大 ⁄ [暂无评论](http://lovesoo.org/view-processes-running-linux-full-path-method.html#respond) ⁄ 阅读 899 次
 
-通过[ps](http://lovesoo.org/tag/ps)及[top](http://lovesoo.org/tag/top)命令查看进程信息时，只能查到[相对路径](http://lovesoo.org/tag/%e7%9b%b8%e5%af%b9%e8%b7%af%e5%be%84)，查不到的进程的详细信息，如[绝对路径](http://lovesoo.org/tag/%e7%bb%9d%e5%af%b9%e8%b7%af%e5%be%84)等。这时，我们需要通过以下的方法来查看进程的详细信息：
+## 问题
 
-[Linux](http://lovesoo.org/tag/linux)在启动一个进程时，系统会在/[proc](http://lovesoo.org/tag/proc)下创建一个以PID命名的文件夹，在该文件夹下会有我们的进程的信息，其中包括一个名为exe的文件即记录了[绝对路径](http://lovesoo.org/tag/%e7%bb%9d%e5%af%b9%e8%b7%af%e5%be%84)，通过[ll](http://lovesoo.org/tag/ll)或[ls](http://lovesoo.org/tag/ls) –l命令即可查看。
+使用 ps 和 top 命令查看进程信息时，只能看到相对路径，无法查看进程的绝对路径等详细信息。
 
-[ll](http://lovesoo.org/tag/ll) /[proc](http://lovesoo.org/tag/proc)/PID
+## 解决方案
 
-![](/images/legacy/legacy-ca69df79a7.png)
+Linux 启动进程时，系统会在 `/proc` 下创建一个以 PID 命名的文件夹，其中包含进程的完整信息。
 
-cwd符号链接的是进程运行目录；
+### 查看进程信息
 
-exe符号连接就是执行程序的[绝对路径](http://lovesoo.org/tag/%e7%bb%9d%e5%af%b9%e8%b7%af%e5%be%84)；
+```bash
+ll /proc/PID
+# 或
+ls -l /proc/PID
+```
 
-cmdline就是程序运行时输入的命令行命令；
+### /proc/PID 目录下的关键文件
 
-environ记录了进程运行时的环境变量；
+| 文件/目录 | 说明 |
+|----------|------|
+| `cwd` | 符号链接，指向进程运行目录（current working directory） |
+| `exe` | 符号链接，指向执行程序的绝对路径 |
+| `cmdline` | 进程运行时的完整命令行参数 |
+| `environ` | 进程运行时的环境变量 |
+| `fd` | 目录，包含进程打开或使用的文件的符号链接 |
 
-fd目录下是进程打开或使用的文件的符号连接。
+### 实践示例
+
+```bash
+# 查看 PID 1234 的进程信息
+ll /proc/1234
+
+# 查看进程的绝对路径
+ls -l /proc/1234/exe
+
+# 查看进程的命令行
+cat /proc/1234/cmdline
+
+# 查看进程的环境变量
+cat /proc/1234/environ
+
+# 查看进程打开的文件
+ls -l /proc/1234/fd
+```
+
+这样就可以获得进程的完整路径和详细运行信息。
