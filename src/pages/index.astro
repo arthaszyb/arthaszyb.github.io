@@ -3,11 +3,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import PostCard from '../components/PostCard.astro';
 import { getPublishedPosts, slugFromId } from '../lib/posts';
 import { categoryDisplayName } from '../data/categories';
-import { site } from '../data/site';
 
 const posts = await getPublishedPosts();
 const [featured, ...rest] = posts;
 const recent = rest.slice(0, 8);
+
+const earliestYear = posts[posts.length - 1]?.data.date.getFullYear() ?? 2013;
 
 const categoryCounts = new Map<string, number>();
 for (const post of posts) {
@@ -20,14 +21,24 @@ const topics = [...categoryCounts.entries()]
 
 <BaseLayout>
   <div class="wrap-wide">
-    <p class="kicker">Sean Jho</p>
-    <p>{site.description}</p>
+    <section class="hero">
+      <h1>你好，我是 Sean&ensp;👋</h1>
+      <p>
+        这里存放着我这些年积累下来的技术笔记——关于 Linux、基础设施、数据库和 AI
+        工具的实践与思考，也有少量读书与时事随笔。写下来，是为了把问题想清楚；
+        留在这里，是希望恰好对你也有用。
+      </p>
+      <p class="hero-meta">
+        自 {earliestYear} 年至今 · {posts.length} 篇笔记 ·
+        <a href="/rss.xml">RSS 订阅</a>
+      </p>
+    </section>
 
     {
       featured && (
         <section class="featured-card">
-          <p class="kicker">最新</p>
-          <h2 style="margin-top:0">
+          <p class="kicker">最新一篇</p>
+          <h2>
             <a href={`/posts/${slugFromId(featured.id)}/`}>{featured.data.title}</a>
           </h2>
           {featured.data.description && <p>{featured.data.description}</p>}
@@ -44,15 +55,15 @@ const topics = [...categoryCounts.entries()]
     </ul>
 
     <div class="section-heading">
-      <h2>主题</h2>
+      <h2>按主题漫游</h2>
       <a href="/topics/">全部主题 &rarr;</a>
     </div>
-    <div class="topic-grid">
+    <div class="topic-cloud">
       {
         topics.map((topic) => (
-          <a class="topic-card" href={`/topics/${topic.slug}/`}>
-            <div>{topic.name}</div>
-            <div class="topic-card__count">{topic.count} 篇</div>
+          <a class="topic-pill" href={`/topics/${topic.slug}/`}>
+            {topic.name}
+            <span class="topic-pill__count">{topic.count}</span>
           </a>
         ))
       }

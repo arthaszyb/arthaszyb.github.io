@@ -12,18 +12,12 @@ const slug = slugFromId(post.id);
 const dateStr = post.data.date.toISOString().slice(0, 10);
 ---
 
-<li class="post-card">
-  <h3 class="post-card__title"><a href={`/posts/${slug}/`}>{post.data.title}</a></h3>
-  <p class="post-card__meta">
-    <time datetime={dateStr}>{dateStr}</time>
-    &nbsp;·&nbsp;
+<li class="post-item">
+  <time class="post-item__date" datetime={dateStr}>{dateStr}</time>
+  <h3 class="post-item__title"><a href={`/posts/${slug}/`}>{post.data.title}</a></h3>
+  {post.data.description && <p class="post-item__desc">{post.data.description}</p>}
+  <p class="post-item__meta">
     <a href={`/topics/${post.data.category}/`}>{categoryDisplayName(post.data.category)}</a>
-    {post.data.minutesRead && (
-      <>
-        &nbsp;·&nbsp;
-        {post.data.minutesRead} 分钟阅读
-      </>
-    )}
+    {post.data.minutesRead && <> · {post.data.minutesRead} 分钟阅读</>}
   </p>
-  {post.data.description && <p class="post-card__desc">{post.data.description}</p>}
 </li>
