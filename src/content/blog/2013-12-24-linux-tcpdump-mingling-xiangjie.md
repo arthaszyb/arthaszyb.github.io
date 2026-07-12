@@ -1,14 +1,11 @@
 ---
-title: Linux tcpdump命令详解
+title: Linux tcpdump 命令详解
 date: '2013-12-24'
-description: 用这个命令，可以配合tcpdump抓包后打印出IP，对机器的性能影响比较小，不会写磁盘，纯内存操作，简单高效。
-category: shell
+description: tcpdump 抓包工具完整教程，包括命令选项、表达式过滤、协议解析、与 Wireshark 配合使用等，性能影响小、适合网络排查。
+category: linux
 tags:
-  - tcpdump
-  - dns
-  - ftp
-  - samba
-  - nfs
+  - 网络排查
+  - linux-admin
 draft: false
 source: evernote-local-db
 lang: zh

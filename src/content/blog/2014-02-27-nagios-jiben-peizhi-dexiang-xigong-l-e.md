@@ -1,13 +1,10 @@
 ---
-title: －Nagios基本配置的详细攻略
+title: Nagios 基本配置详解
 date: '2014-02-27'
-description: >-
-  10月6日 伪技术人员的成长历程之38－Nagios基本配置的详细攻略
-  这篇整个都是用来讲Nagios的localhost.cfg完整的基本功能定义配置，更重要的是要通过配置来理解Nagios的工作方式和原理。
-category: monitoring
+description: Nagios 监控系统的配置入门教程，详细讲解 localhost.cfg 的功能定义、工作原理和配置方法，通过实际配置加深理解。
+category: linux
 tags:
   - nagios
-  - ssl-tls
   - 监控告警
 draft: false
 source: evernote-local-db

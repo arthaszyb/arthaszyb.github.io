@@ -1,16 +1,11 @@
 ---
-title: Redis安装部署，配置详解
+title: Redis 安装部署与配置详解
 date: '2014-10-15'
-description: >-
-  分类： linux & & unix 2013-11-07 14:49 1700人阅读 评论 (0) 收藏 举报 memcached 内存分配 服务器 存储
-  面试 1.  概要 Redis 服务器环境的安装。 指导系统部署和维护使用， 以64 位Linux环境下安装使用 2.
+description: Redis 服务器的安装部署、配置详解与维护指南，覆盖 64 位 Linux 环境下的完整部署流程和关键参数配置。
 category: database
 tags:
   - redis
-  - memcached
-  - dns
-  - python
-  - ssl-tls
+  - linux-admin
 draft: false
 source: evernote-local-db
 lang: zh

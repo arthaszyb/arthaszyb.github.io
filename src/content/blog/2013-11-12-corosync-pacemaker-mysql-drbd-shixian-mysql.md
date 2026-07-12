@@ -1,226 +1,493 @@
 ---
-title: 'corosync+pacemaker+mysql+drbd 实现mysql的高可用2013-09-29 10:46:34'
+title: 'corosync + pacemaker + mysql + drbd 实现 MySQL 高可用'
 date: '2013-11-12'
-description: >-
-  corosync+pacemaker+mysql+drbd 实现mysql的高可用 2013-09-29 10:46:34 标签：corosync
-  pacemaker mysql drbd 原创作品，允许转载，转载时请务必以超链接形式标明文章 原始出处 、作者信息和本声明。 否则将追究法律责任。
+description: 通过 corosync + pacemaker + mysql + drbd 实现 MySQL 双节点高可用集群的完整部署方案，包括集群信息层、资源管理器、数据镜像和故障转移配置。
 category: linux
 tags:
   - mysql
-  - dns
-  - ssh
-  - shell-scripting
-  - lvm
+  - 高可用
+  - linux-admin
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: 'http://litaotao.blog.51cto.com/6224470/1303307'
 ---
+
 ![](/images/legacy/legacy-45212149b0.jpg)
 
-corosync+pacemaker+mysql+drbd 实现mysql的高可用
+高可用集群整体方案整理笔记，包含组件关系、安装配置和故障转移验证。
 
-2013-09-29 10:46:34
+## 环境
 
-标签：[corosync](http://blog.51cto.com/tag-corosync.html) [pacemaker](http://blog.51cto.com/tag-pacemaker.html) [mysql](http://blog.51cto.com/tag-mysql.html) [drbd](http://blog.51cto.com/tag-drbd.html)
+- OS: CentOS 6.x (RHEL 6.x)
+- kernel: 2.6.32-358.el6.x86_64
+- yum 源：
 
-原创作品，允许转载，转载时请务必以超链接形式标明文章 [原始出处](http://litaotao.blog.51cto.com/6224470/1303307) 、作者信息和本声明。否则将追究法律责任。[http://litaotao.blog.51cto.com/6224470/1303307](http://litaotao.blog.51cto.com/6224470/1303307)
+```ini
+[centos]
+name=sohu-centos
+baseurl=http://mirrors.sohu.com/centos/$releasever/os/$basearch
+gpgcheck=1
+enable=0
+gpgkey=http://mirrors.sohu.com/centos/RPM-GPG-KEY-CentOS-6
 
-**corosync+pacemaker+mysql+drbd 实现mysql的高可用**
+[epel]
+name=sohu-epel
+baseurl=http://mirrors.sohu.com/fedora-epel/$releasever/$basearch/
+enable=1
+gpgcheck=0
+```
 
-**\====================================**
-
-**一、了解各组件是什么以及之间的关系**
-
-**二、安装高可用集群的提前**
-
-**三、安装corosync+pacemaker**
-
-**四、编译安装mysql**
-
-**五、安装drbd**
-
-**六、mysql与drbd实现mysql数据的镜像**
-
-**七、利用crmsh配置mysql的高可用**
-
-**\====================================**
-
-**环境：**
-
-**OS：Centos 6.x(redhat 6.x)**
-
-**kernel:2.6.32-358.el6.x86\_64**
-
-**yum源:**
-
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div><div><span><span>6</span></span></div><div><span><span>7</span></span></div><div><span><span>8</span></span></div><div><span><span>9</span></span></div><div><span><span>10</span></span></div><div><span><span>11</span></span></div></td><td><div><span><span>[centos]</span></span></div><div><span><span>name=sohu-centos</span></span></div><div><span><span>baseurl=http://mirrors.sohu.com/centos/$releasever/os/$basearch</span></span></div><div><span><span>gpgcheck=1</span></span></div><div><span><span>enable=0</span></span></div><div><span><span>gpgkey=http://mirrors.sohu.com/centos/RPM-GPG-KEY-CentOS-6</span></span></div><div><span><span>[epel]</span></span></div><div><span><span>name=sohu-epel</span></span></div><div><span><span>baseurl=http://mirrors.sohu.com/fedora-epel/$releasever/$basearch/</span></span></div><div><span><span>enable=1</span></span></div><div><span><span>gpgcheck=0</span></span></div></td></tr></tbody></table>
-
-**拓扑图：**
+### 拓扑图
 
 ![](/images/legacy/legacy-5f9f9c6800.gif)
 
-**部分软件以附件的形式上传，mysql的源码包软件，网上很容易找**
+## 组件说明
 
-**望各位博友带着下面的疑问去实现corosync+pacemaker+mysql+drbd mysql的高可用？**
+**corosync**: 源自 OpenAIS 项目，实现 HA 心跳信息传输的集群信息层（Messaging Layer）工具，与 Heartbeat 并行流行。
 
-**1、corosync是什么？pacemaker是什么？corosync与pacemaker的关系？**
+**pacemaker**: 集群资源管理器 (CRM)，管理来自集群信息层的信息。常见的 CRM 有：
+- heartbeat v1 → haresources
+- heartbeat v2 → crm
+- heartbeat v3 → pacemaker
+- RHCS (cman) → rgmanager
 
-**2、 mysql与drbd之间的连接关系？**
-
-**3、 corosync、pacemaker、mysql、drbd之间的关系？**
-
-**4、提到高可用集群，广大博友们就会想到，高可用集群中资源之间是如何建立关系？各个节点会不会抢占资源使其出现脑裂(split-brain)？**
-
-**出现脑裂可以有fence设备自行解决**
-
-**一、了解各组件是什么以及之间的关系**
-
-**corosync：**corosync的由来是源于一个Openais的项目，是Openais的一个子 项目，可以实现HA心跳信息传输的功能，是众多实现HA集群软件中之一，heartbeat与corosync是流行的Messaging Layer （集群信息层）工具。而corosync是一个新兴的软件，相比Heartbeat这款很老很成熟的软件，corosync与Heartbeat各有优势，博主就不在这里比较之间的优势了，corosync相对于Heartbeat只能说现在比较流行。
-
-**pacemaker：**是众多集群资源管理器(Cluster Resource Manager)CRM中的一个，其主要功能是管理来着集群信息层发送来的信息。Pacemaker是集群的核心,它管理集群和集群信息. 集群信息更新通过Corosync通知到各个节点.
-
-**常见的CRM有:**
-
-**heartbeat v1-->haresources**
-
-**hearbeat v2--->crm**
-
-**hearbeat v3---->pacemaker**
-
-**RHCS(cman)----->rgmanager**
-
-**如下图corosync与pacemaker之间的关系：**
+corosync 与 pacemaker 的关系：
 
 ![](/images/legacy/legacy-fa51a8efe0.gif)
 
-**mysql：**一个开源的关系型数据库
-
-**drbd：**DRBD:(distributed replication block device)即分布式复制块设备。它的工作原理是：在A主机上有对指定磁盘设备写请求时，数据发送给A主机的kernel，然后通kernel中的一个模块，把相同的数据传送给B主机的kernel中一份，然后B主机再写入自己指定的磁盘设备，从而实现两主机数据的同步,也就实现了写操作高可用。类似于raid1一样，实现数据的镜像，DRBD一般是一主一从，并且所有的读写操作，挂载只能在主节点服务器上进行，，但是主从DRBD服务器之间是可以进行调换的。
-
-**各个组件之间的关系：其实mysql与drbd根本没有半毛钱的关系，而drbd与mysql相结合就有很重要的作用了，因为drbd实现数据的镜像，当drbd的主节点挂了之后，drbd的辅助节点还可以提供服务，但是主节点不会主动的切换到辅助的节点上面去，于是乎，高可用集群就派上用场了，因为资源定义为高可用的资源，主节点出现故障之后，高可用集群可以自动的切换到辅助节点上去，实现故障转移继续提供服务。**
-
-**二、安装高可用集群的提前准备**
-
-**1）、hosts文件**
-
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div><div><span><span>6</span></span></div><div><span><span>7</span></span></div><div><span><span>8</span></span></div><div><span><span>9</span></span></div><div><span><span>10</span></span></div><div><span><span>11</span></span></div><div><span><span>12</span></span></div></td><td><div><span><span> #把主机名改成jie2.com</span></span></div><div><span><span>[root@jie2 ~]# sed -i s/`grep HOSTNAME /etc/sysconfig/network |awk -F '=' '{print $2}'`/jie2.com/g /etc/sysconfig/network</span></span></div><div><span><span> #把主机名改成jie3.com</span></span></div><div><span><span>[root@jie3 ~]# sed -i s/`grep HOSTNAME /etc/sysconfig/network |awk -F '=' '{print $2}'`/jie3.com/g /etc/sysconfig/network</span></span></div><div><span><span>[root@jie2 ~]# cat >>/etc/hosts << EOF</span></span></div><div><span><span>>172.16.22.2 jie2.com jie2</span></span></div><div><span><span>>172.16.22.3 jie3.com jie3</span></span></div><div><span><span>>EOF</span></span></div><div><span><span>[root@jie3 ~]# cat >>/etc/hosts << EOF</span></span></div><div><span><span>>172.16.22.2 jie2.com jie2</span></span></div><div><span><span>>172.16.22.3 jie3.com jie3</span></span></div><div><span><span>>EOF</span></span></div></td></tr></tbody></table>
-
-**2）、ssh互信**
-
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div></td><td><div><span><span>[root@jie2 ~]# ssh-keygen -t rsa -P ''</span></span></div><div><span><span>[root@jie2 ~]# ssh-copy-id -i .ssh/id_rsa.pub jie3</span></span></div><div><span><span>[root@jie3 ~]# ssh-keygen -t rsa -P ''</span></span></div><div><span><span>[root@jie3 ~]# ssh-copy-id -i .ssh/id_rsa.pub jie2</span></span></div></td></tr></tbody></table>
-
-**3）、关闭NetworkManger**
-
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div><div><span><span>6</span></span></div></td><td><div><span><span>[root@jie2 ~]# chkconfig --del NetworkManager</span></span></div><div><span><span>[root@jie2 ~]# chkconfig NetworkManager off</span></span></div><div><span><span>[root@jie2 ~]# service NetworkManager stop</span></span></div><div><span><span>[root@jie3 ~]# chkconfig --del NetworkManager</span></span></div><div><span><span>[root@jie3 ~]# chkconfig NetworkManager off</span></span></div><div><span><span>[root@jie3 ~]# service NetworkManager stop</span></span></div></td></tr></tbody></table>
-
-**4）、时间同步(博主用的是自己的ntp时间服务器)**
-
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div></td><td><div><span><span>[root@jie2 ~]#ntpdate 172.16.0.1</span></span></div><div><span><span>[root@jie3 ~]#ntpdate 172.16.0.1</span></span></div></td></tr></tbody></table>
-
-**三、安装corosync+pacemaker**
-
-**1）、安装corosync+pacemaker**
-
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div><div><span><span>6</span></span></div></td><td><div><span><span> #节点jie2.com的操作</span></span></div><div><span><span>[root@jie2 ~]# yum -y install corosync pacemaker</span></span></div><div><span><span>[root@jie2 ~]# yum -y --nogpgcheck install crmsh-1.2.6-4.el6.x86_64.rpm pssh-2.3.1-2.el6.x86_64.rpm #提供crmsh命令接口的软件</span></span></div><div><span><span> #节点jie3.com的操作</span></span></div><div><span><span>[root@jie3 ~]# yum -y install corosync pacemaker</span></span></div><div><span><span>[root@jie3 ~]# yum -y --nogpgcheck install crmsh-1.2.6-4.el6.x86_64.rpm pssh-2.3.1-2.el6.x86_64.rpm</span></span></div></td></tr></tbody></table>
-
-**2）、修改配置文件和生成认证文件**
-
-**配置文件**
-
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div><div><span><span>6</span></span></div><div><span><span>7</span></span></div><div><span><span>8</span></span></div><div><span><span>9</span></span></div><div><span><span>10</span></span></div><div><span><span>11</span></span></div><div><span><span>12</span></span></div><div><span><span>13</span></span></div><div><span><span>14</span></span></div><div><span><span>15</span></span></div><div><span><span>16</span></span></div><div><span><span>17</span></span></div><div><span><span>18</span></span></div><div><span><span>19</span></span></div><div><span><span>20</span></span></div><div><span><span>21</span></span></div><div><span><span>22</span></span></div><div><span><span>23</span></span></div><div><span><span>24</span></span></div><div><span><span>25</span></span></div><div><span><span>26</span></span></div><div><span><span>27</span></span></div><div><span><span>28</span></span></div><div><span><span>29</span></span></div><div><span><span>30</span></span></div><div><span><span>31</span></span></div><div><span><span>32</span></span></div><div><span><span>33</span></span></div><div><span><span>34</span></span></div><div><span><span>35</span></span></div><div><span><span>36</span></span></div><div><span><span>37</span></span></div><div><span><span>38</span></span></div><div><span><span>39</span></span></div><div><span><span>40</span></span></div><div><span><span>41</span></span></div><div><span><span>42</span></span></div><div><span><span>43</span></span></div><div><span><span>44</span></span></div></td><td><div><span><span> #节点jie2.com的操作</span></span></div><div><span><span>[root@jie2 ~]# cd /etc/corosync/</span></span></div><div><span><span>[root@jie2 corosync]# mv corosync.conf.example corosync.conf</span></span></div><div><span><span>[root@jie2 corosync]# vim corosync.conf</span></span></div><div><span><span># Please read the corosync.conf.5 manual page</span></span></div><div><span><span>compatibility: whitetank</span></span></div><div><span><span>totem { #心跳信息传递层</span></span></div><div><span><span> version: 2 #版本</span></span></div><div><span><span> secauth: on #认证信息 一般on</span></span></div><div><span><span> threads: 0 #线程</span></span></div><div><span><span> interface { #定义心跳信息传递的接口</span></span></div><div><span><span> ringnumber: 0</span></span></div><div><span><span> bindnetaddr: 172.16.0.0 #绑定的网络地址，写网络地址</span></span></div><div><span><span> mcastaddr: 226.94.1.1 #多播地址</span></span></div><div><span><span> mcastport: 5405 #多播的端口</span></span></div><div><span><span> ttl: 1 #生存周期</span></span></div><div><span><span> }</span></span></div><div><span><span>}</span></span></div><div><span><span>logging { #日志</span></span></div><div><span><span> fileline: off</span></span></div><div><span><span> to_stderr: no #是否输出在屏幕上</span></span></div><div><span><span> to_logfile: yes</span></span><span><span>#</span></span><span style="font-family: "Microsoft YaHei";"><span>定义自己的日志</span></span></div><div><span><span> to_syslog: no #是否由syslog记录日志</span></span></div><div><span><span> logfile: /var/log/cluster/corosync.log #日志文件的存放路径</span></span></div><div><span><span> debug: off</span></span></div><div><span><span> timestamp: on #时间戳是否关闭</span></span></div><div><span><span> logger_subsys {</span></span></div><div><span><span> subsys: AMF</span></span></div><div><span><span> debug: off</span></span></div><div><span><span> }</span></span></div><div><span><span>}</span></span></div><div><span><span>amf {</span></span></div><div><span><span> mode: disabled</span></span></div><div><span><span>}</span></span></div><div><span><span>service {</span></span></div><div><span><span> ver: 0</span></span></div><div><span><span> name: pacemaker #pacemaker作为corosync的插件进行工作</span></span></div><div><span><span>}</span></span></div><div><span><span>aisexec {</span></span></div><div><span><span> user: root</span></span></div><div><span><span> group: root</span></span></div><div><span><span>}</span></span></div><div><span><span>[root@jie2 corosync]# scp corosync.conf jie3:/etc/corosync/</span></span></div><div><span><span>##把节点jie2.com的配置文件copy到jie3.com中</span></span></div></td></tr></tbody></table>
-
-**认证文件**
-
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div><div><span><span>6</span></span></div><div><span><span>7</span></span></div><div><span><span>8</span></span></div></td><td><div><span><span> #节点jie2.com的操作</span></span></div><div><span><span>[root@jie2 corosync]# corosync-keygen</span></span></div><div><span><span>Corosync Cluster Engine Authentication key generator.</span></span></div><div><span><span>Gathering 1024 bits for</span></span><span><span>key from /dev/random.</span></span></div><div><span><span>Press keys on your keyboard to generate entropy (bits = 152).</span></span></div><div><span><span> #遇到这个情况，表示电脑的随机数不够，各位朋友可以不停的随便敲键盘，或者安装软件也可以生成随机数</span></span></div><div><span><span>[root@jie2 corosync]# scp authkey jie3:/etc/corosync/</span></span></div><div><span><span> #把认证文件也复制到jie3.com主机上</span></span></div></td></tr></tbody></table>
-
-**3）、开启服务和查看集群中的节点信息**
-
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div><div><span><span>6</span></span></div><div><span><span>7</span></span></div><div><span><span>8</span></span></div><div><span><span>9</span></span></div><div><span><span>10</span></span></div><div><span><span>11</span></span></div><div><span><span>12</span></span></div><div><span><span>13</span></span></div><div><span><span>14</span></span></div><div><span><span>15</span></span></div><div><span><span>16</span></span></div><div><span><span>17</span></span></div><div><span><span>18</span></span></div><div><span><span>19</span></span></div><div><span><span>20</span></span></div><div><span><span>21</span></span></div><div><span><span>22</span></span></div></td><td><div><span><span> #节点jie2.com的操作</span></span></div><div><span><span>[root@jie2 ~]# service corosync start</span></span></div><div><span><span>Starting Corosync Cluster Engine (corosync): [ OK ]</span></span></div><div><span><span>[root@jie2 ~]# crm status</span></span></div><div><span><span>Last updated: Thu Aug 8 14:43:13 2013</span></span></div><div><span><span>Last change: Sun Sep 1 16:41:18 2013 via crm_attribute on jie3.com</span></span></div><div><span><span>Stack: classic openais (with plugin)</span></span></div><div><span><span>Current DC: jie3.com - partition with quorum</span></span></div><div><span><span>Version: 1.1.8-7.el6-394e906</span></span></div><div><span><span>2 Nodes configured, 2 expected votes</span></span></div><div><span><span>Online: [ jie2.com jie3.com ]</span></span></div><div><span><span> #节点jie3.com的操作</span></span></div><div><span><span>[root@jie3 ~]# service corosync start</span></span></div><div><span><span>Starting Corosync Cluster Engine (corosync): [ OK ]</span></span></div><div><span><span>[root@jie3 ~]# crm status</span></span></div><div><span><span>Last updated: Thu Aug 8 14:43:13 2013</span></span></div><div><span><span>Last change: Sun Sep 1 16:41:18 2013 via crm_attribute on jie3.com</span></span></div><div><span><span>Stack: classic openais (with plugin)</span></span></div><div><span><span>Current DC: jie3.com - partition with quorum</span></span></div><div><span><span>Version: 1.1.8-7.el6-394e906</span></span></div><div><span><span>2 Nodes configured, 2 expected votes</span></span></div><div><span><span>Online: [ jie2.com jie3.com ]</span></span></div></td></tr></tbody></table>
-
-**四、编译安装mysql(两个节点的操作过程都是一样)**
-
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div><div><span><span>6</span></span></div><div><span><span>7</span></span></div><div><span><span>8</span></span></div><div><span><span>9</span></span></div><div><span><span>10</span></span></div><div><span><span>11</span></span></div><div><span><span>12</span></span></div><div><span><span>13</span></span></div><div><span><span>14</span></span></div><div><span><span>15</span></span></div><div><span><span>16</span></span></div><div><span><span>17</span></span></div><div><span><span>18</span></span></div><div><span><span>19</span></span></div><div><span><span>20</span></span></div><div><span><span>21</span></span></div><div><span><span>22</span></span></div><div><span><span>23</span></span></div><div><span><span>24</span></span></div><div><span><span>25</span></span></div></td><td><div><span><span> #节点jie2.com的操作</span></span></div><div><span><span>#1)、解压编译安装</span></span></div><div><span><span>[root@jie2 ~]# tar xf mysql-5.5.33.tar.gz</span></span></div><div><span><span>[root@jie2 ~]# yum -y groupinstall "Development tools" "Server Platform Development"</span></span></div><div><span><span>[root@jie2 ~]# cd mysql-5.5.33</span></span></div><div><span><span>[root@jie2 mysql-5.5.33]# yum -y install cmake</span></span></div><div><span><span>[root@jie2 mysql-5.5.33]# cmake . -DCMAKE_INSTALL_PREFIX=/usr/local/mysql \</span></span></div><div><span><span>-DMYSQL_DATADIR=/mydata/data</span></span><span><span>-DSYSCONFDIR=/etc</span></span><span><span>\</span></span></div><div><span><span>-DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_ARCHIVE_STORAGE_ENGINE=1 \</span></span></div><div><span><span>-DWITH_BLACKHOLE_STORAGE_ENGINE=1 -DWITH_READLINE=1 -DWITH_SSL=system \</span></span></div><div><span><span>-DWITH_ZLIB=system -DWITH_LIBWRAP=0 -DMYSQL_UNIX_ADDR=/tmp/mysql.sock \</span></span></div><div><span><span>-DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci</span></span></div><div><span><span>[root@jie2 mysql-5.5.33]# make && make install</span></span></div><div><span><span>#2)、建立配置文件和脚本文件</span></span></div><div><span><span>[root@jie2 mysql-5.5.33]# cp /usr/local/mysql/support-files/my-large.cnf /etc/my.cnf</span></span></div><div><span><span>[root@jie2 mysql-5.5.33]# cp /usr/local/mysql/support-files/mysql.server /etc/rc.d/init.d/mysqld</span></span></div><div><span><span>[root@jie2 mysql-5.5.33]# cd /usr/local/mysql/</span></span></div><div><span><span>[root@jie2 mysql]# useradd -r -u 306 mysql</span></span></div><div><span><span>[root@jie2 mysql]# chown -R root:mysql ./*</span></span></div><div><span><span>#3)、关联系统识别的路径</span></span></div><div><span><span>[root@jie2 mysql]#echo "PATH=/usr/local/mysql/bin:$PATH" >/etc/profile.d/mysqld.sh</span></span></div><div><span><span>[root@jie2 mysql]#source /etc/profile.d/mysqld.sh</span></span></div><div><span><span>[root@jie2 mysql]#echo "/usr/local/mysql/lib" >/etc/ld.so.conf.d/mysqld.conf</span></span></div><div><span><span>[root@jie2 mysql]#ldconfig -v | grep mysql</span></span></div><div><span><span>[root@jie2 mysql]#ln -sv /usr/local/mysql/include/ /usr/local/mysqld</span></span></div></td></tr></tbody></table>
-
-先别初始化数据库，安装drbd把drbd挂载到目录下，然后初始化数据库把数据库的数据存放到drbd挂载的目录。
-
-**五、安装drbd**
-
-**安装rpm包的drbd软件必须保证找相同内核版本的drbd-kmdl软件**
-
-**1）、先划分一个分区，此分区做成drbd镜像(RHEL 6.x的重新格式化一个新的分区之后要重启系统）**
-
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div><div><span><span>6</span></span></div><div><span><span>7</span></span></div><div><span><span>8</span></span></div><div><span><span>9</span></span></div><div><span><span>10</span></span></div><div><span><span>11</span></span></div><div><span><span>12</span></span></div><div><span><span>13</span></span></div><div><span><span>14</span></span></div><div><span><span>15</span></span></div><div><span><span>16</span></span></div><div><span><span>17</span></span></div><div><span><span>18</span></span></div><div><span><span>19</span></span></div><div><span><span>20</span></span></div><div><span><span>21</span></span></div><div><span><span>22</span></span></div><div><span><span>23</span></span></div><div><span><span>24</span></span></div></td><td><div><span><span> #节点jie2.com的操作</span></span></div><div><span><span>[root@jie2 ~]# fdisk /dev/sda</span></span></div><div><span><span>Command (m for</span></span><span><span>help): n</span></span></div><div><span><span>Command action</span></span></div><div><span><span> e extended</span></span></div><div><span><span> p primary partition (1-4)</span></span></div><div><span><span>p</span></span></div><div><span><span>Partition number (1-4): 3</span></span></div><div><span><span>First cylinder (7859-15665, default 7859):</span></span></div><div><span><span>Using default value 7859</span></span></div><div><span><span>Last cylinder, +cylinders or +size{K,M,G} (7859-15665, default 15665): +5G</span></span></div><div><span><span>Command (m for</span></span><span><span>help): w</span></span></div><div><span><span> #节点jie3.com的操作</span></span></div><div><span><span>[root@jie3 ~]# fdisk /dev/sda</span></span></div><div><span><span>Command (m for</span></span><span><span>help): n</span></span></div><div><span><span>Command action</span></span></div><div><span><span> e extended</span></span></div><div><span><span> p primary partition (1-4)</span></span></div><div><span><span>p</span></span></div><div><span><span>Partition number (1-4): 3</span></span></div><div><span><span>First cylinder (7859-15665, default 7859):</span></span></div><div><span><span>Using default value 7859</span></span></div><div><span><span>Last cylinder, +cylinders or +size{K,M,G} (7859-15665, default 15665): +5G</span></span></div><div><span><span>Command (m for</span></span><span><span>help): w</span></span></div></td></tr></tbody></table>
-
-**2）、安装drbd和修改配置文件**
-
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div><div><span><span>6</span></span></div><div><span><span>7</span></span></div><div><span><span>8</span></span></div><div><span><span>9</span></span></div><div><span><span>10</span></span></div><div><span><span>11</span></span></div><div><span><span>12</span></span></div><div><span><span>13</span></span></div><div><span><span>14</span></span></div><div><span><span>15</span></span></div><div><span><span>16</span></span></div><div><span><span>17</span></span></div><div><span><span>18</span></span></div><div><span><span>19</span></span></div><div><span><span>20</span></span></div><div><span><span>21</span></span></div><div><span><span>22</span></span></div><div><span><span>23</span></span></div><div><span><span>24</span></span></div><div><span><span>25</span></span></div><div><span><span>26</span></span></div><div><span><span>27</span></span></div><div><span><span>28</span></span></div><div><span><span>29</span></span></div><div><span><span>30</span></span></div><div><span><span>31</span></span></div><div><span><span>32</span></span></div><div><span><span>33</span></span></div><div><span><span>34</span></span></div><div><span><span>35</span></span></div><div><span><span>36</span></span></div><div><span><span>37</span></span></div><div><span><span>38</span></span></div><div><span><span>39</span></span></div><div><span><span>40</span></span></div><div><span><span>41</span></span></div><div><span><span>42</span></span></div><div><span><span>43</span></span></div><div><span><span>44</span></span></div><div><span><span>45</span></span></div><div><span><span>46</span></span></div><div><span><span>47</span></span></div><div><span><span>48</span></span></div><div><span><span>49</span></span></div><div><span><span>50</span></span></div><div><span><span>51</span></span></div><div><span><span>52</span></span></div><div><span><span>53</span></span></div><div><span><span>54</span></span></div><div><span><span>55</span></span></div><div><span><span>56</span></span></div><div><span><span>57</span></span></div><div><span><span>58</span></span></div><div><span><span>59</span></span></div><div><span><span>60</span></span></div><div><span><span>61</span></span></div><div><span><span>62</span></span></div><div><span><span>63</span></span></div><div><span><span>64</span></span></div><div><span><span>65</span></span></div><div><span><span>66</span></span></div><div><span><span>67</span></span></div><div><span><span>68</span></span></div></td><td><div><span><span>#1)、安装drbd</span></span></div><div><span><span> #节点jie2.com的操作</span></span></div><div><span><span>[root@jie2 ~]# rpm -ivh drbd-kmdl-2.6.32-358.el6-8.4.3-33.el6.x86_64.rpm</span></span></div><div><span><span>warning: drbd-kmdl-2.6.32-358.el6-8.4.3-33.el6.x86_64.rpm: Header V4 DSA/SHA1</span></span><span><span>Signature, key ID 66534c2b: NOKEY</span></span></div><div><span><span>Preparing... ################################# [100%]</span></span></div><div><span><span>[root@jie2 ~]# rpm -ivh drbd-8.4.3-33.el6.x86_64.rpm</span></span></div><div><span><span>warning: drbd-8.4.3-33.el6.x86_64.rpm: Header V4 DSA/SHA1</span></span><span><span>Signature, key ID 66534c2b: NOKEY</span></span></div><div><span><span>Preparing... ################################## [100%]</span></span></div><div><span><span> #节点jie3.com的操作</span></span></div><div><span><span>[root@jie3 ~]# rpm -ivh drbd-kmdl-2.6.32-358.el6-8.4.3-33.el6.x86_64.rpm</span></span></div><div><span><span>warning: drbd-kmdl-2.6.32-358.el6-8.4.3-33.el6.x86_64.rpm: Header V4 DSA/SHA1</span></span><span><span>Signature, key ID 66534c2b: NOKEY</span></span></div><div><span><span>Preparing... ################################# [100%]</span></span></div><div><span><span>[root@jie3 ~]# rpm -ivh drbd-8.4.3-33.el6.x86_64.rpm</span></span></div><div><span><span>warning: drbd-8.4.3-33.el6.x86_64.rpm: Header V4 DSA/SHA1</span></span><span><span>Signature, key ID 66534c2b: NOKEY</span></span></div><div><span><span>Preparing... ################################## [100%]</span></span></div><div><span><span>#2)、修改drbd的配置文件</span></span></div><div><span><span> #节点jie2.com的操作</span></span></div><div><span><span>[root@jie2 ~]# cd /etc/drbd.d/</span></span></div><div><span><span>[root@jie2 drbd.d]# cat global_common.conf #全局配置文件</span></span></div><div><span><span>global {</span></span></div><div><span><span> usage-count no;</span></span></div><div><span><span> # minor-count dialog-refresh disable-ip-verification</span></span></div><div><span><span>}</span></span></div><div><span><span>common {</span></span></div><div><span><span> protocol C;</span></span></div><div><span><span> handlers {</span></span></div><div><span><span> pri-on-incon-degr "/usr/lib/drbd/notify-pri-on-incon-degr.sh; /usr/lib/drbd/notify-emergency-reboot.sh; echo b > /proc/sysrq-trigger ; reboot -f";</span></span></div><div><span><span> pri-lost-after-sb "/usr/lib/drbd/notify-pri-lost-after-sb.sh; /usr/lib/drbd/notify-emergency-reboot.sh; echo b > /proc/sysrq-trigger ; reboot -f";</span></span></div><div><span><span> local-io-error "/usr/lib/drbd/notify-io-error.sh; /usr/lib/drbd/notify-emergency-shutdown.sh; echo o > /proc/sysrq-trigger ; halt -f";</span></span></div><div><span><span> # fence-peer "/usr/lib/drbd/crm-fence-peer.sh";</span></span></div><div><span><span> # split-brain "/usr/lib/drbd/notify-split-brain.sh root";</span></span></div><div><span><span> # out-of-sync "/usr/lib/drbd/notify-out-of-sync.sh root";</span></span></div><div><span><span> # before-resync-target "/usr/lib/drbd/snapshot-resync-target-lvm.sh -p 15 -- -c 16k";</span></span></div><div><span><span> # after-resync-target /usr/lib/drbd/unsnapshot-resync-target-lvm.sh;</span></span></div><div><span><span> }</span></span></div><div><span><span> startup {</span></span></div><div><span><span> #wfc-timeout 120;</span></span></div><div><span><span> #degr-wfc-timeout 120;</span></span></div><div><span><span> }</span></span></div><div><span><span> disk {</span></span></div><div><span><span> on-io-error detach;</span></span></div><div><span><span> #fencing resource-only;</span></span></div><div><span><span> }</span></span></div><div><span><span> net {</span></span></div><div><span><span> cram-hmac-alg "sha1";</span></span></div><div><span><span> shared-secret "mydrbdlab";</span></span></div><div><span><span> }</span></span></div><div><span><span> syncer {</span></span></div><div><span><span> rate 1000M;</span></span></div><div><span><span> }</span></span></div><div><span><span>}</span></span></div><div><span><span>[root@jie2 drbd.d]# cat mydata.res #资源配置文件</span></span></div><div><span><span>resource mydata {</span></span></div><div><span><span> on jie2.com {</span></span></div><div><span><span> device /dev/drbd0;</span></span></div><div><span><span> disk /dev/sda3;</span></span></div><div><span><span> address 172.16.22.2:7789;</span></span></div><div><span><span> meta-disk internal;</span></span></div><div><span><span> }</span></span></div><div><span><span> on jie3.com {</span></span></div><div><span><span> device /dev/drbd0;</span></span></div><div><span><span> disk /dev/sda3;</span></span></div><div><span><span> address 172.16.22.3:7789;</span></span></div><div><span><span> meta-disk internal;</span></span></div><div><span><span> }</span></span></div><div><span><span>}</span></span></div><div><span><span> #把配置文件copy到节点jie3.com上面</span></span></div><div><span><span>[root@jie2 drbd.d]# scp global_common.conf mydata.res jie3:/etc/drbd.d/</span></span></div></td></tr></tbody></table>
-
-**3）、初始化drbd的资源并启动**
-
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div><div><span><span>6</span></span></div><div><span><span>7</span></span></div><div><span><span>8</span></span></div><div><span><span>9</span></span></div><div><span><span>10</span></span></div><div><span><span>11</span></span></div><div><span><span>12</span></span></div><div><span><span>13</span></span></div><div><span><span>14</span></span></div><div><span><span>15</span></span></div><div><span><span>16</span></span></div><div><span><span>17</span></span></div><div><span><span>18</span></span></div><div><span><span>19</span></span></div><div><span><span>20</span></span></div><div><span><span>21</span></span></div><div><span><span>22</span></span></div><div><span><span>23</span></span></div><div><span><span>24</span></span></div><div><span><span>25</span></span></div><div><span><span>26</span></span></div><div><span><span>27</span></span></div><div><span><span>28</span></span></div><div><span><span>29</span></span></div><div><span><span>30</span></span></div><div><span><span>31</span></span></div><div><span><span>32</span></span></div><div><span><span>33</span></span></div><div><span><span>34</span></span></div><div><span><span>35</span></span></div><div><span><span>36</span></span></div></td><td><div><span><span> #节点jie2.com的操作</span></span></div><div><span><span>#创建drbd的资源</span></span></div><div><span><span>[root@jie2 ~]# drbdadm create-md mydata</span></span></div><div><span><span>Writing meta data...</span></span></div><div><span><span>initializing activity log</span></span></div><div><span><span>NOT initializing bitmap</span></span></div><div><span><span>lk_bdev_save(/var/lib/drbd/drbd-minor-0.lkbd) failed: No such file</span></span><span><span>or directory</span></span></div><div><span><span>New drbd meta data block successfully created. #提示已经创建成功</span></span></div><div><span><span>lk_bdev_save(/var/lib/drbd/drbd-minor-0.lkbd) failed: No such file</span></span><span><span>or directory</span></span></div><div><span><span>#启动服务</span></span></div><div><span><span>[root@jie2 ~]# service drbd start</span></span></div><div><span><span>Starting DRBD resources: [</span></span></div><div><span><span> create res: mydata</span></span></div><div><span><span> prepare disk: mydata</span></span></div><div><span><span> adjust disk: mydata</span></span></div><div><span><span> adjust net: mydata</span></span></div><div><span><span>]</span></span></div><div><span><span>.......... [ok]</span></span></div><div><span><span> #节点jie3.com的操作</span></span></div><div><span><span>#创建drbd的资源</span></span></div><div><span><span>[root@jie3 ~]# drbdadm create-md mydata</span></span></div><div><span><span>Writing meta data...</span></span></div><div><span><span>initializing activity log</span></span></div><div><span><span>NOT initializing bitmap</span></span></div><div><span><span>lk_bdev_save(/var/lib/drbd/drbd-minor-0.lkbd) failed: No such file</span></span><span><span>or directory</span></span></div><div><span><span>New drbd meta data block successfully created. #提示已经创建成功</span></span></div><div><span><span>lk_bdev_save(/var/lib/drbd/drbd-minor-0.lkbd) failed: No such file</span></span><span><span>or directory</span></span></div><div><span><span>#启动服务</span></span></div><div><span><span>[root@jie3 ~]# service drbd start</span></span></div><div><span><span>Starting DRBD resources: [</span></span></div><div><span><span> create res: mydata</span></span></div><div><span><span> prepare disk: mydata</span></span></div><div><span><span> adjust disk: mydata</span></span></div><div><span><span> adjust net: mydata</span></span></div><div><span><span>]</span></span></div><div><span><span>.......... [ok]</span></span></div></td></tr></tbody></table>
-
-**4）、设置一个主节点，然后同步drbd的数据(此步骤只需在一个节点上操作)**
-
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div><div><span><span>6</span></span></div><div><span><span>7</span></span></div><div><span><span>8</span></span></div><div><span><span>9</span></span></div><div><span><span>10</span></span></div><div><span><span>11</span></span></div><div><span><span>12</span></span></div><div><span><span>13</span></span></div><div><span><span>14</span></span></div><div><span><span>15</span></span></div></td><td><div><span><span> #设置jie2.com为drbd的主节点</span></span></div><div><span><span>[root@jie2 ~]# drbdadm primary --force mydata</span></span></div><div><span><span>[root@jie2 ~]# cat /proc/drbd #查看同步进度</span></span></div><div><span><span>version: 8.4.3 (api:1/proto:86-101)</span></span></div><div><span><span>GIT-hash: 89a294209144b68adb3ee85a73221f964d3ee515 build by gardner@, 2013-05-27 04:30:21</span></span></div><div><span><span> 0: cs:SyncSource ro:Primary/Secondary</span></span><span><span>ds:UpToDate/Inconsistent</span></span><span><span>C r---n-</span></span></div><div><span><span> ns:1897624 nr:0 dw:0 dr:1901216 al:0 bm:115 lo:0 pe:3 ua:3 ap:0 ep:1 wo:f oos:207988</span></span></div><div><span><span> [=================>..] sync'ed: 90.3% (207988/2103412)K</span></span></div><div><span><span> finish: 0:00:07 speed: 26,792 (27,076) K/sec</span></span></div><div><span><span>[root@jie2 ~]# watch -n1 'cat /proc/drbd' 此命令可以动态的查看</span></span></div><div><span><span>[root@jie2 ~]# cat /proc/drbd</span></span></div><div><span><span>version: 8.4.3 (api:1/proto:86-101)</span></span></div><div><span><span>GIT-hash: 89a294209144b68adb3ee85a73221f964d3ee515 build by gardner@, 2013-05-27 04:30:21</span></span></div><div><span><span> 0: cs:Connected ro:Primary/Secondary</span></span><span><span>ds:UpToDate/UpToDate</span></span><span><span>C r-----</span></span></div><div><span><span> ns:120 nr:354 dw:435 dr:5805 al:6 bm:9 lo:0 pe:0 ua:0 ap:0 ep:1 wo:f oos:0 #当两边都为UpToDate时，表示两边已经同步</span></span></div></td></tr></tbody></table>
-
-**5）、格式化drdb分区(此步骤在主节点上操作)**
-
-<table><tbody><tr><td><div><span><span>1</span></span></div></td><td><div><span><span>[root@jie2 ~]# mke2fs -t ext4 /dev/drbd0</span></span></div></td></tr></tbody></table>
-
-**六、mysql与drbd实现mysql数据的镜像**
-
-**1）、在drbd的主节点上，挂载drbd的分区，然后初始化数据库**
-
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div><div><span><span>6</span></span></div><div><span><span>7</span></span></div><div><span><span>8</span></span></div><div><span><span>9</span></span></div><div><span><span>10</span></span></div></td><td><div><span><span>[root@jie2 ~]# mkdir /mydata #创建用于挂载drbd的目录</span></span></div><div><span><span>[root@jie2 ~]# mount /dev/drbd0 /mydata/</span></span></div><div><span><span>[root@jie2 ~]# mkdir /mydata/data</span></span></div><div><span><span>[root@jie2 ~]#chown -R mysql.mysql /mydata #把文件的属主和属组改成mysql</span></span></div><div><span><span>[root@jie2 ~]#vim /etc/my.cnf #修改mysql的配置文件</span></span></div><div><span><span> datadir = /mydata/data</span></span></div><div><span><span> innodb_file_per_table =1</span></span></div><div><span><span>[root@jie2 ~]#/usr/local/mysql/scripts/mysql_install_db --user=mysql --datadir=/mydata/data/ --basedir=/usr/local/mysql #初始化数据库</span></span></div><div><span><span>[root@jie2 ~]# service mysqld start</span></span></div><div><span><span>Starting MySQL ....... [ OK ]</span></span></div></td></tr></tbody></table>
-
-**2）、验证drbd是否镜像**
-
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div><div><span><span>6</span></span></div><div><span><span>7</span></span></div><div><span><span>8</span></span></div><div><span><span>9</span></span></div><div><span><span>10</span></span></div><div><span><span>11</span></span></div><div><span><span>12</span></span></div><div><span><span>13</span></span></div><div><span><span>14</span></span></div><div><span><span>15</span></span></div><div><span><span>16</span></span></div><div><span><span>17</span></span></div><div><span><span>18</span></span></div><div><span><span>19</span></span></div><div><span><span>20</span></span></div><div><span><span>21</span></span></div><div><span><span>22</span></span></div><div><span><span>23</span></span></div><div><span><span>24</span></span></div><div><span><span>25</span></span></div><div><span><span>26</span></span></div><div><span><span>27</span></span></div><div><span><span>28</span></span></div><div><span><span>29</span></span></div><div><span><span>30</span></span></div><div><span><span>31</span></span></div><div><span><span>32</span></span></div><div><span><span>33</span></span></div><div><span><span>34</span></span></div><div><span><span>35</span></span></div><div><span><span>36</span></span></div><div><span><span>37</span></span></div><div><span><span>38</span></span></div><div><span><span>39</span></span></div><div><span><span>40</span></span></div><div><span><span>41</span></span></div><div><span><span>42</span></span></div><div><span><span>43</span></span></div><div><span><span>44</span></span></div><div><span><span>45</span></span></div><div><span><span>46</span></span></div><div><span><span>47</span></span></div><div><span><span>48</span></span></div><div><span><span>49</span></span></div><div><span><span>50</span></span></div><div><span><span>51</span></span></div><div><span><span>52</span></span></div><div><span><span>53</span></span></div><div><span><span>54</span></span></div></td><td><div><span><span> #节点jie2.com的操作</span></span></div><div><span><span>#1)、先在drbd的主节点上面创建一个数据库</span></span></div><div><span><span>[root@jie2 ~]# mysql</span></span></div><div><span><span>mysql> show databases;</span></span></div><div><span><span>+--------------------+</span></span></div><div><span><span>| Database |</span></span></div><div><span><span>+--------------------+</span></span></div><div><span><span>| information_schema |</span></span></div><div><span><span>| mysql |</span></span></div><div><span><span>| performance_schema |</span></span></div><div><span><span>| test</span></span><span><span>|</span></span></div><div><span><span>+--------------------+</span></span></div><div><span><span>4 rows in</span></span><span><span>set</span></span><span><span>(0.00 sec)</span></span></div><div><span><span>mysql> create database jie2;</span></span></div><div><span><span>Query OK, 1 row affected (0.01 sec)</span></span></div><div><span><span>mysql> show databases;</span></span></div><div><span><span>+--------------------+</span></span></div><div><span><span>| Database |</span></span></div><div><span><span>+--------------------+</span></span></div><div><span><span>| information_schema |</span></span></div><div><span><span>| jie2 |</span></span></div><div><span><span>| mysql |</span></span></div><div><span><span>| performance_schema |</span></span></div><div><span><span>| test</span></span><span><span>|</span></span></div><div><span><span>+--------------------+</span></span></div><div><span><span>5 rows in</span></span><span><span>set</span></span><span><span>(0.00 sec)</span></span></div><div><span><span>mysql>\q</span></span></div><div><span><span>#2)、停掉mysql服务，卸载drbd挂载的目录</span></span></div><div><span><span>[root@jie2 ~]# service mysqld stop</span></span></div><div><span><span>[root@jie2 ~]# umount /dev/drbd0 #卸载drbd的挂载点</span></span></div><div><span><span>[root@jie2 ~]# drbdadm secondary mydata #把此节点改为drbd的备用节点</span></span></div><div><span><span> #节点jie3.com的操作</span></span></div><div><span><span>#3）、把jie3.com变为drbd的主节点</span></span></div><div><span><span>[root@jie3 ~]#drbdadm primary mydata #把此节点改为drbd的主节点</span></span></div><div><span><span>[root@jie3 ~]# mkdir /mydata</span></span></div><div><span><span>[root@jie3 ~]#chown -R mysql.mysql /mydata</span></span></div><div><span><span>[root@jie3 ~]#mount /dev/drdb0 /mydata</span></span></div><div><span><span>[root@jie3 ~]#vim /etc/my.cnf</span></span></div><div><span><span> datadir = /mydata/data</span></span></div><div><span><span> innodb_file_per_table = 1</span></span></div><div><span><span>[root@jie3 ~]# service mysqld start #此节点上不用初始化数据库，直接开启服务即可</span></span></div><div><span><span>Starting MySQL ....... [ OK ]</span></span></div><div><span><span>[root@jie3 ~]# mysql</span></span></div><div><span><span>mysql> show databases; #可以看见jie2数据库</span></span></div><div><span><span>+--------------------+</span></span></div><div><span><span>| Database |</span></span></div><div><span><span>+--------------------+</span></span></div><div><span><span>| information_schema |</span></span></div><div><span><span>| jie2 |</span></span></div><div><span><span>| mysql |</span></span></div><div><span><span>| performance_schema |</span></span></div><div><span><span>| test</span></span><span><span>|</span></span></div><div><span><span>+--------------------+</span></span></div><div><span><span>5 rows in</span></span><span><span>set</span></span><span><span>(0.00 sec)</span></span></div></td></tr></tbody></table>
-
-**七、利用crmsh配置mysql的高可用**
-
-**需要定义集群资源而mysql、drbd都是集群的资源，由集群管理的资源开机是一定不能够自行启动的。**
-
-**1）、关闭drbd的服务和关闭mysql的服务**
-
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div></td><td><div><span><span>[root@jie2 ~]#service mysqld stop</span></span></div><div><span><span>[root@jie2 ~]#service drbd stop</span></span></div><div><span><span>[root@jie3 ~]#service mysqld stop</span></span></div><div><span><span>[root@jie3 ~]#umount /dev/drbd0 #之前drbd已经挂载到jie3.com节点上了</span></span></div><div><span><span>[root@jie3 ~]#service drdb stop</span></span></div></td></tr></tbody></table>
-
-**2）、定义集群资源**
-
-**定义drbd的资源(提供drbd的资源代理RA由OCF类别中的linbit提供）**
-
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div><div><span><span>6</span></span></div></td><td><div><span><span>[root@jie2 ~]# crm</span></span></div><div><span><span>crm(live)# configure</span></span></div><div><span><span>crm(live)configure# property stonith-enabled=false</span></span></div><div><span><span>crm(live)configure# property no-quorum-policy=ignore</span></span></div><div><span><span>crm(live)configure# primitive mysqldrbd ocf:linbit:drbd params drbd_resource=mydata op monitor role=Master interval=10 timeout=20 op monitor role=Slave interval=20 timeout=20 op start timeout=240 op stop timeout=100</span></span></div><div><span><span>crm(live)configure#verify #可以检查语法</span></span></div></td></tr></tbody></table>
-
-**定义drbd的主从资源**
-
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div></td><td><div><span><span>crm(live)configure# ms ms_mysqldrbd mysqldrbd meta master-max=1 master-node-max=1 clone-max=2 clone-node-max=1 notify=true</span></span></div><div><span><span>crm(live)configure# verify</span></span></div></td></tr></tbody></table>
-
-**定义文件系统资源和约束关系**
-
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div></td><td><div><span><span>crm(live)configure# primitive mystore ocf:heartbeat:Filesystem params device="/dev/drbd0" directory="/mydata" fstype="ext4" op monitor interval=40 timeout=40 op start timeout=60 op stop timeout=60</span></span></div><div><span><span>crm(live)configure# verify</span></span></div><div><span><span>crm(live)configure# colocation mystore_with_ms_mysqldrbd inf: mystore ms_mysqldrbd:Master</span></span></div><div><span><span>crm(live)configure# order ms_mysqldrbd_before_mystore mandatory: ms_mysqldrbd:promote mystore:start</span></span></div><div><span><span>crm(live)configure# verify</span></span></div></td></tr></tbody></table>
-
-**定义vip资源、mysql服务的资源约束关系**
-
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div><div><span><span>6</span></span></div><div><span><span>7</span></span></div><div><span><span>8</span></span></div><div><span><span>9</span></span></div><div><span><span>10</span></span></div></td><td><div><span><span>crm(live)configure# primitive myvip ocf:heartbeat:IPaddr params ip="172.16.22.100" op monitor interval=20 timeout=20 on-fail=restart</span></span></div><div><span><span>crm(live)configure# primitive myserver lsb:mysqld op monitor interval=20 timeout=20 on-fail=restart</span></span></div><div><span><span>crm(live)configure# verify</span></span></div><div><span><span>crm(live)configure# colocation myserver_with_mystore inf: myserver mystore</span></span></div><div><span><span>crm(live)configure# order mystore_before_myserver mandatory: mystore:start myserver:start</span></span></div><div><span><span>crm(live)configure# verify</span></span></div><div><span><span>crm(live)configure# colocation myvip_with_myserver inf: myvip myserver</span></span></div><div><span><span>crm(live)configure# order myvip_before_myserver mandatory: myvip myserver</span></span></div><div><span><span>crm(live)configure# verify</span></span></div><div><span><span>crm(live)configure# commit</span></span></div></td></tr></tbody></table>
-
-**查看所有定义资源的信息**
-
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div><div><span><span>6</span></span></div><div><span><span>7</span></span></div><div><span><span>8</span></span></div><div><span><span>9</span></span></div><div><span><span>10</span></span></div><div><span><span>11</span></span></div><div><span><span>12</span></span></div><div><span><span>13</span></span></div><div><span><span>14</span></span></div><div><span><span>15</span></span></div><div><span><span>16</span></span></div><div><span><span>17</span></span></div><div><span><span>18</span></span></div><div><span><span>19</span></span></div><div><span><span>20</span></span></div><div><span><span>21</span></span></div><div><span><span>22</span></span></div><div><span><span>23</span></span></div><div><span><span>24</span></span></div><div><span><span>25</span></span></div><div><span><span>26</span></span></div><div><span><span>27</span></span></div><div><span><span>28</span></span></div><div><span><span>29</span></span></div><div><span><span>30</span></span></div><div><span><span>31</span></span></div><div><span><span>32</span></span></div><div><span><span>33</span></span></div><div><span><span>34</span></span></div><div><span><span>35</span></span></div><div><span><span>36</span></span></div></td><td><div><span><span>crm(live)configure# show</span></span></div><div><span><span>node jie2.com \</span></span></div><div><span><span> attributes standby="off"</span></span></div><div><span><span>node jie3.com \</span></span></div><div><span><span> attributes standby="off"</span></span></div><div><span><span>primitive myserver lsb:mysqld \</span></span></div><div><span><span> op</span></span><span><span>monitor interval="20"</span></span><span><span>timeout="20"</span></span><span><span>on-fail="restart"</span></span></div><div><span><span>primitive mysqldrbd ocf:linbit:drbd \</span></span></div><div><span><span> params drbd_resource="mydata"</span></span><span><span>\</span></span></div><div><span><span> op</span></span><span><span>monitor role="Master"</span></span><span><span>interval="10"</span></span><span><span>timeout="20"</span></span><span><span>\</span></span></div><div><span><span> op</span></span><span><span>monitor role="Slave"</span></span><span><span>interval="20"</span></span><span><span>timeout="20"</span></span><span><span>\</span></span></div><div><span><span> op</span></span><span><span>start timeout="240"</span></span><span><span>interval="0"</span></span><span><span>\</span></span></div><div><span><span> op</span></span><span><span>stop timeout="100"</span></span><span><span>interval="0"</span></span></div><div><span><span>primitive mystore ocf:heartbeat:Filesystem \</span></span></div><div><span><span> params device="/dev/drbd0"</span></span><span><span>directory="/mydata"</span></span><span><span>fstype="ext4"</span></span><span><span>\</span></span></div><div><span><span> op</span></span><span><span>monitor interval="40"</span></span><span><span>timeout="40"</span></span><span><span>\</span></span></div><div><span><span> op</span></span><span><span>start timeout="60"</span></span><span><span>interval="0"</span></span><span><span>\</span></span></div><div><span><span> op</span></span><span><span>stop timeout="60"</span></span><span><span>interval="0"</span></span></div><div><span><span>primitive myvip ocf:heartbeat:IPaddr \</span></span></div><div><span><span> params ip="172.16.22.100"</span></span><span><span>\</span></span></div><div><span><span> op</span></span><span><span>monitor interval="20"</span></span><span><span>timeout="20"</span></span><span><span>on-fail="restart"</span></span><span><span>\</span></span></div><div><span><span> meta target-role="Started"</span></span></div><div><span><span>ms ms_mysqldrbd mysqldrbd \</span></span></div><div><span><span> meta master-max="1"</span></span><span><span>master-node-max="1"</span></span><span><span>clone-max="2"</span></span><span><span>clone-node-max="1"</span></span><span><span>notify="true"</span></span></div><div><span><span>colocation myserver_with_mystore inf: myserver mystore</span></span></div><div><span><span>colocation mystore_with_ms_mysqldrbd inf: mystore ms_mysqldrbd:Master</span></span></div><div><span><span>colocation myvip_with_myserver inf: myvip myserver</span></span></div><div><span><span>order ms_mysqldrbd_before_mystore inf: ms_mysqldrbd:promote mystore:start</span></span></div><div><span><span>order mystore_before_myserver inf: mystore:start myserver:start</span></span></div><div><span><span>order myvip_before_myserver inf: myvip myserver</span></span></div><div><span><span>property $id="cib-bootstrap-options"</span></span><span><span>\</span></span></div><div><span><span> dc-version="1.1.8-7.el6-394e906"</span></span><span><span>\</span></span></div><div><span><span> cluster-infrastructure="classic openais (with plugin)"</span></span><span><span>\</span></span></div><div><span><span> expected-quorum-votes="2"</span></span><span><span>\</span></span></div><div><span><span> stonith-enabled="false"</span></span><span><span>\</span></span></div><div><span><span> no-quorum-policy="ignore"</span></span></div></td></tr></tbody></table>
-
-**查看资源运行的状态运行在jie3.com上**
-
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div><div><span><span>6</span></span></div><div><span><span>7</span></span></div><div><span><span>8</span></span></div><div><span><span>9</span></span></div><div><span><span>10</span></span></div><div><span><span>11</span></span></div><div><span><span>12</span></span></div><div><span><span>13</span></span></div><div><span><span>14</span></span></div><div><span><span>15</span></span></div></td><td><div><span><span>[root@jie2 ~]# crm status</span></span></div><div><span><span>Last updated: Thu Aug 8 17:55:30 2013</span></span></div><div><span><span>Last change: Sun Sep 1 16:41:18 2013 via crm_attribute on jie3.com</span></span></div><div><span><span>Stack: classic openais (with plugin)</span></span></div><div><span><span>Current DC: jie3.com - partition with quorum</span></span></div><div><span><span>Version: 1.1.8-7.el6-394e906</span></span></div><div><span><span>2 Nodes configured, 2 expected votes</span></span></div><div><span><span>5 Resources configured.</span></span></div><div><span><span>Online: [ jie2.com jie3.com ]</span></span></div><div><span><span> Master/Slave</span></span><span><span>Set: ms_mysqldrbd [mysqldrbd]</span></span></div><div><span><span> Masters: [ jie3.com ]</span></span></div><div><span><span> Slaves: [ jie2.com ]</span></span></div><div><span><span> mystore (ocf::heartbeat:Filesystem): Started jie3.com</span></span></div><div><span><span> myvip (ocf::heartbeat:IPaddr): Started jie3.com</span></span></div><div><span><span> myserver (lsb:mysqld): Started jie3.com</span></span></div></td></tr></tbody></table>
-
-**切换节点，看资源是否转移**
-
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div><div><span><span>6</span></span></div><div><span><span>7</span></span></div><div><span><span>8</span></span></div><div><span><span>9</span></span></div><div><span><span>10</span></span></div><div><span><span>11</span></span></div><div><span><span>12</span></span></div><div><span><span>13</span></span></div><div><span><span>14</span></span></div><div><span><span>15</span></span></div><div><span><span>16</span></span></div><div><span><span>17</span></span></div></td><td><div><span><span>[root@jie3 ~]# crm node standby jie3.com #把此节点设置为备用节点</span></span></div><div><span><span>[root@jie3 ~]# crm status</span></span></div><div><span><span>Last updated: Mon Sep 2 01:45:07 2013</span></span></div><div><span><span>Last change: Mon Sep 2 01:44:59 2013 via crm_attribute on jie3.com</span></span></div><div><span><span>Stack: classic openais (with plugin)</span></span></div><div><span><span>Current DC: jie3.com - partition with quorum</span></span></div><div><span><span>Version: 1.1.8-7.el6-394e906</span></span></div><div><span><span>2 Nodes configured, 2 expected votes</span></span></div><div><span><span>5 Resources configured.</span></span></div><div><span><span>Node jie3.com: standby</span></span></div><div><span><span>Online: [ jie2.com ]</span></span></div><div><span><span> Master/Slave</span></span><span><span>Set: ms_mysqldrbd [mysqldrbd]</span></span></div><div><span><span> Masters: [ jie2.com ] #资源已然转到jie2.com上面</span></span></div><div><span><span> Stopped: [ mysqldrbd:1 ]</span></span></div><div><span><span> mystore (ocf::heartbeat:Filesystem): Started jie2.com</span></span></div><div><span><span> myvip (ocf::heartbeat:IPaddr): Started jie2.com</span></span></div><div><span><span> myserver (lsb:mysqld): Started jie2.com</span></span></div></td></tr></tbody></table>
-
-**由于定义了drbd的资源约束，Masters运行在那个节点，则此节点不可能成为drbd的辅助节点**
-
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div><div><span><span>6</span></span></div><div><span><span>7</span></span></div><div><span><span>8</span></span></div></td><td><div><span><span>[root@jie3 ~]# cat /proc/drbd</span></span></div><div><span><span>version: 8.4.3 (api:1/proto:86-101)</span></span></div><div><span><span>GIT-hash: 89a294209144b68adb3ee85a73221f964d3ee515 build by gardner@, 2013-05-27 04:30:21</span></span></div><div><span><span> 0: cs:Connected ro:Primary/Secondary</span></span><span><span>ds:UpToDate/UpToDate</span></span><span><span>C r-----</span></span></div><div><span><span> ns:426 nr:354 dw:741 dr:6528 al:8 bm:9 lo:0 pe:0 ua:0 ap:0 ep:1 wo:f oos:0</span></span></div><div><span><span>[root@jie3 ~]# drbdadm secondary mydata</span></span></div><div><span><span>0: State change failed: (-12) Device is held open</span></span><span><span>by someone</span></span></div><div><span><span>Command 'drbdsetup secondary 0'</span></span><span><span>terminated with exit</span></span><span><span>code 11</span></span></div></td></tr></tbody></table>
-
-**手动的停掉myvip资源还是会启动（因为定义资源是指定了on-fail=restart）**
-
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div><div><span><span>6</span></span></div><div><span><span>7</span></span></div><div><span><span>8</span></span></div><div><span><span>9</span></span></div><div><span><span>10</span></span></div><div><span><span>11</span></span></div><div><span><span>12</span></span></div><div><span><span>13</span></span></div><div><span><span>14</span></span></div><div><span><span>15</span></span></div><div><span><span>16</span></span></div><div><span><span>17</span></span></div><div><span><span>18</span></span></div><div><span><span>19</span></span></div><div><span><span>20</span></span></div><div><span><span>21</span></span></div><div><span><span>22</span></span></div><div><span><span>23</span></span></div><div><span><span>24</span></span></div><div><span><span>25</span></span></div><div><span><span>26</span></span></div><div><span><span>27</span></span></div><div><span><span>28</span></span></div><div><span><span>29</span></span></div><div><span><span>30</span></span></div><div><span><span>31</span></span></div><div><span><span>32</span></span></div><div><span><span>33</span></span></div><div><span><span>34</span></span></div><div><span><span>35</span></span></div><div><span><span>36</span></span></div><div><span><span>37</span></span></div><div><span><span>38</span></span></div><div><span><span>39</span></span></div><div><span><span>40</span></span></div><div><span><span>41</span></span></div><div><span><span>42</span></span></div><div><span><span>43</span></span></div><div><span><span>44</span></span></div><div><span><span>45</span></span></div><div><span><span>46</span></span></div><div><span><span>47</span></span></div><div><span><span>48</span></span></div><div><span><span>49</span></span></div><div><span><span>50</span></span></div><div><span><span>51</span></span></div><div><span><span>52</span></span></div><div><span><span>53</span></span></div><div><span><span>54</span></span></div></td><td><div><span><span>[root@jie2 ~]# ifconfig | grep eth0</span></span></div><div><span><span>eth0 Link encap:Ethernet HWaddr 00:0C:29:1F:74:CF</span></span></div><div><span><span> inet addr:172.16.22.2 Bcast:172.16.255.255 Mask:255.255.0.0</span></span></div><div><span><span> inet6 addr: fe80::20c:29ff:fe1f:74cf/64</span></span><span><span>Scope:Link</span></span></div><div><span><span> UP BROADCAST RUNNING MULTICAST MTU:1500 Metric:1</span></span></div><div><span><span> RX packets:2165062 errors:0 dropped:0 overruns:0 frame:0</span></span></div><div><span><span> TX packets:4109895 errors:0 dropped:0 overruns:0 carrier:0</span></span></div><div><span><span> collisions:0 txqueuelen:1000</span></span></div><div><span><span> RX bytes:167895762 (160.1 MiB) TX bytes:5731508707 (5.3 GiB)</span></span></div><div><span><span>eth0:0 Link encap:Ethernet HWaddr 00:0C:29:1F:74:CF</span></span></div><div><span><span> inet addr:172.16.22.100 Bcast:172.16.255.255 Mask:255.255.0.0</span></span></div><div><span><span> UP BROADCAST RUNNING MULTICAST MTU:1500 Metric:1</span></span></div><div><span><span>[root@jie2 ~]# ifconfig eth0:0 down</span></span></div><div><span><span>[root@jie2 ~]# ifconfig | grep eth0</span></span></div><div><span><span>eth0 Link encap:Ethernet HWaddr 00:0C:29:1F:74:CF</span></span></div><div><span><span> inet addr:172.16.22.2 Bcast:172.16.255.255 Mask:255.255.0.0</span></span></div><div><span><span> inet6 addr: fe80::20c:29ff:fe1f:74cf/64</span></span><span><span>Scope:Link</span></span></div><div><span><span> UP BROADCAST RUNNING MULTICAST MTU:1500 Metric:1</span></span></div><div><span><span> RX packets:2165242 errors:0 dropped:0 overruns:0 frame:0</span></span></div><div><span><span> TX packets:4110094 errors:0 dropped:0 overruns:0 carrier:0</span></span></div><div><span><span> collisions:0 txqueuelen:1000</span></span></div><div><span><span> RX bytes:167917669 (160.1 MiB) TX bytes:5731537035 (5.3 GiB)</span></span></div><div><span><span>[root@jie2 ~]# crm status</span></span></div><div><span><span>Last updated: Thu Aug 8 18:29:27 2013</span></span></div><div><span><span>Last change: Mon Sep 2 01:44:59 2013 via crm_attribute on jie3.com</span></span></div><div><span><span>Stack: classic openais (with plugin)</span></span></div><div><span><span>Current DC: jie3.com - partition with quorum</span></span></div><div><span><span>Version: 1.1.8-7.el6-394e906</span></span></div><div><span><span>2 Nodes configured, 2 expected votes</span></span></div><div><span><span>5 Resources configured.</span></span></div><div><span><span>Node jie3.com: standby</span></span></div><div><span><span>Online: [ jie2.com ]</span></span></div><div><span><span> Master/Slave</span></span><span><span>Set: ms_mysqldrbd [mysqldrbd]</span></span></div><div><span><span> Masters: [ jie2.com ]</span></span></div><div><span><span> Stopped: [ mysqldrbd:1 ]</span></span></div><div><span><span> mystore (ocf::heartbeat:Filesystem): Started jie2.com</span></span></div><div><span><span> myvip (ocf::heartbeat:IPaddr): Started jie2.com</span></span></div><div><span><span> myserver (lsb:mysqld): Started jie2.com</span></span></div><div><span><span>Failed actions:</span></span></div><div><span><span> myvip_monitor_20000 (node=jie2.com, call=47, rc=7, status=complete): not running</span></span></div><div><span><span> myserver_monitor_20000 (node=jie3.com, call=209, rc=7, status=complete): not running</span></span></div><div><span><span>[root@jie2 ~]# ifconfig | grep eth0</span></span></div><div><span><span>eth0 Link encap:Ethernet HWaddr 00:0C:29:1F:74:CF</span></span></div><div><span><span> inet addr:172.16.22.2 Bcast:172.16.255.255 Mask:255.255.0.0</span></span></div><div><span><span> inet6 addr: fe80::20c:29ff:fe1f:74cf/64</span></span><span><span>Scope:Link</span></span></div><div><span><span> UP BROADCAST RUNNING MULTICAST MTU:1500 Metric:1</span></span></div><div><span><span> RX packets:2165681 errors:0 dropped:0 overruns:0 frame:0</span></span></div><div><span><span> TX packets:4110535 errors:0 dropped:0 overruns:0 carrier:0</span></span></div><div><span><span> collisions:0 txqueuelen:1000</span></span></div><div><span><span> RX bytes:168015864 (160.2 MiB) TX bytes:5731617112 (5.3 GiB)</span></span></div><div><span><span>eth0:1 Link encap:Ethernet HWaddr 00:0C:29:1F:74:CF</span></span></div><div><span><span> inet addr:172.16.22.100 Bcast:172.16.255.255 Mask:255.255.0.0</span></span></div><div><span><span> UP BROADCAST RUNNING MULTICAST MTU:1500 Metric:1</span></span></div><div><span><span>[root@jie2 ~]#</span></span></div></td></tr></tbody></table>
-
-**自此mysql的高可用已经完成。本博客没对crm命令参数进行解释**
+**MySQL**: 开源关系型数据库。
+
+**DRBD**: 分布式复制块设备 (Distributed Replication Block Device)，通过在主从节点间同步数据块实现数据镜像（类似 RAID1）。主节点的磁盘写请求会通过网络同步到从节点，DRBD 一般是一主一从，读写和挂载只能在主节点上进行，但主从可互相切换。
+
+DRBD 仅实现数据镜像，主节点故障时从节点可提供服务但不会自动切换。高可用集群通过 pacemaker 实现自动故障转移——当 DRBD 主节点故障时，集群自动将服务转移到从节点。
+
+## 前置准备
+
+### 配置 hosts
+
+```bash
+# 节点 jie2.com
+sed -i s/`grep HOSTNAME /etc/sysconfig/network |awk -F '=' '{print $2}'`/jie2.com/g /etc/sysconfig/network
+cat >>/etc/hosts << EOF
+172.16.22.2 jie2.com jie2
+172.16.22.3 jie3.com jie3
+EOF
+
+# 节点 jie3.com
+sed -i s/`grep HOSTNAME /etc/sysconfig/network |awk -F '=' '{print $2}'`/jie3.com/g /etc/sysconfig/network
+cat >>/etc/hosts << EOF
+172.16.22.2 jie2.com jie2
+172.16.22.3 jie3.com jie3
+EOF
+```
+
+### SSH 互信
+
+```bash
+# 节点 jie2.com
+ssh-keygen -t rsa -P ''
+ssh-copy-id -i .ssh/id_rsa.pub jie3
+
+# 节点 jie3.com
+ssh-keygen -t rsa -P ''
+ssh-copy-id -i .ssh/id_rsa.pub jie2
+```
+
+### 关闭 NetworkManager
+
+```bash
+# 两个节点都执行
+chkconfig --del NetworkManager
+chkconfig NetworkManager off
+service NetworkManager stop
+```
+
+### 时间同步
+
+```bash
+# 两个节点都执行
+ntpdate 172.16.0.1
+```
+
+## 安装 corosync + pacemaker
+
+### 安装软件包
+
+```bash
+# 两个节点都执行
+yum -y install corosync pacemaker
+yum -y --nogpgcheck install crmsh-1.2.6-4.el6.x86_64.rpm pssh-2.3.1-2.el6.x86_64.rpm
+```
+
+### 配置 corosync.conf
+
+```bash
+cd /etc/corosync/
+mv corosync.conf.example corosync.conf
+```
+
+编辑 `/etc/corosync/corosync.conf`：
+
+```text
+# Please read the corosync.conf.5 manual page
+compatibility: whitetank
+
+totem {
+  version: 2
+  secauth: on
+  threads: 0
+  interface {
+    ringnumber: 0
+    bindnetaddr: 172.16.0.0
+    mcastaddr: 226.94.1.1
+    mcastport: 5405
+    ttl: 1
+  }
+}
+
+logging {
+  fileline: off
+  to_stderr: no
+  to_logfile: yes
+  to_syslog: no
+  logfile: /var/log/cluster/corosync.log
+  debug: off
+  timestamp: on
+  logger_subsys {
+    subsys: AMF
+    debug: off
+  }
+}
+
+amf {
+  mode: disabled
+}
+
+service {
+  ver: 0
+  name: pacemaker
+}
+
+aisexec {
+  user: root
+  group: root
+}
+```
+
+复制配置到 jie3：
+
+```bash
+scp corosync.conf jie3:/etc/corosync/
+```
+
+### 生成认证文件
+
+```bash
+corosync-keygen
+# 需要输入足够的随机数，持续敲击键盘
+scp authkey jie3:/etc/corosync/
+```
+
+### 启动服务
+
+```bash
+# 两个节点都执行
+service corosync start
+crm status
+```
+
+预期输出：
+```
+2 Nodes configured, 2 expected votes
+Online: [ jie2.com jie3.com ]
+```
+
+## 编译安装 MySQL
+
+两个节点的操作过程相同。
+
+```bash
+tar xf mysql-5.5.33.tar.gz
+yum -y groupinstall "Development tools" "Server Platform Development"
+cd mysql-5.5.33
+yum -y install cmake
+
+cmake . -DCMAKE_INSTALL_PREFIX=/usr/local/mysql \
+  -DMYSQL_DATADIR=/mydata/data \
+  -DSYSCONFDIR=/etc \
+  -DWITH_INNOBASE_STORAGE_ENGINE=1 \
+  -DWITH_ARCHIVE_STORAGE_ENGINE=1 \
+  -DWITH_BLACKHOLE_STORAGE_ENGINE=1 \
+  -DWITH_READLINE=1 \
+  -DWITH_SSL=system \
+  -DWITH_ZLIB=system \
+  -DWITH_LIBWRAP=0 \
+  -DMYSQL_UNIX_ADDR=/tmp/mysql.sock \
+  -DDEFAULT_CHARSET=utf8 \
+  -DDEFAULT_COLLATION=utf8_general_ci
+
+make && make install
+
+# 建立配置文件和脚本
+cp /usr/local/mysql/support-files/my-large.cnf /etc/my.cnf
+cp /usr/local/mysql/support-files/mysql.server /etc/rc.d/init.d/mysqld
+cd /usr/local/mysql/
+
+useradd -r -u 306 mysql
+chown -R root:mysql ./*
+
+# 关联系统识别的路径
+echo "PATH=/usr/local/mysql/bin:$PATH" >/etc/profile.d/mysqld.sh
+source /etc/profile.d/mysqld.sh
+echo "/usr/local/mysql/lib" >/etc/ld.so.conf.d/mysqld.conf
+ldconfig -v | grep mysql
+ln -sv /usr/local/mysql/include/ /usr/local/mysqld
+```
+
+暂不初始化数据库，待 DRBD 配置完成后初始化。
+
+## 安装 DRBD
+
+注：DRBD 内核模块版本必须与内核版本匹配。
+
+### 分区
+
+```bash
+# 两个节点都执行，创建 5GB 分区用于 DRBD
+fdisk /dev/sda
+# 操作：n → p → 3 → +5G → w
+```
+
+### 安装软件包
+
+```bash
+# 两个节点都执行
+rpm -ivh drbd-kmdl-2.6.32-358.el6-8.4.3-33.el6.x86_64.rpm
+rpm -ivh drbd-8.4.3-33.el6.x86_64.rpm
+```
+
+### 配置文件
+
+编辑 `/etc/drbd.d/global_common.conf`：
+
+```text
+global {
+  usage-count no;
+}
+
+common {
+  protocol C;
+  handlers {
+    pri-on-incon-degr "/usr/lib/drbd/notify-pri-on-incon-degr.sh; /usr/lib/drbd/notify-emergency-reboot.sh; echo b > /proc/sysrq-trigger ; reboot -f";
+    pri-lost-after-sb "/usr/lib/drbd/notify-pri-lost-after-sb.sh; /usr/lib/drbd/notify-emergency-reboot.sh; echo b > /proc/sysrq-trigger ; reboot -f";
+    local-io-error "/usr/lib/drbd/notify-io-error.sh; /usr/lib/drbd/notify-emergency-shutdown.sh; echo o > /proc/sysrq-trigger ; halt -f";
+  }
+  startup {
+  }
+  disk {
+    on-io-error detach;
+  }
+  net {
+    cram-hmac-alg "sha1";
+    shared-secret "mydrbdlab";
+  }
+  syncer {
+    rate 1000M;
+  }
+}
+```
+
+编辑 `/etc/drbd.d/mydata.res`：
+
+```text
+resource mydata {
+  on jie2.com {
+    device /dev/drbd0;
+    disk /dev/sda3;
+    address 172.16.22.2:7789;
+    meta-disk internal;
+  }
+  on jie3.com {
+    device /dev/drbd0;
+    disk /dev/sda3;
+    address 172.16.22.3:7789;
+    meta-disk internal;
+  }
+}
+```
+
+复制配置到 jie3：
+
+```bash
+scp global_common.conf mydata.res jie3:/etc/drbd.d/
+```
+
+### 初始化并启动
+
+```bash
+# 两个节点都执行
+drbdadm create-md mydata
+service drbd start
+```
+
+### 同步数据
+
+```bash
+# jie2.com：设为主节点
+drbdadm primary --force mydata
+
+# 查看同步进度
+cat /proc/drbd
+watch -n1 'cat /proc/drbd'
+
+# 同步完成后，两边都应为 UpToDate/UpToDate
+```
+
+### 格式化
+
+```bash
+# 在主节点上格式化 DRBD 分区
+mke2fs -t ext4 /dev/drbd0
+```
+
+## MySQL 与 DRBD 实现数据镜像
+
+### 挂载与初始化
+
+```bash
+# jie2.com (主)
+mkdir /mydata
+mount /dev/drbd0 /mydata/
+mkdir /mydata/data
+chown -R mysql:mysql /mydata
+
+# 修改 /etc/my.cnf
+# datadir = /mydata/data
+# innodb_file_per_table = 1
+
+/usr/local/mysql/scripts/mysql_install_db --user=mysql --datadir=/mydata/data/ --basedir=/usr/local/mysql
+service mysqld start
+```
+
+### 验证数据镜像
+
+```bash
+# jie2.com：创建测试数据库
+mysql
+> create database jie2;
+> show databases;
+> exit;
+
+# jie2.com：停止 MySQL 并卸载 DRBD
+service mysqld stop
+umount /dev/drbd0
+drbdadm secondary mydata
+
+# jie3.com：切换为主节点
+drbdadm primary mydata
+mkdir /mydata
+chown -R mysql:mysql /mydata
+mount /dev/drbd0 /mydata
+
+# 修改 /etc/my.cnf
+# datadir = /mydata/data
+# innodb_file_per_table = 1
+
+service mysqld start
+mysql
+> show databases;  # 应可见 jie2 数据库
+> exit;
+```
+
+## 利用 crmsh 配置 MySQL 高可用
+
+DRBD 和 MySQL 作为集群管理的资源，不应开机自启。
+
+### 停止服务
+
+```bash
+# 两个节点都执行
+service mysqld stop
+service drbd stop
+# jie3：umount /dev/drbd0
+```
+
+### 定义集群资源
+
+```bash
+crm
+configure
+property stonith-enabled=false
+property no-quorum-policy=ignore
+
+# 定义 DRBD 资源
+primitive mysqldrbd ocf:linbit:drbd params drbd_resource=mydata op monitor role=Master interval=10 timeout=20 op monitor role=Slave interval=20 timeout=20 op start timeout=240 op stop timeout=100
+verify
+
+# 定义主从资源
+ms ms_mysqldrbd mysqldrbd meta master-max=1 master-node-max=1 clone-max=2 clone-node-max=1 notify=true
+verify
+
+# 定义文件系统资源
+primitive mystore ocf:heartbeat:Filesystem params device="/dev/drbd0" directory="/mydata" fstype="ext4" op monitor interval=40 timeout=40 op start timeout=60 op stop timeout=60
+verify
+
+# 定义约束关系
+colocation mystore_with_ms_mysqldrbd inf: mystore ms_mysqldrbd:Master
+order ms_mysqldrbd_before_mystore mandatory: ms_mysqldrbd:promote mystore:start
+verify
+
+# 定义 VIP 和 MySQL 服务资源
+primitive myvip ocf:heartbeat:IPaddr params ip="172.16.22.100" op monitor interval=20 timeout=20 on-fail=restart
+primitive myserver lsb:mysqld op monitor interval=20 timeout=20 on-fail=restart
+verify
+
+# 定义服务约束关系
+colocation myserver_with_mystore inf: myserver mystore
+order mystore_before_myserver mandatory: mystore:start myserver:start
+verify
+
+colocation myvip_with_myserver inf: myvip myserver
+order myvip_before_myserver mandatory: myvip myserver
+verify
+
+commit
+```
+
+### 查看资源状态
+
+```bash
+crm status
+```
+
+预期输出：
+```
+2 Nodes configured, 2 expected votes
+Online: [ jie2.com jie3.com ]
+
+Master/Slave Set: ms_mysqldrbd [mysqldrbd]
+ Masters: [ jie3.com ]
+ Slaves: [ jie2.com ]
+
+mystore (ocf::heartbeat:Filesystem): Started jie3.com
+myvip (ocf::heartbeat:IPaddr): Started jie3.com
+myserver (lsb:mysqld): Started jie3.com
+```
+
+### 验证故障转移
+
+```bash
+# 切换主节点
+crm node standby jie3.com
+crm status
+
+# 资源应转移到 jie2.com
+# Masters: [ jie2.com ]
+# Stopped: [ mysqldrbd:1 ]
+
+# 取消备用
+crm node online jie3.com
+```
+
+至此，MySQL 高可用集群部署完成。主要特点是 DRBD 实现数据同步，pacemaker 通过资源约束关系实现自动故障转移和服务转移。
