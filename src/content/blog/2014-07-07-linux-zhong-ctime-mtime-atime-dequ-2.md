@@ -3,11 +3,11 @@ title: 'linux中ctime,mtime,atime的区别2008-10-03 14:05:39'
 date: '2014-07-07'
 description: >-
   linux中ctime,mtime,atime的区别 2008-10-03 14:05:39 标签：ctime mtime atime linux 休闲
-  当你同熟练的UNIX用户进行交谈时，你经常会听到他们傲慢地讲出术语“改变时间(change time)”和“修改时间(modification
+  当你同熟练的UNIX用户进行交谈时，你经常会听到他们傲慢地讲出术语”改变时间(change time)”和”修改时间(modification
   time)”。
 category: linux
 tags: []
-draft: false
+draft: true
 source: evernote-local-db
 lang: zh
 ---

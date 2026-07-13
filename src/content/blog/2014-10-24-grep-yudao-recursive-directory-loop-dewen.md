@@ -1,18 +1,23 @@
 ---
-title: grep遇到 recursive directory loop的问题解决方法
+title: grep遇到recursive directory loop的问题解决方法
 date: '2014-10-24'
-description: >-
-  遇到无限循环错误的原因是因为含有符号连接,所以grep中需要排除符号连接,即-il eg: grep -R --include='\.sh'
-  --include='\.conf' --include='\.py' --include='\.yaml' --include='\.php' -E
+description: "grep递归搜索时如果目录含有符号链接会导致无限循环错误。使用-l标志排除符号链接可以解决此问题。"
 category: linux
 tags:
-  - php
+  - shell-scripting
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-遇到无限循环错误的原因是因为含有符号连接,所以grep中需要排除符号连接,即-il
 
-eg:
+遇到无限循环错误的原因是目录含有符号链接。在 grep 中使用 `-l` 标志排除符号链接即可解决：
 
-grep -R --include='\*.sh' --include='\*.conf' --include='\*.py' --include='\*.yaml' --include='\*.php' -E '172.24.6.71' /data1/resource/ -il| grep -vP '\[^:\]+:\\s\*#'
+```bash
+grep -R --include='*.sh' --include='*.conf' --include='*.py' --include='*.yaml' --include='*.php' -E '172.24.6.71' /data1/resource/ -l | grep -vP '[^:]+:\s*#'
+```
+
+参数说明：
+- `-R`：递归搜索目录
+- `--include='*.ext'`：仅搜索指定扩展名的文件
+- `-E`：使用扩展正则表达式
+- `-l`：仅列出匹配的文件名（避免符号链接导致的无限循环）

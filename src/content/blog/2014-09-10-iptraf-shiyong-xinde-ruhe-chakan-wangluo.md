@@ -1,24 +1,15 @@
 ---
-title: 'iptraf使用心得——如何查看网络流量2011-12-08 12:05:37'
+title: iptraf使用心得——如何查看网络流量
 date: '2014-09-10'
-description: >-
-  iptraf使用心得——如何查看网络流量 2011-12-08 12:05:37 标签：iptraf 休闲 职场
-  前几天找到的iptraf真的让我爱不释手，今天抽空仔细把功能过了一遍，并且和三层交换机上统计的数据进行比较，基本弄清楚了数据含义和使用场景。
-  这里分享一下我跟人觉得比较有用的内容，希望对大家能有帮助。
+description: "iptraf是网络流量监控工具，可通过IP traffic monitor、General interface statistics等功能查看实时网络流量分布。需要配置Reverse DNS lookups和TCP/UDP service names等选项以获得直观结果。"
 category: linux
 tags:
-  - dns
   - 监控告警
   - 网络排查
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-iptraf使用心得——如何查看网络流量
-
-2011-12-08 12:05:37
-
-标签：[iptraf](http://blog.51cto.com/tag-iptraf.html) [休闲](http://blog.51cto.com/tag-%E4%BC%91%E9%97%B2.html) [职场](http://blog.51cto.com/tag-%E8%81%8C%E5%9C%BA.html)
 
 前几天找到的iptraf真的让我爱不释手，今天抽空仔细把功能过了一遍，并且和三层交换机上统计的数据进行比较，基本弄清楚了数据含义和使用场景。这里分享一下我跟人觉得比较有用的内容，希望对大家能有帮助。
 
