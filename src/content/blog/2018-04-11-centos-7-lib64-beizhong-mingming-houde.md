@@ -1,17 +1,14 @@
 ---
-title: CentOS 7 /lib64被重命名后的解决(yau亲测有用，赞)
+title: CentOS 7 /lib64 被重命名后的解决
 date: '2018-04-11'
-description: >-
-  <table<tbody<tr<td<div<span<span<span[日期：2017-01-22]</span</span</span</div</td<td<div<span<span<span来源：Linux社区
+description: "不小心重命名 /lib64 导致系统命令崩溃的恢复方法。涉及 LD_LIBRARY_PATH、LD_PRELOAD 环境变量和动态链接器原理。"
 category: linux
 tags:
-  - ssh
-  - ftp
+  - linux-admin
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-<table><tbody><tr><td><div><span><span><span>[日期：2017-01-22]</span></span></span></div></td><td><div><span><span><span>来源：Linux社区 作者：wwmshe</span></span></span></div></td><td><div><span><span><span>[字体：</span><span>大</span><span>中</span><span>小</span><span>]</span></span></span></div></td></tr></tbody></table>
 
 [CentOS](http://www.linuxidc.com/topicnews.aspx?tid=14 "CentOS") 7 64 位系统，为了测试，把/usr/lib64重命名成了/usr/lib64.bk，结果发现，在运行vi命令的时候报错：
 

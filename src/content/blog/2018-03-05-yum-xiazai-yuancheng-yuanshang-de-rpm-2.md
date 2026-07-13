@@ -1,28 +1,27 @@
 ---
-title: yum下载远程源上的rpm包
+title: yum 下载远程源上的 RPM 包
 date: '2018-03-05'
-description: >-
-  2018年3月5日 10:27 yum下载远程源上的rpm包 Thursday, November 7, 2013 9:55 AM
-  对没有安装过的rpm包可以直接 yumdownloader +包名 下载到当前目录 如果已经安装了，则加上resolve参数 yumdownloader
-  --resolve +包名
+description: "用 yumdownloader 命令从远程 yum 源下载 RPM 包，支持自动解析依赖关系。"
 category: linux
-tags: []
+tags:
+  - linux-admin
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-2018年3月5日
 
-10:27
+用 `yumdownloader` 从远程 yum 源下载 RPM 包。
 
-yum下载远程源上的rpm包
+未安装过的包，直接下载：
 
-Thursday, November 7, 2013
+```bash
+yumdownloader packagename
+```
 
-9:55 AM
+已安装的包，或需要自动解析依赖关系，加 `--resolve` 参数：
 
-对没有安装过的rpm包可以直接 yumdownloader +包名 下载到当前目录
+```bash
+yumdownloader --resolve packagename
+```
 
-如果已经安装了，则加上resolve参数
-
-yumdownloader --resolve +包名
+包会下载到当前目录。

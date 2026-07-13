@@ -1,184 +1,134 @@
 ---
-title: Linux 技巧：让进程在后台可靠运行的几种方法
+title: Linux 后台进程管理方法
 date: '2017-12-18'
-description: >-
-  2017年12月18日 17:25 Linux 技巧：让进程在后台可靠运行的几种方法 申 毅 2008 年 5 月 29 日发布 Weibo Google+
-  用电子邮件发送本页面
+description: "远程 SSH 登录时进程的后台运行方法。介绍 nohup、setsid、subshell、disown、screen 等命令的用法，帮助进程在网络断开或终端关闭后继续运行。"
 category: linux
 tags:
-  - ssh
-  - php
-  - ssl-tls
+  - shell-scripting
+  - linux-admin
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: https://www.ibm.com/developerworks/cn/linux/l-cn-nohup/index.html
 ---
-2017年12月18日
 
-17:25
+## 问题
 
-Linux 技巧：让进程在后台可靠运行的几种方法
+用 telnet/ssh 登录远程 Linux 服务器运行耗时任务时，网络断开或关闭终端会导致进程中断。需要使进程在后台稳定运行。
 
-![](/images/legacy/legacy-ac6f0f5971.png)
+## HUP 信号与 hangup
 
-申 毅
+Unix 早期，每个终端通过 modem 与系统通信。用户 logout 时 modem 挂断（hang up），给终端发送 HUP（hangup）信号关闭所有子进程。现代系统中网络断开时也会触发 HUP 信号。
 
-2008 年 5 月 29 日发布
+解决方案：要么让进程忽略 HUP 信号，要么让进程运行在新的会话里成为不属于该终端的子进程。
 
-[Weibo](http://service.weibo.com/share/share.php?url=http%3A%2F%2Fwww.ibm.com%2Fdeveloperworks%2Fcn%2Flinux%2Fl-cn-nohup%2Findex.html%25&title=Linux%20%E6%8A%80%E5%B7%A7%EF%BC%9A%E8%AE%A9%E8%BF%9B%E7%A8%8B%E5%9C%A8%E5%90%8E%E5%8F%B0%E5%8F%AF%E9%9D%A0%E8%BF%90%E8%A1%8C%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E6%B3%95&language=zh_cn)
+## nohup
 
-[Google+](https://plus.google.com/share?url=http%3A%2F%2Fwww.ibm.com%2Fdeveloperworks%2Fcn%2Flinux%2Fl-cn-nohup%2Findex.html&t=Linux%20%E6%8A%80%E5%B7%A7%EF%BC%9A%E8%AE%A9%E8%BF%9B%E7%A8%8B%E5%9C%A8%E5%90%8E%E5%8F%B0%E5%8F%AF%E9%9D%A0%E8%BF%90%E8%A1%8C%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E6%B3%95)
+命令前加 `nohup`，让命令忽略 hangup 信号。标准输出和错误默认重定向到 `nohup.out`，可用 `> filename 2>&1` 指定输出文件。
 
-[用电子邮件发送本页面](mailto:?subject=Linux%20%E6%8A%80%E5%B7%A7%EF%BC%9A%E8%AE%A9%E8%BF%9B%E7%A8%8B%E5%9C%A8%E5%90%8E%E5%8F%B0%E5%8F%AF%E9%9D%A0%E8%BF%90%E8%A1%8C%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E6%B3%95&body=http%3A%2F%2Fwww.ibm.com%2Fdeveloperworks%2Fcn%2Flinux%2Fl-cn-nohup%2Findex.html)
+```bash
+nohup ping www.ibm.com &
+ps -ef | grep ping
+```
 
-![](/images/legacy/legacy-d3276455ec.png)
+## setsid
 
-[https://www.ibm.com/developerworks/cn/linux/l-cn-nohup/index.html#icomments](https://www.ibm.com/developerworks/cn/linux/l-cn-nohup/index.html#icomments)
+运行程序在新会话中，使其不属于当前终端的子进程。
 
-[11](https://www.ibm.com/developerworks/cn/linux/l-cn-nohup/index.html#icomments)
+```bash
+setsid ping www.ibm.com
+ps -ef | grep ping
+# 进程父进程 ID（PPID）为 1（init 进程）
+```
 
-我们经常会碰到这样的问题，用 telnet/ssh 登录了远程的 Linux 服务器，运行了一些耗时较长的任务， 结果却由于网络的不稳定导致任务中途失败。如何让命令提交后不受本地关闭终端窗口/网络断开连接的干扰呢？下面举了一些例子， 您可以针对不同的场景选择不同的方式来处理这个问题。
+## subshell（& 和 ()）
 
-nohup/setsid/&
+将命令放在 `()` 中并加 `&` 后台运行：
 
-场景：
+```bash
+(ping www.ibm.com &)
+ps -ef | grep ping
+# 进程 PPID 也为 1
+# 无法通过 jobs 查看，但可用 ps -ef 看到
+```
 
-如果只是临时有一个命令需要长时间运行，什么方法能最简便的保证它在后台稳定运行呢？
+## disown（事后补救）
 
-**hangup 名称的来由**
+若命令已提交但未加保护，可用 disown 补救。前提是已用 `&` 放入后台或用 Ctrl-z 暂停后用 `bg` 恢复。
 
-在 Unix 的早期版本中，每个终端都会通过 modem 和系统通讯。当用户 logout 时，modem 就会挂断（hang up）电话。 同理，当 modem 断开连接时，就会给终端发送 hangup 信号来通知其关闭所有子进程。
+用法：
 
-解决方法：
+```bash
+disown -h %jobspec    # 使指定作业忽略 HUP
+disown -ah            # 所有作业忽略 HUP
+disown -rh            # 正在运行的作业忽略 HUP
+```
 
-我们知道，当用户注销（logout）或者网络断开时，终端会收到 HUP（hangup）信号从而关闭其所有子进程。因此，我们的解决办法就有两种途径：要么让进程忽略 HUP 信号，要么让进程运行在新的会话里从而成为不属于此终端的子进程。
+### disown 示例 1（命令已后台运行）
 
-1\. nohup
+```bash
+cp -r testLargeFile largeFile &
+jobs
+disown -h %1
+ps -ef | grep largeFile
+logout
+```
 
-nohup 无疑是我们首先想到的办法。顾名思义，nohup 的用途就是让提交的命令忽略 hangup 信号。让我们先来看一下 nohup 的帮助信息：
+### disown 示例 2（命令未后台运行）
 
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div><div><span><span>6</span></span></div><div><span><span>7</span></span></div><div><span><span>8</span></span></div><div><span><span>9</span></span></div><div><span><span>10</span></span></div><div><span><span>11</span></span></div><div><span><span>12</span></span></div><div><span><span>13</span></span></div><div><span><span>14</span></span></div><div><span><span>15</span></span></div><div><span><span>16</span></span></div></td><td><div><span><span>NOHUP(1) User Commands NOHUP(1)</span></span></div><div><span><span>NAME</span></span></div><div><span><span> nohup - run a command immune to hangups, with output to a non-tty</span></span></div><div><span><span>SYNOPSIS</span></span></div><div><span><span> nohup COMMAND [ARG]...</span></span></div><div><span><span> nohup OPTION</span></span></div><div><span><span>DESCRIPTION</span></span></div><div><span><span> Run COMMAND, ignoring hangup signals.</span></span></div><div><span><span> --help display this help and exit</span></span></div><div><span><span> --version</span></span></div><div><span><span> output version information and exit</span></span></div></td></tr></tbody></table>
+先用 Ctrl-z 暂停，再用 `bg` 恢复，最后 disown：
 
-可见，nohup 的使用是十分方便的，只需在要处理的命令前加上 nohup 即可，标准输出和标准错误缺省会被重定向到 nohup.out 文件中。一般我们可在结尾加上"&"来将命令同时放入后台运行，也可用">_filename_ 2>&1"来更改缺省的重定向文件名。
+```bash
+cp -r testLargeFile largeFile2
+# 按 Ctrl-z
+bg %1
+jobs
+disown -h %1
+ps -ef | grep largeFile2
+```
 
-nohup 示例
+### Ctrl-z 与 jobs 配合
 
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div><div><span><span>6</span></span></div><div><span><span>7</span></span></div></td><td><div><span><span>[root@pvcent107 ~]# nohup ping <a>www.ibm.com</a> &</span></span></div><div><span><span>[1] 3059</span></span></div><div><span><span>nohup: appending output to `nohup.out'</span></span></div><div><span><span>[root@pvcent107 ~]# ps -ef |grep 3059</span></span></div><div><span><span>root 3059 984 0 21:06 pts/3 00:00:00 ping <a>www.ibm.com</a></span></span></div><div><span><span>root 3067 984 0 21:06 pts/3 00:00:00 grep 3059</span></span></div><div><span><span>[root@pvcent107 ~]#</span></span></div></td></tr></tbody></table>
+- `Ctrl-z`：暂停当前进程
+- `jobs`：查看所有作业及作业号
+- `bg %jobspec`：在后台继续运行
+- `fg %jobspec`：恢复到前台
 
-2。setsid
+disown 后，作业将从作业列表中移除，无法用 jobs 查看，但仍可用 `ps -ef` 找到。
 
-nohup 无疑能通过忽略 HUP 信号来使我们的进程避免中途被中断，但如果我们换个角度思考，如果我们的进程不属于接受 HUP 信号的终端的子进程，那么自然也就不会受到 HUP 信号的影响了。setsid 就能帮助我们做到这一点。让我们先来看一下 setsid 的帮助信息：
+## screen（大批量场景最佳选择）
 
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div><div><span><span>6</span></span></div><div><span><span>7</span></span></div><div><span><span>8</span></span></div><div><span><span>9</span></span></div><div><span><span>10</span></span></div></td><td><div><span><span>SETSID(8) Linux Programmer’s Manual SETSID(8)</span></span></div><div><span><span>NAME</span></span></div><div><span><span> setsid - run a program in a new session</span></span></div><div><span><span>SYNOPSIS</span></span></div><div><span><span> setsid program [ arg ... ]</span></span></div><div><span><span>DESCRIPTION</span></span></div><div><span><span> setsid runs a program in a new session.</span></span></div></td></tr></tbody></table>
+screen 是虚拟终端管理器，在一个真实终端下运行多个伪终端。在 screen 会话中启动的进程的父进程是 screen（PID 为 1 的 init），不再属于 ssh 终端的子进程，从而避免 HUP 信号影响。
 
-可见 setsid 的使用也是非常方便的，也只需在要处理的命令前加上 setsid 即可。
+常用选项：
 
-setsid 示例
+```bash
+screen -dmS sessionname   # 建立名为 sessionname 的断开模式会话
+screen -list              # 列出所有会话
+screen -r sessionname     # 重新连接会话
+# 在 screen 中按 Ctrl-a d 暂时断开
+```
 
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div></td><td><div><span><span>[root@pvcent107 ~]# setsid ping <a>www.ibm.com</a></span></span></div><div><span><span>[root@pvcent107 ~]# ps -ef |grep <a>www.ibm.com</a></span></span></div><div><span><span>root 31094 1 0 07:28 ? 00:00:00 ping <a>www.ibm.com</a></span></span></div><div><span><span>root 31102 29217 0 07:29 pts/4 00:00:00 grep <a>www.ibm.com</a></span></span></div><div><span><span>[root@pvcent107 ~]#</span></span></div></td></tr></tbody></table>
+示例：
 
-值得注意的是，上例中我们的进程 ID(PID)为31094，而它的父 ID（PPID）为1（即为 init 进程 ID），并不是当前终端的进程 ID。请将此例与[nohup 例](https://www.ibm.com/developerworks/cn/linux/l-cn-nohup/index.html#nohup)中的父 ID 做比较。
+```bash
+screen -dmS Urumchi
+screen -list
+# 输出：12842.Urumchi (Detached)
+screen -r Urumchi
+# 连接后可运行任意命令，关闭 ssh 后进程继续运行
+```
 
-3。&
+进程树对比（假设 ping 进程 ID 为 9488）：
 
-这里还有一个关于 subshell 的小技巧。我们知道，将一个或多个命名包含在“()”中就能让这些命令在子 shell 中运行中，从而扩展出很多有趣的功能，我们现在要讨论的就是其中之一。
+**不使用 screen：** 进程树为 `init -> sshd -> bash -> ping`，ssh 断开时 bash 收到 HUP 并传递给 ping。
 
-当我们将"&"也放入“()”内之后，我们就会发现所提交的作业并不在作业列表中，也就是说，是无法通过jobs来查看的。让我们来看看为什么这样就能躲过 HUP 信号的影响吧。
+**使用 screen：** 进程树为 `init -> screen -> bash -> ping`，ssh 断开时 screen 不会收到 HUP。
 
-subshell 示例
+## 总结
 
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div></td><td><div><span><span>[root@pvcent107 ~]# (ping <a>www.ibm.com</a> &)</span></span></div><div><span><span>[root@pvcent107 ~]# ps -ef |grep <a>www.ibm.com</a></span></span></div><div><span><span>root 16270 1 0 14:13 pts/4 00:00:00 ping <a>www.ibm.com</a></span></span></div><div><span><span>root 16278 15362 0 14:13 pts/4 00:00:00 grep <a>www.ibm.com</a></span></span></div><div><span><span>[root@pvcent107 ~]#</span></span></div></td></tr></tbody></table>
+选择方案根据场景：
 
-从上例中可以看出，新提交的进程的父 ID（PPID）为1（init 进程的 PID），并不是当前终端的进程 ID。因此并不属于当前终端的子进程，从而也就不会受到当前终端的 HUP 信号的影响了。
-
-disown
-
-场景：
-
-我们已经知道，如果事先在命令前加上 nohup 或者 setsid 就可以避免 HUP 信号的影响。但是如果我们未加任何处理就已经提交了命令，该如何补救才能让它避免 HUP 信号的影响呢？
-
-解决方法：
-
-这时想加 nohup 或者 setsid 已经为时已晚，只能通过作业调度和 disown 来解决这个问题了。让我们来看一下 disown 的帮助信息：
-
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div><div><span><span>6</span></span></div><div><span><span>7</span></span></div><div><span><span>8</span></span></div><div><span><span>9</span></span></div><div><span><span>10</span></span></div><div><span><span>11</span></span></div></td><td><div><span><span>disown [-ar] [-h] [jobspec ...]</span></span></div><div><span><span> Without options, each jobspec is removed from the table of</span></span></div><div><span><span> active jobs. If the -h option is given, each jobspec is not</span></span></div><div><span><span> removed from the table, but is marked so that SIGHUP is not</span></span></div><div><span><span> sent to the job if the shell receives a SIGHUP. If no jobspec</span></span></div><div><span><span> is present, and neither the -a nor the -r option is supplied,</span></span></div><div><span><span> the current job is used. If no jobspec is supplied, the -a</span></span></div><div><span><span> option means to remove or mark all jobs; the -r option without</span></span></div><div><span><span> a jobspec argument restricts operation to running jobs. The</span></span></div><div><span><span> return value is 0 unless a jobspec does not specify a valid</span></span></div><div><span><span> job.</span></span></div></td></tr></tbody></table>
-
-可以看出，我们可以用如下方式来达成我们的目的。
-
-**灵活运用 CTRL-z**
-
-在我们的日常工作中，我们可以用 CTRL-z 来将当前进程挂起到后台暂停运行，执行一些别的操作，然后再用 fg 来将挂起的进程重新放回前台（也可用 bg 来将挂起的进程放在后台）继续运行。这样我们就可以在一个终端内灵活切换运行多个任务，这一点在调试代码时尤为有用。因为将代码编辑器挂起到后台再重新放回时，光标定位仍然停留在上次挂起时的位置，避免了重新定位的麻烦。
-
-- 用disown -h _jobspec_来使某个作业忽略HUP信号。
-
-- 用disown -ah 来使所有的作业都忽略HUP信号。
-
-- 用disown -rh 来使正在运行的作业忽略HUP信号。
-
-需要注意的是，当使用过 disown 之后，会将把目标作业从作业列表中移除，我们将不能再使用jobs来查看它，但是依然能够用ps -ef查找到它。
-
-但是还有一个问题，这种方法的操作对象是作业，如果我们在运行命令时在结尾加了"&"来使它成为一个作业并在后台运行，那么就万事大吉了，我们可以通过jobs命令来得到所有作业的列表。但是如果并没有把当前命令作为作业来运行，如何才能得到它的作业号呢？答案就是用 CTRL-z（按住Ctrl键的同时按住z键）了！
-
-CTRL-z 的用途就是将当前进程挂起（Suspend），然后我们就可以用jobs命令来查询它的作业号，再用bg _jobspec_来将它放入后台并继续运行。需要注意的是，如果挂起会影响当前进程的运行结果，请慎用此方法。
-
-disown 示例1（如果提交命令时已经用“&”将命令放入后台运行，则可以直接使用“disown”）
-
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div><div><span><span>6</span></span></div><div><span><span>7</span></span></div><div><span><span>8</span></span></div><div><span><span>9</span></span></div></td><td><div><span><span>[root@pvcent107 build]# cp -r testLargeFile largeFile &</span></span></div><div><span><span>[1] 4825</span></span></div><div><span><span>[root@pvcent107 build]# jobs</span></span></div><div><span><span>[1]+ Running cp -i -r testLargeFile largeFile &</span></span></div><div><span><span>[root@pvcent107 build]# disown -h %1</span></span></div><div><span><span>[root@pvcent107 build]# ps -ef |grep largeFile</span></span></div><div><span><span>root 4825 968 1 09:46 pts/4 00:00:00 cp -i -r testLargeFile largeFile</span></span></div><div><span><span>root 4853 968 0 09:46 pts/4 00:00:00 grep largeFile</span></span></div><div><span><span>[root@pvcent107 build]# logout</span></span></div></td></tr></tbody></table>
-
-disown 示例2（如果提交命令时未使用“&”将命令放入后台运行，可使用 CTRL-z 和“bg”将其放入后台，再使用“disown”）
-
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div><div><span><span>6</span></span></div><div><span><span>7</span></span></div><div><span><span>8</span></span></div><div><span><span>9</span></span></div><div><span><span>10</span></span></div><div><span><span>11</span></span></div><div><span><span>12</span></span></div></td><td><div><span><span>[root@pvcent107 build]# cp -r testLargeFile largeFile2</span></span></div><div><span><span>[1]+ Stopped cp -i -r testLargeFile largeFile2</span></span></div><div><span><span>[root@pvcent107 build]# bg %1</span></span></div><div><span><span>[1]+ cp -i -r testLargeFile largeFile2 &</span></span></div><div><span><span>[root@pvcent107 build]# jobs</span></span></div><div><span><span>[1]+ Running cp -i -r testLargeFile largeFile2 &</span></span></div><div><span><span>[root@pvcent107 build]# disown -h %1</span></span></div><div><span><span>[root@pvcent107 build]# ps -ef |grep largeFile2</span></span></div><div><span><span>root 5790 5577 1 10:04 pts/3 00:00:00 cp -i -r testLargeFile largeFile2</span></span></div><div><span><span>root 5824 5577 0 10:05 pts/3 00:00:00 grep largeFile2</span></span></div><div><span><span>[root@pvcent107 build]#</span></span></div></td></tr></tbody></table>
-
-screen
-
-场景：
-
-我们已经知道了如何让进程免受 HUP 信号的影响，但是如果有大量这种命令需要在稳定的后台里运行，如何避免对每条命令都做这样的操作呢？
-
-解决方法：
-
-此时最方便的方法就是 screen 了。简单的说，screen 提供了 ANSI/VT100 的终端模拟器，使它能够在一个真实终端下运行多个全屏的伪终端。screen 的参数很多，具有很强大的功能，我们在此仅介绍其常用功能以及简要分析一下为什么使用 screen 能够避免 HUP 信号的影响。我们先看一下 screen 的帮助信息：
-
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div><div><span><span>6</span></span></div><div><span><span>7</span></span></div><div><span><span>8</span></span></div><div><span><span>9</span></span></div><div><span><span>10</span></span></div><div><span><span>11</span></span></div><div><span><span>12</span></span></div><div><span><span>13</span></span></div><div><span><span>14</span></span></div><div><span><span>15</span></span></div><div><span><span>16</span></span></div><div><span><span>17</span></span></div><div><span><span>18</span></span></div><div><span><span>19</span></span></div></td><td><div><span><span>SCREEN(1) SCREEN(1)</span></span></div><div><span><span>NAME</span></span></div><div><span><span> screen - screen manager with VT100/ANSI terminal emulation</span></span></div><div><span><span>SYNOPSIS</span></span></div><div><span><span> screen [ -options ] [ cmd [ args ] ]</span></span></div><div><span><span> screen -r [[pid.]tty[.host]]</span></span></div><div><span><span> screen -r sessionowner/[[pid.]tty[.host]]</span></span></div><div><span><span>DESCRIPTION</span></span></div><div><span><span> Screen is a full-screen window manager that multiplexes a physical</span></span></div><div><span><span> terminal between several processes (typically interactive shells).</span></span></div><div><span><span> Each virtual terminal provides the functions of a DEC VT100 terminal</span></span></div><div><span><span> and, in addition, several control functions from the ISO 6429 (ECMA</span></span></div><div><span><span> 48, ANSI X3.64) and ISO 2022 standards (e.g. insert/delete line and</span></span></div><div><span><span> support for multiple character sets). There is a scrollback history</span></span></div><div><span><span> buffer for each virtual terminal and a copy-and-paste mechanism that</span></span></div><div><span><span> allows moving text regions between windows.</span></span></div></td></tr></tbody></table>
-
-使用 screen 很方便，有以下几个常用选项：
-
-- 用screen -dmS _session name_来建立一个处于断开模式下的会话（并指定其会话名）。
-
-- 用screen -list 来列出所有会话。
-
-- 用screen -r _session name_来重新连接指定会话。
-
-- 用快捷键CTRL-a d 来暂时断开当前会话。
-
-screen 示例
-
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div><div><span><span>6</span></span></div><div><span><span>7</span></span></div></td><td><div><span><span>[root@pvcent107 ~]# screen -dmS Urumchi</span></span></div><div><span><span>[root@pvcent107 ~]# screen -list</span></span></div><div><span><span>There is a screen on:</span></span></div><div><span><span> 12842.Urumchi (Detached)</span></span></div><div><span><span>1 Socket in /tmp/screens/S-root.</span></span></div><div><span><span>[root@pvcent107 ~]# screen -r Urumchi</span></span></div></td></tr></tbody></table>
-
-当我们用“-r”连接到 screen 会话后，我们就可以在这个伪终端里面为所欲为，再也不用担心 HUP 信号会对我们的进程造成影响，也不用给每个命令前都加上“nohup”或者“setsid”了。这是为什么呢？让我来看一下下面两个例子吧。
-
-1\. 未使用 screen 时新进程的进程树
-
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div><div><span><span>6</span></span></div><div><span><span>7</span></span></div><div><span><span>8</span></span></div><div><span><span>9</span></span></div></td><td><div><span><span>[root@pvcent107 ~]# ping <a>www.google.com</a> &</span></span></div><div><span><span>[1] 9499</span></span></div><div><span><span>[root@pvcent107 ~]# pstree -H 9499</span></span></div><div><span><span>init─┬─Xvnc</span></span></div><div><span><span> ├─acpid</span></span></div><div><span><span> ├─atd</span></span></div><div><span><span> ├─2*[sendmail]</span></span></div><div><span><span> ├─sshd─┬─sshd───bash───pstree</span></span></div><div><span><span> │ └─sshd───bash───ping</span></span></div></td></tr></tbody></table>
-
-我们可以看出，未使用 screen 时我们所处的 bash 是 sshd 的子进程，当 ssh 断开连接时，HUP 信号自然会影响到它下面的所有子进程（包括我们新建立的 ping 进程）。
-
-2\. 使用了 screen 后新进程的进程树
-
-<table><tbody><tr><td><div><span><span>1</span></span></div><div><span><span>2</span></span></div><div><span><span>3</span></span></div><div><span><span>4</span></span></div><div><span><span>5</span></span></div><div><span><span>6</span></span></div><div><span><span>7</span></span></div><div><span><span>8</span></span></div><div><span><span>9</span></span></div></td><td><div><span><span>[root@pvcent107 ~]# screen -r Urumchi</span></span></div><div><span><span>[root@pvcent107 ~]# ping <a>www.ibm.com</a> &</span></span></div><div><span><span>[1] 9488</span></span></div><div><span><span>[root@pvcent107 ~]# pstree -H 9488</span></span></div><div><span><span>init─┬─Xvnc</span></span></div><div><span><span> ├─acpid</span></span></div><div><span><span> ├─atd</span></span></div><div><span><span> ├─screen───bash───ping</span></span></div><div><span><span> ├─2*[sendmail]</span></span></div></td></tr></tbody></table>
-
-而使用了 screen 后就不同了，此时 bash 是 screen 的子进程，而 screen 是 init（PID为1）的子进程。那么当 ssh 断开连接时，HUP 信号自然不会影响到 screen 下面的子进程了。
-
-总结
-
-现在几种方法已经介绍完毕，我们可以根据不同的场景来选择不同的方案。nohup/setsid 无疑是临时需要时最方便的方法，disown 能帮助我们来事后补救当前已经在运行了的作业，而 screen 则是在大批量操作时不二的选择了。
-
-相关主题
-
-- “[系统管理员工具包：进程管理技巧](http://www.ibm.com/developerworks/cn/aix/library/es-unix-sysadmin1.html)”（developerWorks 中国，2006 年 5 月）介绍了 Linux 进程管理的更多技巧。
-
-- “[Linux 技巧：使用 screen 管理你的远程会话](http://www.ibm.com/developerworks/cn/linux/l-cn-screen/)”（developerWorks 中国，2007 年 7 月）介绍了 screen 的更多技巧。
-
-- 在 [developerWorks 中国网站 Linux 专区](http://www.ibm.com/developerworks/cn/linux/)中学习更多 Linux 方面的知识。
-
-来自 <[https://www.ibm.com/developerworks/cn/linux/l-cn-nohup/index.html](https://www.ibm.com/developerworks/cn/linux/l-cn-nohup/index.html)\>
+- **临时一次性任务**：nohup 或 setsid 最简便
+- **任务已在运行、需补救**：disown + Ctrl-z + bg
+- **大量长期运行任务**：screen 是最佳选择

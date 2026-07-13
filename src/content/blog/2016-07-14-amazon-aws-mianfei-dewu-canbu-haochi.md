@@ -1,31 +1,54 @@
 ---
-title: Amazon AWS —— 免费的午餐不好吃
+title: Amazon AWS 免费的午餐不好吃
 date: '2016-07-14'
-description: >-
-  免费资源那么多，为何只用 EC2？  EBS 好东西，天价 I/O 是问题 S3真高端，静态资源往里搬 RDS也帮忙，I/O 不再飞快涨
-  免费服务很多，其他不再多说 众技术宅所周知，Amazon AWS 之前提供了“新用户凭有效信用卡免费试用一年”的活动，至今没有给出截止日期。
+description: 'AWS 免费套餐使用经验：EC2、EBS、RDS 等服务的免费额度限制及超费陷阱分析，实际月均费用计算。'
 category: linux
 tags:
   - mysql
   - redis
-  - memcached
-  - dns
-  - php
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-- [免费资源那么多，为何只用 EC2？](http://bropaul.com/post/amazon-aws-in-practice#toc_0)
+Amazon AWS 之前提供了「新用户凭有效信用卡免费试用一年」的活动。虽然免费额度很诱人，但实际使用中容易踩坑超费。这是使用 AWS 免费套餐的经验总结。
 
-- [EBS 好东西，天价 I/O 是问题](http://bropaul.com/post/amazon-aws-in-practice#toc_1)
+## 免费资源那么多，为何只用 EC2？
 
-- [S3真高端，静态资源往里搬](http://bropaul.com/post/amazon-aws-in-practice#toc_2)
+AWS 免费套餐包括为期一年每月 750 小时的 Linux 和 Windows 微型实例试用时间。注意是「和」，也就是说可以同时运行一个 Linux 微型实例和一个 Windows 微型实例。但微型实例只能使用以 EBS 作为存储的系统镜像，而 Windows 镜像要求最小 30GB 存储。如果要同时运行 Linux 和 Windows，就必须为 EBS 埋单。因此实际上 Amazon 只允许你同时运行一个微型实例。
 
-- [RDS也帮忙，I/O 不再飞快涨](http://bropaul.com/post/amazon-aws-in-practice#toc_3)
+## EBS 好东西，天价 I/O 是问题
 
-- [免费服务很多，其他不再多说](http://bropaul.com/post/amazon-aws-in-practice#toc_4)
+AWS 免费套餐包括：
+- 30 GB 的 Amazon Elastic Block Storage (EBS)
+- 200 万个 I/O 操作
+- 1 GB 的快照存储
 
-众技术宅所周知，Amazon AWS 之前提供了“新用户凭有效信用卡免费试用一年”的活动，至今没有给出截止日期。虽说免费的午餐很诱人，而且由于信用卡的门槛，也避免了一部分的滥用，但是要安心吃好这顿饭，没有第一个吃螃蟹的人提供一点经验，多多少少心里还是会没底的。那么，在消失了这么多天鼓捣本站彩蛋至今终于算是基本完成于是我又可以继续写博客之后（这半句可以简单理解为：我终于滚回来了），打算和大家分享一下这段时间使用 AWS 的一些经验，希望有所帮助。
+I/O 是「磁盘读写操作」，读写都计数。超过 200 万后按 $0.12/100 万 I/O 计费（数据中心不同价格有差异）。如果把数据库也放在 EC2 上频繁读写，一个月就容易超出 200 万 I/O。
+
+### 降低 I/O 的方法
+
+使用缓存技术。AWS 免费套餐包括 750 小时的 Amazon ElastiCache 服务：
+
+```
+支持 Memcached 和 Redis 缓存引擎，足够整月持续运行微缓存节点
+```
+
+## S3 真高端，静态资源往里搬
+
+AWS 免费套餐包括：
+- 5 GB 的 Amazon S3 标准存储
+- 20,000 个获取请求
+- 2,000 个放入请求
+
+S3 容量大，限制获取次数但不限制流量。注意防盗链，否则月账单可能上万。S3 的访问控制功能强大，可直接托管静态网站。
+
+## RDS 也帮忙，I/O 不再飞快涨
+
+AWS 免费套餐包括：
+- 750 小时的 Amazon RDS 单一可用区域微型数据库实例
+- 20 GB 数据库存储
+- 1,000 万 I/O 操作
+- 20 GB 备份存储虽说免费的午餐很诱人，而且由于信用卡的门槛，也避免了一部分的滥用，但是要安心吃好这顿饭，没有第一个吃螃蟹的人提供一点经验，多多少少心里还是会没底的。那么，在消失了这么多天鼓捣本站彩蛋至今终于算是基本完成于是我又可以继续写博客之后（这半句可以简单理解为：我终于滚回来了），打算和大家分享一下这段时间使用 AWS 的一些经验，希望有所帮助。
 
 预警：本文不适合**纯小白**（比如不知道啥是 AWS 的人），请确保至少是和博主一样的小白级别
 
@@ -115,32 +138,45 @@ AWS 免费套餐包括为期一年每月 750 小时 Linux 和 Windows 微型实�
 
 **2014年3月4日更新：**
 
-贴一下我现在使用的实例的参数吧，其实我自己也只用到 AWS 中的 EC2 和 RDS 而已，连 S3 都没用上...
+## 实例配置参考
 
-<table><tbody><tr><td><div><b><span><span>EC2 控制面板条目</span></span></b></div></td><td><div><b><span><span>数据</span></span></b></div></td></tr><tr><td><div><span><span>EC2 Region（地区）</span></span></div></td><td><div><span><span>Asia Pacific (Singapore)</span></span></div></td></tr><tr><td><div><span><span>EC2 Instance Type（实例类型）</span></span></div></td><td><div><span><span>t1.micro</span></span></div></td></tr><tr><td><div><span><span>EC2 Availability Zone（数据中心）</span></span></div></td><td><div><span><span>ap-southeast-1b</span></span></div></td></tr><tr><td><div><span><span>EBS Capacity（容量）</span></span></div></td><td><div><span><span>10GiB</span></span></div></td></tr><tr><td><div><span><span>EBS Zone（数据中心）</span></span></div></td><td><div><span><span>ap-southeast-1b</span></span></div></td></tr></tbody></table>
+我现在使用的实例参数（仅用到 EC2 和 RDS，未使用 S3）：
 
-<table><tbody><tr><td><div><b><span><span>RDS 控制面板条目</span></span></b></div></td><td><div><b><span><span>数据</span></span></b></div></td></tr><tr><td><div><span><span>Multi-AZ（多数据中心容灾）</span></span></div></td><td><div><span><span>No</span></span></div></td></tr><tr><td><div><span><span>Class（实例类型）</span></span></div></td><td><div><span><span>db.t1.micro</span></span></div></td></tr><tr><td><div><span><span>Storage（容量）</span></span></div></td><td><div><span><span>20GB</span></span></div></td></tr><tr><td><div><span><span>Engine（数据库类型）</span></span></div></td><td><div><span><span>MySQL</span></span></div></td></tr><tr><td><div><span><span>Zone（数据中心）</span></span></div></td><td><div><span><span>ap-southeast-1b</span></span></div></td></tr></tbody></table>
+**EC2 控制面板条目**
 
-要切换不同的控制面板，请点击左上角的Services，然后在一大堆列表里找你要的服务。
+| 项目 | 配置 |
+|-----|------|
+| Region（地区） | Asia Pacific (Singapore) |
+| Instance Type（实例类型） | t1.micro |
+| Availability Zone（数据中心） | ap-southeast-1b |
+| EBS Capacity（容量） | 10GiB |
+| EBS Zone（数据中心） | ap-southeast-1b |
 
-鉴于留言中有朋友询问最低月费用，感觉我用的已经是最低配置了，如果全部收费的话，Linux 实例按每个月（按31天不间断使用算）2000访客，每个访客平均查看3个页面，每个页面30个请求，数据库、EC2 均不作备份来计算，费用大概要：
+**RDS 控制面板条目**
 
-- EC2实例：0.02x24x31=14.88
+| 项目 | 配置 |
+|-----|------|
+| Multi-AZ（多数据中心容灾） | No |
+| Class（实例类型） | db.t1.micro |
+| Storage（容量） | 20GB |
+| Engine（数据库类型） | MySQL |
+| Zone（数据中心） | ap-southeast-1b |
 
-- EBS存储：0.08x10=0.8
+要切换不同的控制面板，请点击左上角的 Services。
 
-- EBS I/O：0.08x2000x3x30/1000000=0.0144
+## 月度费用估算
 
-- RDS实例：0.035x24x31=26.04
+按 2000 访客/月、3 页面/访客、30 请求/页面、无备份方式计算（31 天不间断使用）：
 
-- RDS存储：0.11x10=1.1
+```
+EC2 实例：0.02 × 24 × 31 = $14.88
+EBS 存储：0.08 × 10 = $0.80
+EBS I/O：0.08 × 2000 × 3 × 30 / 1000000 = $0.01
+RDS 实例：0.035 × 24 × 31 = $26.04
+RDS 存储：0.11 × 10 = $1.10
+RDS I/O：0.11 × 2000 × 3 × 30 / 1000000 = $0.02
 
-- RDS I/O：0.11x2000x3x30/1000000=0.0198
+总费用：约 $42.85/月
+```
 
-- 总费用：14.88+0.8+0.0144+26.04+1.1+0.0198=42.8542，单位：美刀
-
-- 结论：略贵
-
-或者你可以试试不用 RDS，全靠 EBS 进行 I/O 操作，然后算算费用是多少，应该可以便宜不少。另外，EBS 和 RDS 存储可以相应降低一些，毕竟像我这样的小网站用不了那么多空间。当然，实在觉得博主实在不靠谱的也可以到[官方计算工具](http://calculator.s3.amazonaws.com/)自行计算~
-
-就这样啦，谢谢围观，欢迎留言。
+结论：略贵。可考虑降低存储容量或去掉 RDS 只用 EBS。

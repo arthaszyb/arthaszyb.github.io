@@ -2,13 +2,11 @@
 title: 分享日志
 date: '2018-03-05'
 description: >-
-  2018年3月5日 10:26 分享日志 热门日志 将win7电脑变身WiFi热点 分享 开启windows
-  7的隐藏功能：虚拟WiFi和SoftAP（即虚拟无线AP），就可以让电脑变成无线路由器，实现共享上网，节省网费和路由器购买费。
-  iphone4亲测通过,比conncetify方便，稳定，网速好！
+  Windows 7 虚拟 WiFi 配置方法（重复内容）。
 category: misc
 tags:
   - 网络排查
-draft: false
+draft: true
 source: evernote-local-db
 lang: zh
 ---

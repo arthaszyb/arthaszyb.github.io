@@ -1,27 +1,16 @@
 ---
 title: 'BIOS, UEFI, MBR, Legacy, GPT等概念整理'
 date: '2020-07-16'
-description: >-
-  HTML Content Jun Zheng 程序员 之前对以下概念的理解有些模糊并且比较容易混淆，因此抽空整理了一下，信息的主要来源是维基百科。 
-  分区表是在磁盘（存储介质）上的，用于描述该磁盘的分区情况，有GPT和MBR两种格式。
+description: 整理 BIOS/UEFI 固件接口标准、MBR/GPT 分区表、Legacy/UEFI 启动方式，以及 ESP 系统分区、引导程序等相关概念的对比和说明。
 category: linux
 tags:
-  - php
-  - ssl-tls
-  - 存储
+  - linux-admin
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-HTML Content
 
 # BIOS, UEFI, MBR, Legacy, GPT等概念整理
-
-[![](/images/legacy/legacy-00ea4a6280.jpg)](https://www.zhihu.com/people/jimzeus)
-
-[Jun Zheng](https://www.zhihu.com/people/jimzeus)
-
-程序员
 
 之前对以下概念的理解有些模糊并且比较容易混淆，因此抽空整理了一下，信息的主要来源是维基百科。
 

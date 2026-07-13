@@ -1,33 +1,18 @@
 ---
-title: 'CentOS 6和CentOS 7进入单用户模式区别【转】 (2016-02-24 13:30:19)'
+title: CentOS 6 和 CentOS 7 进入单用户模式区别
 date: '2018-03-21'
-description: >-
-  HTML Content CentOS 6和CentOS 7进入单用户模式区别【转】 (2016-02-24 13:30:19) Untitled
-  Attachment转载▼
-  <table<tbody<tr<td<div<br</div</td<td<div<span<span<span分类：</span
+description: "CentOS 6（GRUB）和 CentOS 7（GRUB 2、systemd）进入单用户模式的方法对比。"
 category: linux
 tags:
+  - linux-admin
   - systemd
-  - selinux
-  - lvm
-  - 备份恢复
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: http://dusiguxia.blog.163.com/blog/static/556293162010101483711469/
 ---
-HTML Content
 
-CentOS 6和CentOS 7进入单用户模式区别【转】 (2016-02-24 13:30:19)
-
-Untitled Attachment转载▼
-
-<table><tbody><tr><td><div><br></div></td><td><div><span><span><span>分类：</span> <a><span>linux摸索历程</span></a></span></span></div></td></tr></tbody></table>
-
-转载自：[http://dusiguxia.blog.163.com/blog/static/556293162010101483711469/](http://dusiguxia.blog.163.com/blog/static/556293162010101483711469/)
-
-参考自：[http://wenku.baidu.com/view/483a697203d8ce2f01662326.html](http://wenku.baidu.com/view/483a697203d8ce2f01662326.html)
-
-[http://f.dataguru.cn/thread-467168-1-1.html](http://f.dataguru.cn/thread-467168-1-1.html)
+单用户模式用于系统维护和故障排查，仅允许管理员访问。CentOS 6 和 CentOS 7 的进入方法不同。
 
 运行级别 1 只允许管理员通过服务器主机的单一控制台进行操作，即“单用户模式”。
 

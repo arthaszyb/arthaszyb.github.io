@@ -1,30 +1,33 @@
 ---
 title: 使用zsh替换bash
 date: '2016-07-22'
-description: >-
-  yum install zsh Changing your default shell After installing one the above
-  shells, you can execute that shell inside of your current shell, by just
-  running its
+description: '安装和配置 zsh shell，修改用户默认登录 shell。'
 category: linux
 tags: []
 draft: false
 source: evernote-local-db
 lang: zh
 ---
+## 安装 zsh
+
+```bash
 yum install zsh
+```
 
-Changing your default shell
+## 修改默认 shell
 
-After installing one the above shells, you can execute that shell inside of your current shell, by just running its executable. If you want to be served that shell when you login however, you will need to change your default shell.
+### 列出所有已安装的 shell
 
-To list all installed shells, run:
+```bash
+chsh -l
+```
 
-$ chsh -l
+### 设置默认 shell
 
-And to set one as default for your user do:
+```bash
+chsh -s /full-path-to-shell
+```
 
-$ chsh -s _full-path-to-shell_
+其中 `/full-path-to-shell` 是 `chsh -l` 输出的完整路径。
 
-where _full-path-to-shell_ is the full path as given by chsh -l.
-
-If you now log out and log in again, you will be greeted by the other shell.
+设置后，下次登录时会使用新的 shell。

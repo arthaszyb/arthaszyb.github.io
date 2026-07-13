@@ -1,12 +1,10 @@
 ---
-title: C语言中.h和.c文件解析（很精彩）
+title: C 语言中 .h 和 .c 文件解析
 date: '2018-07-27'
-description: >-
-  简单的说其实要理解C文件与头文件（即.h）有什么不同之处，首先需要弄明白编译器的工作过程，一般说来编译器会做以下几个过程： 1.预处理阶段
-  2.词法与语法分析阶段 3 .编译阶段，首先 编译 成纯汇编语句，再将之 汇编 成跟CPU相关的二进制码，生成各个目标文件 (.obj文件) 4.连接阶段，
+description: C 编译器的编译过程和 .h/.c 文件的分工，以及为什么要分开写头文件和源文件。
 category: misc
 tags:
-  - 存储
+  - java
 draft: false
 source: evernote-local-db
 lang: zh

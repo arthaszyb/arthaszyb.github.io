@@ -1,23 +1,14 @@
 ---
-title: 路由修改route
+title: 路由修改 route
 date: '2018-08-23'
-description: >-
-  HTML Content 2007-12-05 09:47 鸟哥 机械工业出版社华章公司 字号：T | T 综合评级： 想读(47) 在读(15)
-  已读(11) 品书斋鉴(1) 已有73人发表书评
-  《鸟哥的Linux私房菜——服务器架设篇》（第二版）第五章的主要介绍一些常见的网络命令，并新增了一些数据包捕获的命令。
+description: "Linux 网络路由配置，使用 route 命令查看和修改路由表。"
 category: linux
 tags:
-  - vmware
-  - php
-  - 集群
   - 网络排查
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-HTML Content
-
-# 路由修改route
 
 2007-12-05 09:47 鸟哥 机械工业出版社华章公司 字号：T | T
 
