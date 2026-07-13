@@ -1,106 +1,75 @@
 ---
 title: set names utf8的内部执行原理
 date: '2015-01-21'
-description: >-
-  解决乱码的方法，我们经常使用“ set names utf8 ”,那么为什么加上这句代码就可以解决了呢？ 下面跟着我一起来深入set names
-  utf8的内部执行原理 先说MySQL的字符集问题。
+description: "SET NAMES UTF8 如何解决 MySQL 乱码问题：设置 character_set_client、character_set_connection、character_set_results 三个字符集参数，保证数据在输入输出路径上的编码一致。"
 category: database
 tags:
   - mysql
   - php
 draft: false
 source: evernote-local-db
+origin_url: "http://hi.baidu.com/myt1988/blog/item/335786808ab7b8ce9123d9b7.html"
 lang: zh
 ---
-解决乱码的方法，我们经常使用“
-set names utf8
-”,那么为什么加上这句代码就可以解决了呢？下面跟着我一起来深入set names utf8的内部执行原理
-先说MySQL的字符集问题。Windows下可通过修改my.ini内的
-PHP代码
+
+## MySQL 字符集配置
+
+在 my.ini（Windows）或 my.cnf 中设置：
+
+```ini
 [mysql]
-default-character-set=utf8 //
-客户端的默认字符集
+default-character-set=utf8
+
 [mysqld]
-default-character-set=utf8 //服务器端默认的字符集
-假设我们把两个都设为
-utf8
-，然后在
-MySQL Command Line Client
-里面输入
-“show variebles like“character_set_%”;”
-，可看到如下字符：
-character_set_client latin1
+default-character-set=utf8
+```
+
+但即使设置了这些，直接连接时仍可能遇到乱码。查看当前字符集设置：
+
+```sql
+show variables like "character_set_%";
+```
+
+可能看到：
+
+```
+character_set_client     latin1
 character_set_connection latin1
-character_set_database utf8
-character_set_results latin1
-character_set_server utf8
-character_set_system utf8
-要是我们通过采用
-UTF-8
-的
-PHP
-程序从数据库里读取数据，很有可能是一串
-“?????”
-或者是其他乱码。
-解决办法是，在连接数据库之后，读取数据之前，先执行一项查询“SET NAMES UTF8”，即在PHP里为
-mysql_query("SET NAMES UTF8");
-//该句话一定要放在数据库服务器连接语句【$connection=mysql_connect($db_host,$db_user,$db_psw)or die("连接服务器失败");】之后
-即可显示正常（只要数据库里信息的字符正常）。
-到MySQL命令行输入“SET NAMES UTF8;”，然后执行“show variebles like“character_set_%”;”，发现原来为latin1的那些变量“character_set_client”、“character_set_connection”、“character_set_results”的值全部变为utf8了，原来是这3个变量在捣蛋。
-查阅手册，上面那句等于：
+character_set_database   utf8
+character_set_results    latin1
+character_set_server     utf8
+character_set_system     utf8
+```
+
+## SET NAMES UTF8 的作用
+
+在连接数据库后、读取数据前，执行：
+
+```sql
+SET NAMES UTF8;
+```
+
+PHP 中：
+
+```php
+mysql_query("SET NAMES UTF8");  // 必须在 mysql_connect() 之后
+```
+
+这等同于：
+
+```sql
 SET character_set_client = utf8;
-SET character_set_results = utf8;
 SET character_set_connection = utf8;
-看看这
-3
-个变量的作用：
-信息输入路径：
-client
-→
-connection
-→
-server
-；
-信息输出路径：
-server
-→
-connection
-→
-results
-。
-换句话说，每个路径要经过
-3
-次改变字符集编码。以出现乱码的输出为例，
-server
-里
-utf8
-的数据，传入
-connection
-转为
-latin1
-，传入
-results
-转为
-latin1
-，
-utf-8
-页面又把
-results
-转过来。如果两种字符集不兼容，比如
-latin1
-和
-utf8
-，转化过程就为不可逆的，破坏性的。
-但这里要声明一点，“SET NAMES UTF8”作用只是临时的，MySQL重启后就恢复默认了。
-接下来就说到
-MySQL
-在服务器上的配置问题了。岂不是我们每次对数据库读写都得加上
-“SET NAMESUTF8”
-，以保证数据传输的编码一致？能不能通过配置
-MySQL
-来达到那三个变量默认就为我们要想的字符集？手册上没说，我在网上也没找到答案。所以，从服务器配置的角度而言，是没办法省略掉那行代码的。
-总结：为了让你的网页能在更多的服务器上正常地显示，还是加上
-“SET NAMES UTF8”
-吧，即使你现在没有加上这句也能正常访问。
-转载自：
-http://hi.baidu.com/myt1988/blog/item/335786808ab7b8ce9123d9b7.html
+SET character_set_results = utf8;
+```
+
+## 数据传输路径
+
+**输入路径**：client → connection → server  
+**输出路径**：server → connection → results
+
+问题出在三个关键字符集上。以输出乱码为例，server 中的 utf8 数据经过 connection 转为 latin1，再转为 latin1 的 results，最后 utf-8 页面再转一次。两种字符集不兼容时，转化过程是不可逆的。
+
+## 注意
+
+SET NAMES UTF8 的作用仅是临时的，MySQL 重启后恢复默认值。从服务器配置角度无法通过配置完全省略这行代码，所以为了兼容性，建议每次连接后都执行一次 SET NAMES UTF8。
