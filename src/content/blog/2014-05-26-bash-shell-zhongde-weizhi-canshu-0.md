@@ -1,116 +1,84 @@
 ---
-title: 'Bash shell中的位置参数$#,$*,$@,$0,$1,$2...及特殊参数$?,$-等的含义'
+title: Bash 位置参数与特殊参数的含义
 date: '2014-05-26'
-description: >-
-  在Bash shell中 经常会 见到一些比较特殊的符号，本人现收集与此，以供查阅： 位置参数： 详见ABS(Advanced Bash
-  Shell)中文翻译版103页第9章第一节内部变量，当然英文版ABS都一样啦 $0, $1, $2,等等... 
-  位置参数,从命令行传递给脚本,或者是传递给函数.或者赋职给一个变量.
+description: 整理 Bash 中位置参数（$0/$1/$#/$*/$@）和特殊参数（$?/$-/$!/$_/$$）的含义，以及函数退出状态与 return 的用法。内容参考 ABS（Advanced Bash Scripting）。
 category: shell
-tags: []
+tags:
+  - shell-scripting
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: https://tldp.org/LDP/abs/html/
 ---
-在Bash shell中
-经常会
-见到一些比较特殊的符号，本人现收集与此，以供查阅：
-位置参数：
-详见ABS(Advanced Bash Shell)中文翻译版103页第9章第一节内部变量，当然英文版ABS都一样啦
-$0, $1, $2,等等...
-位置参数,从命令行传递给脚本,或者是传递给函数.或者赋职给一个变量.
-(具体见Example 4-5 和Example 11-15)
-$0表示
-当前执行的进程名,script 本身的名字,或者在正则表达式中表示整行输出
-$#
-命令行或者是位置参数的个数.(见Example 33-2)
-$*
-所有的位置参数,被作为一个单词.
-注意:"$*"必须被""引用.
-$@
-与$*同义,但是每个参数都是一个独立的""引用字串,这就意味着参数被完整地传递,
-并没有被解释和扩展.这也意味着,每个参数列表中的每个参数都被当成一个独立的单词.
-注意:"$@"必须被
-""
-引用.
-其他的特殊参数
-$-
-传递给脚本的falg(使用set 命令).参考Example 11-15.
-注意:这起初是ksh 的特征,后来被引进到Bash 中,但不幸的是,在Bash 中它看上去也不
-能可靠的工作.使用它的一个可能的方法就是让这个脚本进行自我测试(查看是否是交
-互的).
-$!
-在后台运行的最后的工作的PID(进程ID).
-$_
-保存之前执行的命令的最后一个参数.
-$?
-命令,函数或者脚本本身的退出状态(见Example 23-7)
-用于检查上一个命令,函数或者脚本执行是否正确。（在Linux中，命令退出状态为0表示该命令正确执行，任何非0值表示命令出错。）
-$$
-脚本自身的进程ID.这个变量经常用来构造一个"unique"的临时文件名.
-(参考Example A-13,Example 29-6,Example 12-28 和Example 11-25).
-这通常比调用mktemp 来得简单.
-注意事项:
-[1] 当前运行的脚本的PID 为$$.
-[2] "argument"和"parameter"这两个单词经常不加区分的使用.在这整本书中,这两个
-单词的意思完全相同.(在翻译的时候就未加区分,统统翻译成参数)
-退出和返回
-退出状态(exit status)
-函数返回一个被称为退出状态的值. 退出状态可以由return 来指定statement, 否则函数的
-退出状态是函数最后一个执行命令的退出状态(0 表示成功,非0 表示出错代码). 退出状态
-(exit status)可以在脚本中由$? 引用. 这个机制使脚本函数也可以像C 函数一样有一个"
-返回值".
-return
-终止一个函数.return 命令[1]可选地带一个整数参数,这个整数作为函数的"返回值"返回
-给调用此函数的脚本,并且这个值也被赋给变量$?.
-while true可以写为while :
-Example 23-7 两个数中的最大者
-###################Start Script#################
-1 #!/bin/bash
-2 # max.sh: 两个整数中的最大者.
-3
-4 E_PARAM_ERR=-198 # 如果传给函数的参数少于2 个时的返回值.
-5 EQUAL=-199 # 如果两个整数值相等的返回值.
-6 # 任一个传给函数的参数值溢出
-7 #
-8
-9 max2 () # 返回两个整数的较大值.
-10 { # 注意: 参与比较的数必须小于257.
-11 if [ -z "$2" ]
-12 then
-13 return $E_PARAM_ERR
-14 fi
-15
-16 if [ "$1" -eq "$2" ]
-17 then
-18 return $EQUAL
-19 else
-20 if [ "$1" -gt "$2" ]
-21 then
-22 return $1
-23 else
-24 return $2
-25 fi
-26 fi
-27 }
-28
-29 max2 33 34
-30 return_val=$?
-31
-32 if [ "$return_val" -eq $E_PARAM_ERR ]
-33 then
-34 echo "Need to pass two parameters to the function."
-35 elif [ "$return_val" -eq $EQUAL ]
-36 then
-37 echo "The two numbers are equal."
-38 else
-39 echo "The larger of the two numbers is $return_val."
-40 fi
-41
-42
-43 exit 0
-44
-45 # 练习 (容易):
-46 # ---------------
-47 # 把这个脚本转化成交互式的脚本,
-48 #+ 也就是说,让脚本可以要求调用者输入两个整数.
-#####################End Script##################
+Bash 中常见的特殊符号收集，参考 ABS（Advanced Bash Scripting）中文翻译版第 9 章内部变量。
+
+## 位置参数
+
+- `$0`：当前执行的进程名 / 脚本本身的名字（正则中表示整行输出）
+- `$1, $2, ...`：从命令行传给脚本、或传给函数、或赋给变量的位置参数
+- `$#`：命令行或位置参数的个数
+- `$*`：所有位置参数，被作为一个单词（`"$*"` 必须被引号引用）
+- `$@`：与 `$*` 同义，但每个参数都是独立的引用字串，参数被完整传递、不被解释和扩展（`"$@"` 必须被引号引用）
+
+## 其他特殊参数
+
+- `$-`：传给脚本的 flag（使用 `set` 命令）。源自 ksh 后引进 Bash，但在 Bash 中不太可靠
+- `$!`：后台运行的最后一个作业的 PID
+- `$_`：保存之前执行命令的最后一个参数
+- `$?`：命令、函数或脚本的退出状态。用于检查上一个命令是否正确执行（0 表示正确，非 0 表示出错）
+- `$$`：脚本自身的进程 ID，常用来构造唯一的临时文件名，比调用 mktemp 简单
+
+## 退出与返回
+
+函数返回一个「退出状态」值，可由 `return` 指定，否则是函数最后一个执行命令的退出状态（0 成功，非 0 出错）。退出状态可在脚本中由 `$?` 引用，使 shell 函数也能像 C 函数一样有「返回值」。
+
+`return` 终止一个函数，可选带一个整数参数作为返回值返回给调用脚本，并赋给 `$?`。
+
+> 注意：函数返回值最大不能超过 255（只占一个字节），且只能返回整数，不能返回字符串。
+
+`while true` 可写为 `while :`。
+
+## 示例：两个数中的最大者
+
+```bash
+#!/bin/bash
+# max.sh: 两个整数中的最大者
+
+E_PARAM_ERR=-198   # 参数少于 2 个时的返回值
+EQUAL=-199         # 两个整数相等的返回值
+
+max2 ()            # 返回两个整数的较大值
+{                  # 注意: 参与比较的数必须小于 257
+    if [ -z "$2" ]
+    then
+        return $E_PARAM_ERR
+    fi
+
+    if [ "$1" -eq "$2" ]
+    then
+        return $EQUAL
+    else
+        if [ "$1" -gt "$2" ]
+        then
+            return $1
+        else
+            return $2
+        fi
+    fi
+}
+
+max2 33 34
+return_val=$?
+
+if [ "$return_val" -eq $E_PARAM_ERR ]
+then
+    echo "Need to pass two parameters to the function."
+elif [ "$return_val" -eq $EQUAL ]
+then
+    echo "The two numbers are equal."
+else
+    echo "The larger of the two numbers is $return_val."
+fi
+
+exit 0
+```
