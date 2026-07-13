@@ -1,70 +1,56 @@
 ---
 title: Shell脚本生成随机密码的若干种可能
 date: '2018-03-15'
-description: >-
-  转载 2017-09-30 作者：丁丁历险 的BLOG 我要评论 这篇文章主要介绍了Shell脚本生成随机密码的若干种可能,需要的朋友可以参考下
-  1.生成随机密码（urandom版本） < /dev/urandom tr -dc 'A-Za-z0-9' < /dev/urandom | head -c
-  10
+description: 生成随机密码的多种方法，包括 urandom、字符串截取、UUID、进程 ID 等方式。
 category: shell
 tags:
   - shell-scripting
-  - 存储
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-转载
-2017-09-30 作者：丁丁历险 的BLOG
-我要评论
-这篇文章主要介绍了Shell脚本生成随机密码的若干种可能,需要的朋友可以参考下
-1.生成随机密码（urandom版本）
+
+Shell 脚本生成随机密码的几种方法整理。
+
+## 方法 1：urandom 版本
+
+使用 `/dev/urandom` 和 `tr` 过滤特殊字符：
+
 ```bash
 #!/bin/bash
-#Author:丁丁历险(Jacob)
-#/dev/urandom文件是Linux内置的随机设备文件
-#cat /dev/urandom可以看看里面的内容，ctrl+c退出查看
-#查看该文件内容后，发现内容有些太随机，包括很多特殊符号，我们需要的密码不希望使用这些符号
-#tr -dc '_A-Za-z0-9'
+tr -dc '_A-Za-z0-9' < /dev/urandom | head -c 10
 ```
-<
-/dev/urandom
-```bash
-#该命令可以将随机文件中其他的字符删除，仅保留大小写字母，数字，下划线，但是内容还是太多
-#我们可以继续将优化好的内容通过管道传递给head命令，在大量数据中仅显示头10个字节
-#注意A前面有个下划线
-```
-tr -dc '_A-Za-z0-9'
-<
-/dev/urandom | head -c 10
-2.生成随机密码（字串截取版本）
+
+## 方法 2：字符串截取版本
+
+通过 RANDOM 随机数对密码库长度取余，循环提取字符：
+
 ```bash
 #!/bin/bash
-#Author:丁丁历险(Jacob)
-#设置变量key，存储密码的所有可能性（密码库），如果还需要其他字符请自行添加其他密码字符
-#使用$#统计密码库的长度
-```
 key="0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 num=${#key}
-#设置初始密码为空
 pass=''
-```bash
-#循环8次，生成8为随机密码
-#每次都是随机数对密码库的长度取余，确保提取的密码字符不超过密码库的长度
-#每次循环提取一位随机密码，并将该随机密码追加到pass变量的最后
-```
-for i in {1..8}
-do
-index=$[RANDOM%num]
-pass=$pass${key:$index:1}
+for i in {1..8}; do
+  index=$[RANDOM%num]
+  pass=$pass${key:$index:1}
 done
 echo $pass
-3.生成随机密码（UUID版本，16进制密码）
+```
+
+## 方法 3：UUID 版本
+
+使用 uuidgen 生成 16 进制密码：
+
+```bash
 #!/bin/bash
 uuidgen
-4.生成随机密码（进程ID版本,数字密码）
+```
+
+## 方法 4：进程 ID 版本
+
+使用 `$$` 获取脚本进程 ID（纯数字）：
+
 ```bash
 #!/bin/bash
 echo $$
 ```
-总结
-以上所述是小编给大家介绍的Shell脚本生成随机密码的若干种可能，希望对大家有所帮助，如果大家有任何疑问请给我留言，小编会及时回复大家的。在此也非常感谢大家对脚本之家网站的支持！

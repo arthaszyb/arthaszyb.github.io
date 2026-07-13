@@ -1,224 +1,110 @@
 ---
-title: Python3 是如何解决棘手的字符编码问题的？
+title: Python3 如何解决字符编码问题
 date: '2019-02-27'
-description: >-
-  By liuzhijun , 2017-03-26, 分类： Python技术 编码 Python3 最重要的一项改进之一就是解决了 Python2
-  中字符串与字符编码遗留下来的这个大坑。  Python 编码为什么那么蛋疼？
+description: Python3 的关键改进是解决了 Python2 中字符串与编码的问题。默认使用 UTF-8，区分 str（文本）和 bytes（二进制），提供清晰的 encode/decode 转换方法。
 category: python
 tags:
   - python
-  - 存储
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-By
-liuzhijun
-, 2017-03-26, 分类：
-Python技术
-编码
-Python3 最重要的一项改进之一就是解决了 Python2 中字符串与字符编码遗留下来的这个大坑。
-Python 编码为什么那么蛋疼？
-已经介绍过 Python2 字符串设计上的一些缺陷：
-使用 ASCII 码作为默认编码方式，对中文处理很不友好。
-把字符串的牵强地分为 unicode 和 str 两种类型，误导开发者
-当然这并不算 Bug，只要处理的时候多留心也可以避免这些坑。但在 Python3 两个问题都很好的解决了。
-首先，Python3 把系统默认编码设置为 UTF-8
->>>
-import
-sys
->>>
-sys
-.
-getdefaultencoding
-()
+
+Python3 最重要的改进之一是解决了 Python2 中字符编码的大坑。
+
+## Python2 的问题
+
+- 使用 ASCII 码作为默认编码，对中文处理不友好
+- 将字符串分为 unicode 和 str 两种类型，容易误导开发者
+
+## Python3 的改进
+
+### 默认编码为 UTF-8
+
+```python
+>>> import sys
+>>> sys.getdefaultencoding()
 'utf-8'
->>>
-然后，文本字符和二进制数据区分得更清晰，分别用 str 和 bytes 表示。文本字符全部用 str 类型表示，str 能表示 Unicode 字符集中所有字符，而二进制字节数据用一种全新的数据类型，用 bytes 来表示。
-str
->>>
-a
-=
-"a"
->>>
-a
-'a'
->>>
-type
-(
-a
-)
-<
-class
-'
-str
-'>
->>>
-b
-=
-"禅"
->>>
-b
-'禅'
->>>
-type
-(
-b
-)
-<
-class
-'
-str
-'>
-bytes
-Python3 中，在字符引号前加‘b’，明确表示这是一个 bytes 类型的对象，实际上它就是一组二进制字节序列组成的数据，bytes 类型可以是 ASCII范围内的字符和其它十六进制形式的字符数据，但不能用中文等非ASCII字符表示。
->>>
-c
-=
-b
-'a'
->>>
-c
-b
-'a'
->>>
-type
-(
-c
-)
-<
-class
-'
-bytes
-'>
->>>
-d
-=
-b
-'
-\xe7\xa6\x85
-'
->>>
-d
-b
-'
-\xe7\xa6\x85
-'
->>>
-type
-(
-d
-)
-<
-class
-'
-bytes
-'>
-```bash
->>>
->>>
 ```
-e
-=
-b
-'禅'
-File
-"
-<
-stdin>"
-,
-line
-1
-SyntaxError
-:
-bytes
-can
-only
-contain
-ASCII
-literal
-characters
-.
-bytes 类型提供的操作和 str 一样，支持分片、索引、基本数值运算等操作。但是 str 与 bytes 类型的数据不能执行
-+
-操作，尽管在py2中是可行的。
->>> b"a"+b"c"
+
+### str 和 bytes 区分
+
+文本字符使用 `str` 类型（可表示 Unicode 字符集所有字符），二进制数据使用 `bytes` 类型。
+
+**str 类型**：
+
+```python
+>>> a = "a"
+>>> type(a)
+<class 'str'>
+>>> b = "禅"
+>>> type(b)
+<class 'str'>
+```
+
+**bytes 类型**：在字符引号前加 `b` 表示字节序列，只能包含 ASCII 字符和十六进制字符：
+
+```python
+>>> c = b'a'
+>>> type(c)
+<class 'bytes'>
+>>> d = b'\xe7\xa6\x85'  # UTF-8 编码的 "禅"
+>>> type(d)
+<class 'bytes'>
+```
+
+bytes 不能包含非 ASCII 字符（如中文）：
+
+```python
+>>> e = b'禅'
+SyntaxError: bytes can only contain ASCII literal characters.
+```
+
+### bytes 操作
+
+bytes 支持分片、索引、基本运算，但 str 与 bytes 不能直接相加：
+
+```python
+>>> b"a" + b"c"
 b'ac'
->>> b"a"*2
+>>> b"a" * 2
 b'aa'
 >>> b"abcdef\xd6"[1:]
 b'bcdef\xd6'
 >>> b"abcdef\xd6"[-1]
 214
 >>> b"a" + "b"
-Traceback (most recent call last):
-File "
-<
-stdin>", line 1, in
-<
-module>
 TypeError: can't concat bytes to str
-python2 与 python3 字节与字符的对应关系
-python2
-python3
-表现
-转换
-作用
-str
-bytes
-字节
-encode
-存储
-unicode
-str
-字符
-decode
-显示
-encode 与 decode
-str 与 bytes 之间的转换可以用 encode 和从decode 方法。
-encode 负责字符到字节的编码转换。默认使用 UTF-8 编码准换。
->>>
-s
-=
-"Python之禅"
->>>
-s
-.
-encode
-()
-b
-'Python
-\xe4\xb9\x8b\xe7\xa6\x85
-'
->>>
-s
-.
-encode
-(
-"gbk"
-)
-b
-'Python
-\xd6\xae\xec\xf8
-'
-decode 负责字节到字符的解码转换，通用使用 UTF-8 编码格式进行转换。
->>>
-b
-'Python
-\xe4\xb9\x8b\xe7\xa6\x85
-'
-.
-decode
-()
+```
+
+## Python2 vs Python3 对比
+
+| Python2 | Python3 | 表现 | 转换方法 | 用途 |
+|---------|---------|------|---------|------|
+| str | bytes | 字节 | encode | 存储 |
+| unicode | str | 字符 | decode | 显示 |
+
+## encode 与 decode
+
+### encode：字符 → 字节
+
+负责将字符转换为字节（编码）。默认使用 UTF-8：
+
+```python
+>>> s = "Python之禅"
+>>> s.encode()
+b'Python\xe4\xb9\x8b\xe7\xa6\x85'
+>>> s.encode("gbk")
+b'Python\xd6\xae\xec\xf8'
+```
+
+### decode：字节 → 字符
+
+负责将字节转换为字符（解码）。默认使用 UTF-8：
+
+```python
+>>> b'Python\xe4\xb9\x8b\xe7\xa6\x85'.decode()
 'Python之禅'
->>>
-b
-'Python
-\xd6\xae\xec\xf8
-'
-.
-decode
-(
-"gbk"
-)
+>>> b'Python\xd6\xae\xec\xf8'.decode("gbk")
 'Python之禅'
+```

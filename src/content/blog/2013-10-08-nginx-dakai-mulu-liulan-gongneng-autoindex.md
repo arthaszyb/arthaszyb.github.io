@@ -1,9 +1,7 @@
 ---
 title: Nginx打开目录浏览功能(autoindex)
 date: '2013-10-08'
-description: >-
-  Nginx默认是不允许列出整个目录的。 如需此功能， 打开nginx.conf文件，在location server 或 http段中加入
-  autoindex on; 另外两个参数最好也加上去: autoindexexactsize off; 默认为on，显示出文件的确切大小，单位是bytes。
+description: 在 nginx 配置中启用 autoindex 参数实现目录列表浏览，支持文件大小和修改时间的显示选项。
 category: web-infra
 tags:
   - nginx
@@ -11,19 +9,38 @@ draft: false
 source: evernote-local-db
 lang: zh
 ---
-Nginx默认是不允许列出整个目录的。如需此功能，
-打开nginx.conf文件，在location server 或 http段中加入
+
+Nginx 默认不允许列出整个目录。在 nginx.conf 中，在 location、server 或 http 段加入以下配置：
+
+## 基本配置
+
+```nginx
 autoindex on;
-另外两个参数最好也加上去:
+```
+
+## 扩展参数
+
+```nginx
 autoindex_exact_size off;
-默认为on，显示出文件的确切大小，单位是bytes。
-改为off后，显示出文件的大概大小，单位是kB或者MB或者GB
+```
+
+- 默认为 on，显示文件的确切大小（单位：bytes）
+- 改为 off 后，显示文件的大概大小（单位：KB、MB、GB）
+
+```nginx
 autoindex_localtime on;
-默认为off，显示的文件时间为GMT时间。
-改为on后，显示的文件时间为文件的服务器时间
+```
+
+- 默认为 off，显示文件时间为 GMT 时间
+- 改为 on 后，显示文件的服务器本地时间
+
+## 配置示例
+
+```nginx
 location /images {
-root /var/www
-ginx-default/ibugaocn;
-autoindex on;
+  root /var/www/html;
+  autoindex on;
+  autoindex_exact_size off;
+  autoindex_localtime on;
 }
-详细参照:http://wiki.nginx.org/NginxChsHttpAutoindexModule
+```
