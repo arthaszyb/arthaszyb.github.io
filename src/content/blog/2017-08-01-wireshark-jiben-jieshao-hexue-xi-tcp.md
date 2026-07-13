@@ -1,51 +1,17 @@
 ---
-title: Wireshark基本介绍和学习TCP三次握手
+title: Wireshark 基本介绍和 TCP 三次握手实例分析
 date: '2017-08-01'
-description: >-
-  Wireshark 基本介绍和学习 TCP 三次握手 2017 年 8 月 1 日 10:10 Wireshark基本介绍和学习TCP三次握手
-  之前写过一篇博客： 用 Fiddler 来调试HTTP，HTTPS 。
+description: 使用 Wireshark 抓包工具查看 TCP 三次握手的实现细节，包括窗口、序列号等关键字段。
 category: network
 tags:
-  - ssl-tls
   - 网络排查
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: http://www.cnblogs.com/TankXiao/archive/2012/10/10/2711777.html
 ---
-Wireshark
-基本介绍和学习
-TCP
-三次握手
-2017
-年
-8
-月
-1
-日
-10:10
-Wireshark基本介绍和学习TCP三次握手
-之前写过一篇博客：
-用 Fiddler 来调试HTTP，HTTPS
-。 这篇文章介绍另一个好用的抓包工具wireshark， 用来获取网络数据封包，包括http,TCP,UDP，等网络协议包。
-记得大学的时候就学习过TCP的三次握手协议，那时候只是知道，虽然在书上看过很多TCP和UDP的资料，但是从来没有真正见过这些数据包， 老是感觉在云上飘一样，学得不踏实。有了wireshark就能截获这些网络数据包，可以清晰的看到数据包中的每一个字段。更能加深我们对网络协议的理解。
-对我而言， wireshark 是学习网络协议最好的工具。
-阅读目录
-wireshark介绍
-wireshark不能做的
-wireshark VS Fiddler
-同类的其他工具
-什么人会用到wireshark
-wireshark 开始抓包
-wireshark 窗口介绍
-wireshark 显示过滤
-保存过滤
-过滤表达式
-封包列表(Packet List Pane)
-封包详细信息 (Packet Details Pane)
-wireshark与对应的OSI七层模型
-TCP包的具体内容
-实例分析TCP三次握手过程
-wireshark介绍
+
+## Wireshark 介绍
 wireshark的官方下载网站：
 http://www.wireshark.org/
 wireshark是非常流行的网络封包分析软件，功能十分强大。可以截取各种网络封包，显示网络封包的详细信息。
@@ -141,7 +107,3 @@ http://www.cnblogs.com/tankxiao
 第三次握手的数据包
 客户端再次发送确认包(ACK) SYN标志位为0,ACK标志位为1.并且把服务器发来ACK的序号字段+1,放在确定字段中发送给对方.并且在数据段放写ISN的+1, 如下图:
 就这样通过了TCP三次握手，建立了连接
-来自
-<
-http://www.cnblogs.com/TankXiao/archive/2012/10/10/2711777.html
->

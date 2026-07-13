@@ -1,110 +1,58 @@
 ---
 title: Python中执行系统命令常见的几种方法
 date: '2015-07-27'
-description: >-
-  2013-01-03 13:46:14 标签： Python 系统命令 popen system subprocess commands
-  原创作品，允许转载，转载时请务必以超链接形式标明文章 原始出处 、作者信息和本声明。 否则将追究法律责任。
+description: Python执行系统命令的四种方法总结（os.system、os.popen、subprocess、commands），各自的特点和适用场景。
 category: python
 tags:
-  - mysql
-  - zabbix
   - python
-  - 监控告警
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: http://wangwei007.blog.51cto.com/68019/1106857
 ---
-2013-01-03 13:46:14
-标签：
-Python
-系统命令
-popen
-system
-subprocess
-commands
-原创作品，允许转载，转载时请务必以超链接形式标明文章
-原始出处
-、作者信息和本声明。否则将追究法律责任。
-http://wangwei007.blog.51cto.com/68019/1106857
-Python中执行系统命令常见的几种方法：
-(1)os.system
-```bash
-# 仅仅在一个子终端运行系统命令，而不能获取命令执行后的返回信息
-# 如果再命令行下执行，结果直接打印出来
+Python执行系统命令的常用方法整理笔记。
+
+## os.system()
+在子终端运行系统命令，不返回执行结果。
+
+```python
+import os
+os.system('ls')
 ```
-例如：
->>>
-import
-os
->>> os.system(
-'ls'
-)
-chk_err_log.py CmdTool.log install_log.txt install_zabbix.sh manage_deploy.sh MegaSAS.log
-(2)os.popen
-```bash
-#该方法不但执行命令还返回执行后的信息对象
-#好处在于：将返回的结果赋于一变量，便于程序的处理。
+
+## os.popen()
+执行命令并返回信息对象，便于程序处理。
+
+```python
+import os
+tmp = os.popen('ls *.sh').readlines()
+# tmp: ['install_zabbix.sh\n', 'manage_deploy.sh\n', ...]
 ```
-例如：
->>>
-import
-os
->>>tmp = os.popen(
-'ls *.sh'
-).readlines()
->>>tmp
-[
-'install_zabbix.sh\n'
-,
-'manage_deploy.sh\n'
-,
-'mysql_setup.sh\n'
-,
-'python_manage_deploy.sh\n'
-,
-'setup.sh\n'
-]
-(3)使用模块subprocess
-使用方法：
->>>
-import
-subprocess
->>> subprocess.call ([
-"cmd"
-,
-"arg1"
-,
-"arg2"
-],shell=True)
-好处在于:运用对线程的控制和监控，将返回的结果赋于一变量，便于程序的处理。
-如获取返回和输出:
-import
-subprocess
-p = subprocess.Popen(
-'ls *.sh'
-, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-print
-p.stdout.readlines()
-for
-line
-in
-p.stdout.readlines():
-print
-line,
+
+## subprocess 模块
+支持线程控制和监控，返回结果，推荐使用。
+
+```python
+import subprocess
+subprocess.call(["cmd", "arg1", "arg2"], shell=True)
+
+p = subprocess.Popen('ls *.sh', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+print(p.stdout.readlines())
+for line in p.stdout.readlines():
+    print(line,)
 retval = p.wait()
-(4) 使用模块commands模块
-常用的主要有两个方法：getoutput和getstatusoutput
->>>
-import
-commands
->>> commands.getoutput(
-'ls *.sh'
-)
-'install_zabbix.sh\nmanage_deploy.sh\nmysql_setup.sh\npython_manage_deploy.sh\nsetup.sh'
->>> commands.getstatusoutput(
-'ls *.sh'
-)
-(0,
-'install_zabbix.sh\nmanage_deploy.sh\nmysql_setup.sh\npython_manage_deploy.sh\nsetup.sh'
-)
-注意： 当执行命令的参数或者返回中包含了中文文字，那么建议使用subprocess，如果使用os.popen则会出现错误。
+```
+
+## commands 模块
+常用方法：getoutput() 返回输出，getstatusoutput() 返回状态码和输出。
+
+```python
+import commands
+commands.getoutput('ls *.sh')
+# 'install_zabbix.sh\nmanage_deploy.sh\n...'
+
+commands.getstatusoutput('ls *.sh')
+# (0, 'install_zabbix.sh\nmanage_deploy.sh\n...')
+```
+
+**注意**：处理中文时建议使用 subprocess，os.popen 会出错。

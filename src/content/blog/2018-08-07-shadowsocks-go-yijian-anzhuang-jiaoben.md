@@ -1,29 +1,23 @@
 ---
-title: Shadowsocks-go一键安装脚本
+title: Shadowsocks-go 一键安装脚本
 date: '2018-08-07'
-description: >-
-  技术 秋水逸冰 发布于: 2015-01-05 更新于: 2018-03-15 698592 次围观 687 次吐槽 本脚本适用环境：
-  系统支持：CentOS，Debian，Ubuntu 内存要求：≥64M 日期：2018 年 03 月 15 日 关于本脚本： 一键安装 Go 版的
-  shadowsocks 最新版本
+description: Shadowsocks Go 版本服务端一键安装脚本，支持 CentOS/Debian/Ubuntu，安装和配置说明。
 category: network
 tags:
-  - python
-  - ssl-tls
+  - shell-scripting
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: https://teddysun.com/392.html
 ---
-技术
-秋水逸冰
-发布于: 2015-01-05 更新于: 2018-03-15
-698592 次围观
-687 次吐槽
-本脚本适用环境：
-系统支持：CentOS，Debian，Ubuntu
-内存要求：≥64M
-日期：2018 年 03 月 15 日
-关于本脚本：
-一键安装 Go 版的 shadowsocks 最新版本 1.2.1。与 Python 版不同的是，其客户端程序能使用多个服务端配置，本脚本安装的是服务端程序。
+
+## 脚本说明
+
+Go 版 Shadowsocks 最新版本 1.2.1 的一键安装脚本。相比 Python 版本，Go 版客户端支持多个服务端配置，该脚本用于服务端安装。
+
+**适用环境：**
+- 系统：CentOS, Debian, Ubuntu
+- 内存：≥64M
 友情提示：
 如果你有问题，请先参考这篇《
 Shadowsocks Troubleshooting
@@ -132,7 +126,3 @@ Github 上的最新代码
 修改了启动脚本 /etc/init.d/shadowsocks ，按照 CentOS 的 chkconfig 标准语法修改了一下（原来使用的是作者 Github 上自带的）。去掉了以 nobody 用户启动 shadowsocks 的方式，改为直接以当前登录用户直接启动（一般是 root 用户）。开机自启动，以及修改端口号提示无权限的问题已经解决。
 参考链接：
 https://github.com/shadowsocks/shadowsocks-go
-转载请注明：
-秋水逸冰
-»
-Shadowsocks-go一键安装脚本

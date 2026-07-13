@@ -1,27 +1,17 @@
 ---
 title: 多进程查询大量IP信息并入库
 date: '2017-02-09'
-description: >-
-  多进程查询大量 IP 信息并入库 2017 年 2 月 9 日 17:22 import os import struct import socket
-  import urllib2 import json import sys import time import multiprocessing from
+description: 多进程查询 IP 地址库获取归属地信息，更新数据库的脚本，使用 multiprocessing 并发加速。
 category: python
 tags:
   - mysql
   - python
+  - shell-scripting
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-多进程查询大量
-IP
-信息并入库
-2017
-年
-2
-月
-9
-日
-17:22
+多进程查询大量 IP 信息并入库脚本。
 ```bash
 #!/bin/env python
 #coding:utf-8
@@ -37,33 +27,12 @@ import time
 import multiprocessing
 from multiprocessing.dummy import Pool as ThreadPool
 def ip_show(ip):
-url="http://dbip.wsd.com/ip/search?token=b9539e0c40fe5b628ad735977298998f
-&
-ip={ip}
-&
-type=3
-&
-bodyEncode=utf8".format(ip=ip)
-#
-这里
-ip
-库接口有个坑
-,
-返回的
-json
-字符串后面有空字节
-,
-需要处理一下
-\0x00
+url="http://dbip.wsd.com/ip/search?token=b9539e0c40fe5b628ad735977298998f&ip={ip}&type=3&bodyEncode=utf8".format(ip=ip)
+# IP库接口有个坑：返回的json字符串后面有空字节，需要处理 \0x00
 try:
 _content=urllib2.urlopen(url).read().strip('\0x00')
 content = json.loads(_content)
-#
-以下
-replace
-作用为兼容
-ip
-库输出的各种带乱七八糟的特殊符号的字符串，保证正常入库
+# 以下 replace 作用为兼容 IP库输出的各种特殊符号的字符串，保证正常入库
 country=content.get('data').get('country','unknow').replace("'","''").replace(",",",,")
 prov=content.get('data').get('province','unknow').replace("'","''").replace(",",",,")
 city=content.get('data').get('city','unknow').replace("'","''").replace(",",",,")
@@ -115,17 +84,12 @@ if int(process_num) > 4:
 now_tim=time.strftime('%m-%d %H:%M:%S')
 print "%s process exist,quit" % now_tim
 sys.exit(1)
-#
-删除异常上报，避免脚本出错
-20161215
+# 删除异常上报，避免脚本出错（20161215）
 del_cmd='mysql --default-character-set=UTF8 -upcmgr_rw -pyw#1a3 -h10.240.64.140 -P3306 conn_quality -NBe "delete from ver_hijack_cnt where mainserverip not regexp \'^[0-9]+$\'";'
 os.system(del_cmd)
 origin_list=origin_str()
-pool=multiprocessing.Pool(4) #
-多进程
-#pool=ThreadPool(4)
-#
-多线程
+pool=multiprocessing.Pool(4)  # 多进程
+#pool=ThreadPool(4)  # 多线程
 start_time=time.time()
 pool.map(imp_data,origin_list)
 pool.close()

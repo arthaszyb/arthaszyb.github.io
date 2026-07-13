@@ -1,29 +1,25 @@
 ---
 title: '#!/usr/bin/python'
 date: '2016-07-14'
-description: >-
-  import io import json import os import urllib2 import sys import tarfile from
-  optparse import OptionParser import StringIO import re import mimetypes import
+description: 服务包生成和部署脚本，从远端查询服务配置、生成 package 和 cron 配置文件、打包上传。
 category: python
 tags:
-  - crontab
   - python
-  - 监控告警
+  - shell-scripting
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-```bash
+服务包生成助手脚本（generate package helper script for service）。
+
+```python
 #!/usr/bin/python
-#encoding: utf-8
-###############################################
-# generate package helper script for service
+# encoding: utf-8
 # Author: curuwang
 # Date: 2013-11-07
 # Changelog:
 # - 2015-07-23 marryhe 2.1.5
-# * 拉取监控上报频率字段
-###############################################
+#   * 拉取监控上报频率字段
 ```
 import io
 import json
@@ -115,10 +111,8 @@ except tarfile.TarError as e:
 print "unable to open script package: %s" % e
 return False
 try:
-```bash
 tar.extractall(target_dir)
 tar.close()
-```
 except IOError as e:
 print "failed to extract script package:%s" % e
 return True
@@ -203,10 +197,8 @@ pkg_parent = os.path.dirname(pkg_dir)
 pkg_base = os.path.basename(pkg_dir)
 os.chdir(pkg_parent)
 s = StringIO.StringIO()
-```bash
 tar = tarfile.open(mode="w:gz", fileobj=s)
 tar.add(pkg_base, exclude=pkg_exclude, recursive=True)
-```
 print tar.list()
 tar.close()
 return s.getvalue()
@@ -230,11 +222,9 @@ help = "package base directory", metavar = "DIR", default=".")
 opt_parser.add_option("-f", "--overrite", dest = 'overrite', action="store_true",
 default=True, help = "overrite existing config file")
 (options, args) = opt_parser.parse_args()
-if len(args)
-<
-2:
-sys.stderr.write(usage + "\n")
-sys.exit(1)
+if len(args) < 2:
+    sys.stderr.write(usage + "\n")
+    sys.exit(1)
 real_path = os.path.realpath(options.basedir)
 if not os.path.isdir("%s/bin"%(real_path)) or not os.path.isdir("%s/conf"%(real_path)):
 print "Incorrect package directory '%s': no bin/ or conf/ sub directory!" % real_path

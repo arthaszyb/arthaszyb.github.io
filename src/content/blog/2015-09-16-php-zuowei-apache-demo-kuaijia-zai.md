@@ -1,9 +1,7 @@
 ---
 title: php作为apache的模块加载
 date: '2015-09-16'
-description: >-
-  需求:为检查所有apache+php的服务器是否安装phpips,需要找到php的主目录.  1\.  检查apache是否调用php 2\. 
-  查找php的主路径 作为apache的模块加载后，php就成为了apache的一部分。
+description: PHP 作为 Apache 模块加载时的工作原理，以及如何确认 Apache 是否成功加载 PHP 模块。
 category: php
 tags:
   - apache

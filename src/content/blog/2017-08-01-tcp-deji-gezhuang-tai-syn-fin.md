@@ -1,49 +1,16 @@
 ---
-title: 'TCP的几个状态 (SYN, FIN, ACK, PSH, RST, URG)'
+title: 'TCP 的几个状态 (SYN, FIN, ACK, PSH, RST, URG)'
 date: '2017-08-01'
-description: >-
-  TCP 的几个状态 (SYN, FIN, ACK, PSH, RST, URG) 2017 年 8 月 1 日 11:20 TCP 的几个状态 (SYN,
-  FIN, ACK, PSH, RST, URG) 发布时间 : 2012-03-17 00:20 文章来源 : 网络 文章作者 : 佚名 点击次数 : 次
+description: TCP FLAGS 字段及各标志位的含义，包括连接建立、数据传输、连接关闭的过程。
 category: network
-tags: []
+tags:
+  - 网络排查
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: http://www.yunsec.net/a/school/wlcs/agreement/2012/0317/10262.html
 ---
-TCP
-的几个状态
-(SYN, FIN, ACK, PSH, RST, URG)
-2017
-年
-8
-月
-1
-日
-11:20
-TCP
-的几个状态
-(SYN, FIN, ACK, PSH, RST, URG)
-发布时间
-:
-2012-03-17 00:20
-文章来源
-:
-网络
-文章作者
-:
-佚名
-点击次数
-:
-次
-分享到：
-QQ
-空间
-QQ
-微博
-新浪微博
-开心网
-人人网
-摘要：在
+在
 TCP
 层，有个
 FLAGS
@@ -61,9 +28,7 @@ PSH
 DATA
 数据传输，
 RST
-表示连接重置。 其
-...
-在
+表示连接重置。 其中，
 TCP
 层，有个
 FLAGS
@@ -275,7 +240,3 @@ ACK(ack=k+1)
 ESTABLISHED
 状态，完成三次握手。完成三次握手，客户端与服务器开始传送数据
 .
-来自
-<
-http://www.yunsec.net/a/school/wlcs/agreement/2012/0317/10262.html
->

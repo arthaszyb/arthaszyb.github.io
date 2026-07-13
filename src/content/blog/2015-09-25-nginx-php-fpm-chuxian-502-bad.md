@@ -1,7 +1,7 @@
 ---
 title: nginx+php-fpm出现502 bad gateway错误解决方法
 date: '2015-09-25'
-description: 2012年8月22日mood发表评论阅读评论 <table<tbody<tr<td<div<span<span<a<span本站主机运行在？
+description: 关于 nginx+php-fpm 常见的 502 错误原因的排查和解决方法，包括进程数、文件限制、脚本超时、缓存配置等优化建议。
 category: php
 tags:
   - nginx
@@ -9,77 +9,57 @@ tags:
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: http://www.nginx.cn/102.html
 ---
-2012年8月22日[mood](http://www.nginx.cn/author/mood)[发表评论](http://www.nginx.cn/102.html#respond)[阅读评论](http://www.nginx.cn/102.html#comments)
 
-<table><tbody><tr><td><div><span><span><a><span>本站主机运行在？</span></a></span></span></div></td><td><div><span><span><a><span>手机号码吉凶测试</span></a></span></span></div></td><td><div><span><span><a><span>智能计算器</span></a></span></span></div></td></tr></tbody></table>
+502 错误常见原因及解决方法整理：
 
-502错误是所有用nginx跑php的运维人员不愿意看见的
+## php-fpm 进程数不够
 
-nginx出现502有很多原因，但大部分原因可以归结为资源数量不够用,也就是说后端php-fpm处理有问题，nginx将正确的客户端请求发给了后端的php-fpm进程，但是因为php-fpm进程的问题导致不能正确解析php代码，最终返回给了客户端502错误。
+检查当前 fastcgi 进程个数：
 
-服务器出现502的原因是连接超时 我们向服务器发送请求 由于服务器当前链接太多，导致服务器方面无法给于正常的响应,产生此类报错
+```bash
+netstat -napo | grep "php-fpm" | wc -l
+```
 
-因此如果你服务器并发量非常大，那只能先增加机器，然后按以下方式优化会取得更好效果;但如果你并发不大却出现502，一般都可以归结为配置问题，脚本超时问题。
+如接近上限需要调高进程数。根据服务器内存情况，4G 内存可配置 200 个子进程。
 
-**1.php-fpm进程数不够用**
+## 提高 Linux 打开文件数量
 
-使用 netstat -napo |grep "php-fpm" | wc -l 查看一下当前fastcgi进程个数，如果个数接近conf里配置的上限，就需要调高进程数。
-
-但也不能无休止调高，可以根据服务器内存情况，可以把php-fpm子进程数调到100或以上，在4G内存的服务器上200就可以。
-
-**2. 调高调高linux内核打开文件数量**
-
-可以使用这些命令(必须是root帐号)
-
+```bash
 echo 'ulimit -HSn 65536' >> /etc/profile
-
 echo 'ulimit -HSn 65536' >> /etc/rc.local
-
 source /etc/profile
+```
 
-**3.脚本执行时间超时**
+## 脚本执行超时
 
-如果脚本因为某种原因长时间等待不返回 ，导致新来的请求不能得到处理，可以适当调小如下配置。
+在 nginx.conf 中调整：
 
-nginx.conf里面主要是如下
+```nginx
+fastcgi_connect_timeout 300;
+fastcgi_send_timeout 300;
+fastcgi_read_timeout 300;
+```
 
-fastcgi\_connect\_timeout 300;
+在 php-fpm.conf 中调整：
 
-fastcgi\_send\_timeout 300;
+```ini
+request_terminate_timeout = 10s
+```
 
-fastcgi\_read\_timeout 300;
+建议设置为 0，避免 php-fpm 直接杀掉进程导致前端返回 104 错误，影响体验。
 
-php-fpm.conf里如要是如下
+## 缓存设置
 
-request\_terminate\_timeout = 10s
+在 nginx.conf 中增加或修改：
 
-**4.缓存设置比较小**
+```nginx
+proxy_buffer_size 64k;
+proxy_buffers 512k;
+proxy_busy_buffers_size 128k;
+```
 
-修改或增加配置到nginx.conf
+## Connection reset by peer 错误
 
-proxy\_buffer\_size 64k;
-
-proxy\_buffers 512k;
-
-proxy\_busy\_buffers\_size 128k;
-
-**5. recv() failed (104: Connection reset by peer) while reading response header from upstream**
-
-可能的原因机房网络丢包或者机房有硬件防火墙禁止访问该域名
-
-但最重要的是程序里要设置好超时，不要使用php-fpm的request\_terminate\_timeout，
-
-最好设成request\_terminate\_timeout=0;
-
-因为这个参数会直接杀掉php进程，然后重启php进程，这样前端nginx就会返回104: Connection reset by peer。这个过程是很慢，总体感觉就是网站很卡。
-
-May 01 10:50:58.044162 \[WARNING\] \[pool www\] child 4074, script '/usr/local/nginx/html/quancha/sameip/detail.php' execution timed out (15.129933 sec), terminating
-
-May 01 10:50:58.045725 \[WARNING\] \[pool www\] child 4074 exited on signal 15 SIGTERM after 90.227060 seconds from start
-
-May 01 10:50:58.046818 \[NOTICE\] \[pool www\] child 4082 started
-
-说一千道一万最重要的就是程序里控制好超时，gethostbyname、curl、file\_get\_contents等函数的都要设置超时时间。
-
-另一个就是多说，这个东西是增加了网站的交互性，但是使用的多了反应就慢了，如果你网站超时且使用了多说是，可以关闭它。
+程序层面要设置好超时，gethostbyname、curl、file_get_contents 等函数都要设置超时时间。如使用多说评论，过多会影响响应速度，可考虑关闭。

@@ -1,47 +1,28 @@
 ---
 title: 'python通过get,post方式发送http请求和接收http响应的方法'
 date: '2016-09-01'
-description: >-
-  2016 年 9 月 1 日 10:25 python通过get,post方式发送http请求和接收http响应的方法 作者：无影
-  这篇文章主要介绍了python通过get,post方式发送http请求和接收http响应的方法,涉及Python使用urllib模块与urllib2模块实现get与post发送数据的相关技
+description: Python 用 urllib、urllib2、httplib 实现 HTTP GET 和 POST 请求，包括参数编码、请求头设置、响应处理。
 category: python
 tags:
-  - apache
   - python
-  - ssl-tls
+  - 网络排查
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: http://m.jb51.net/article/66763.htm
 ---
-2016
-年
-9
-月
-1
-日
-10:25
-python通过get,post方式发送http请求和接收http响应的方法
-作者：无影
-这篇文章主要介绍了python通过get,post方式发送http请求和接收http响应的方法,涉及Python使用urllib模块与urllib2模块实现get与post发送数据的相关技巧,需要的朋友可以参考下
-本文实例讲述了python通过get,post方式发送http请求和接收http响应的方法。分享给大家供大家参考。具体如下：
-测试用CGI,名字为test.py，放在apache的cgi-bin目录下:
+Python HTTP 请求方法笔记（GET、POST 请求实现）。
+
+## 测试 CGI 服务器
 #!/usr/bin/python
 import cgi
 def main():
 print "Content-type: text/html\n"
 form = cgi.FieldStorage()
 if form.has_key("ServiceCode") and form["ServiceCode"].value != "":
-print "
-<
-h1> Hello",form["ServiceCode"].value,"
-<
-/h1>"
+print "<h1> Hello",form["ServiceCode"].value,"</h1>"
 else:
-print "
-<
-h1> Error! Please enter first name.
-<
-/h1>"
+print "<h1> Error! Please enter first name.</h1>"
 main()
 python发送post和get请求
 get请求：
@@ -49,9 +30,7 @@ get请求：
 方法一、
 import urllib
 import urllib2
-url = "
-http://192.168.81.16/cgi-bin/python_test/test.py?ServiceCode=aaaa
-"
+url = "http://192.168.81.16/cgi-bin/python_test/test.py?ServiceCode=aaaa"
 req = urllib2.Request(url)
 print req
 res_data = urllib2.urlopen(req)
@@ -59,9 +38,7 @@ res = res_data.read()
 print res
 方法二、
 import httplib
-url = "
-http://192.168.81.16/cgi-bin/python_test/test.py?ServiceCode=aaaa
-"
+url = "http://192.168.81.16/cgi-bin/python_test/test.py?ServiceCode=aaaa"
 conn = httplib.HTTPConnection("192.168.81.16")
 conn.request(method="GET",url=url)
 response = conn.getresponse()
@@ -149,7 +126,3 @@ date=response.getheader('date');
 print date
 取出响应头部的date的值。
 希望本文所述对大家的Python程序设计有所帮助。
-来自
-<
-http://m.jb51.net/article/66763.htm
->

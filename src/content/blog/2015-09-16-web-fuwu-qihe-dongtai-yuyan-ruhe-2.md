@@ -12,7 +12,7 @@ tags:
   - mysql
   - dns
   - php
-draft: false
+draft: true
 source: evernote-local-db
 lang: zh
 ---

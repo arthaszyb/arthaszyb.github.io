@@ -1,31 +1,45 @@
 ---
-title: shadowsock搭梯子
+title: Shadowsocks 搭梯子
 date: '2018-03-08'
-description: >-
-  服务端： 下载一键安装脚本。 wget --no-check-certificate
-  https://raw.githubusercontent.com/teddysun/shadowsocksinstall/master/shadowsocks-go.sh
-  执行该脚本，会安装好该软件。  编辑配置文件后启动软件。
+description: Shadowsocks 服务端一键安装脚本和客户端配置方法。
 category: network
 tags:
-  - iptables
-  - systemd
-  - selinux
   - shell-scripting
-  - ssl-tls
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-服务端：
-下载一键安装脚本。wget --no-check-certificate
-https://raw.githubusercontent.com/teddysun/shadowsocks_install/master/shadowsocks-go.sh
-执行该脚本，会安装好该软件。
-编辑配置文件后启动软件。/etc/shadowsocks/config.json
-客户端：
-检查是否能telnet通服务端端口
-通了之后安装shadowsock客户端，配置服务器信息后启用系统代理，搞定（需要浏览器配置好shadowsock客户端的服务端口代理）
-附件：
-1. conf.json
+
+## 服务端部署
+
+使用一键安装脚本：
+
+```bash
+wget --no-check-certificate https://raw.githubusercontent.com/teddysun/shadowsocks_install/master/shadowsocks-go.sh
+bash shadowsocks-go.sh
+```
+
+脚本执行后自动安装并配置服务。编辑配置文件：
+
+```bash
+vi /etc/shadowsocks/config.json
+```
+
+## 客户端接入
+
+1. 先测试服务端端口是否可达：
+
+```bash
+telnet <server_ip> <port>
+```
+
+2. 安装对应操作系统的 Shadowsocks 客户端
+3. 配置服务器信息后启用系统代理
+4. 浏览器配置代理即可
+
+## 配置示例
+
+conf.json：
 {
 "server":"0.0.0.0",
 "server_port":8989,
