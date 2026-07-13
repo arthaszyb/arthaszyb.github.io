@@ -1,31 +1,24 @@
 ---
 title: 修复表、优化时减少磁盘占用空间
 date: '2014-07-16'
-description: >-
-  随着mysql的长期使用，肯定会出现一些问题，一般情况下mysql表无法访问，就可以修复表了，优化时减少磁盘占用空间。 方便备份。  复制代码 代码如下:
-  REPAIR TABLE tablename 修复表 OPTIMIZE TABLE tablename 优化表 REPAIR TABLE
-  用于修复被破坏的表。
+description: "MySQL表修复和优化命令的用途说明，使用REPAIR TABLE修复损坏表，使用OPTIMIZE TABLE回收删除数据后的磁盘空间。"
 category: database
 tags:
   - mysql
-  - 备份恢复
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-随着mysql的长期使用，肯定会出现一些问题，一般情况下mysql表无法访问，就可以修复表了，优化时减少磁盘占用空间。方便备份。
-复制代码
-代码如下:
-REPAIR TABLE `table_name`
-修复表
-OPTIMIZE TABLE `table_name`
-优化表
-REPAIR TABLE
-用于修复被破坏的表。
-OPTIMIZE TABLE
-用于回收闲置的数据库空间，当表上的数据行被删除时，所占据的磁盘空间并没有立即被回收，使用了
-OPTIMIZE TABLE
-命令后这些空间将被回收，并且对磁盘上的数据行进行重排（注意：是磁盘上，而非数据库）。
-多数时间并不需要运行
-OPTIMIZE TABLE
-，只需在批量删除数据行之后，或定期（每周一次或每月一次）进行一次数据表优化操作即可，只对那些特定的表运行。
+MySQL表在长期使用过程中可能出现损坏或磁盘空间浪费的问题，可以通过修复和优化来解决。
+
+修复表（用于修复被破坏的表）：
+```sql
+REPAIR TABLE `table_name`;
+```
+
+优化表（用于回收被删除数据行占用的磁盘空间）：
+```sql
+OPTIMIZE TABLE `table_name`;
+```
+
+`OPTIMIZE TABLE` 执行后会回收闲置空间并对磁盘上的数据行进行重排。通常不需要频繁运行，只需在批量删除数据行之后、或定期（每周一次或每月一次）对特定表进行一次优化即可。

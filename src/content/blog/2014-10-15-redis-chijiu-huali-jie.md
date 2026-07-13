@@ -1,16 +1,11 @@
 ---
 title: redis 持久化理解
 date: '2014-10-15'
-description: >-
-  博客分类： redis redis persistence snapshotting aof 快照方式(Snapshotting)
-  作者将这种持久化方式称为point-in-time, 即它并不能保证每个时刻内存中的数据集与磁盘上的二进制文件是完全一样的
+description: "Redis持久化的两种主要方式——快照(RDB)和追加日志(AOF)的工作原理、参数配置、内存消耗特性和各自的优缺点分析。"
 category: database
 tags:
   - redis
-  - mysql-replication
-  - 存储
   - 备份恢复
-  - 集群
 draft: false
 source: evernote-local-db
 lang: zh

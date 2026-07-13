@@ -1,10 +1,11 @@
 ---
-title: 克隆一个新的机器后，需要修改ip地址，但是发现网卡起不来，报“device eth0 does not seem to be present..”
+title: 克隆机器后网卡启动问题
 date: '2014-02-10'
+description: 克隆机器后修改 IP 时网卡无法启动的排查
 category: linux
 tags:
   - 网络排查
-draft: false
+draft: true
 source: evernote-local-db
 lang: zh
 ---

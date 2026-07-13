@@ -1,22 +1,17 @@
 ---
-title: Linux NFS配置小结
+title: Linux NFS 配置小结
 date: '2013-12-17'
-description: >-
-  点击量：次 发布时间：2012-04-16 17:17 Redhat Linux NFS配置 NFS简介： NFS是网络文件系统的简写（network
-  file system），主要用在linux或unix环境中，是有sun公司开发，并于1984年推出的一个RPC服务系统。
+description: Linux NFS（网络文件系统）的配置步骤，包括服务安装、exports 配置文件编写、权限设置和客户端挂载
 category: linux
 tags:
-  - iptables
-  - selinux
   - nfs
-  - vim
+  - linux-admin
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-点击量：次 发布时间：2012-04-16 17:17
 
-Redhat Linux NFS配置
+## Redhat Linux NFS 配置
 
 NFS简介：
 

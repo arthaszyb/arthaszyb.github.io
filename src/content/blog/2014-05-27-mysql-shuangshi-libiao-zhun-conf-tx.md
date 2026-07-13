@@ -1,29 +1,28 @@
 ---
 title: mysql双实例标准conf(tx)
 date: '2014-05-27'
-description: >-
-  [client] port = 3306 socket = /tmp/mysql.sock [mysqld1] user=mysql
-  bind-address = 10.166.6.170 port = 3306 socket = /tmp/mysql3306.sock datadir =
+description: "MySQL双实例配置文件示例，展示同一主机上运行两个MySQL服务（3306和3307端口）的标准配置方案。"
 category: database
 tags:
   - mysql
-  - dns
-  - mysql-replication
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-```bash
+MySQL主机上同时运行多个实例需要在配置文件中分别定义各实例的参数。下面是双实例配置的范例。
+
+```ini
 # mysql config file
 # File : /etc/my.cnf
 # Author : TR
 # Date : 2010-08-27
 # Notes
 # First edit by marryhe
-```
+
 [client]
 port = 3306
 socket = /tmp/mysql.sock
+
 [mysqld1]
 user=mysql
 bind-address = 10.166.6.170
@@ -50,6 +49,7 @@ myisam_max_sort_file_size=134217728
 myisam_max_extra_sort_file_size=134217728
 thread_concurrency=4
 myisam_sort_buffer_size=134217728
+
 [mysqld2]
 user=mysql
 bind-address = 10.166.6.170
@@ -76,20 +76,26 @@ thread_concurrency=4
 myisam_sort_buffer_size=128M
 max_heap_table_size=4096M
 tmp_table_size=4096M
+
 [mysqldump]
 quick
 max_allowed_packet=16M
+
 [mysql]
 no-auto-rehash
+
 [isamchk]
 key_buffer=256M
 sort_buffer=256M
 read_buffer=2M
 write_buffer=2M
+
 [myisamchk]
 key_buffer=256M
 sort_buffer=256M
 read_buffer=2M
 write_buffer=2M
+
 [mysqlhotcopy]
 interactive-timeout
+```

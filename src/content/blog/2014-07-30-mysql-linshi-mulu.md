@@ -1,9 +1,7 @@
 ---
 title: mysql临时目录
 date: '2014-07-30'
-description: >-
-  某天突然报警/分区饱满，查到是/tmp下多了很多mysql数据文件： 这些文件过会就消失，然后又产生，通过lsof命令查询与之相关的进程：
-  是mysqld进程产生的，遂查询该进程相关活动： 到此就没有头绪了。
+description: "MySQL执行排序等大查询时会在临时目录生成数据文件，默认为/tmp，导致分区饱满时的排查方法和解决方案。"
 category: database
 tags:
   - mysql
@@ -11,10 +9,13 @@ draft: false
 source: evernote-local-db
 lang: zh
 ---
-某天突然报警/分区饱满，查到是/tmp下多了很多mysql数据文件：
-这些文件过会就消失，然后又产生，通过lsof命令查询与之相关的进程：
-是mysqld进程产生的，遂查询该进程相关活动：
-到此就没有头绪了。请高人指点，
-原来是mysql内若有排序等查询操作时，会产生较大量的临时数据，而mysql默认的临时数据存放在/tmp下，若数据太大，则会导致/爆满，因此，在my.cnf下配置好临时文件的目录：
+若发现/tmp分区突然饱满，且临时文件频繁出现和消失，通常是MySQL产生的临时数据。MySQL在执行排序等大查询操作时会在临时目录生成数据文件，默认存放在/tmp。可通过lsof命令确认是mysqld进程产生。
+
+解决方法是在my.cnf中为MySQL指定专用的临时文件目录：
+
+```ini
+[mysqld]
 tmpdir=/data1/mysqldata/tmp
-即可。
+```
+
+这样可避免/tmp分区被MySQL临时数据撑满的问题。

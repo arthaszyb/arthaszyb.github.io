@@ -1,15 +1,12 @@
 ---
-title: Linux vmstat命令实战详解
+title: Linux vmstat 命令实战详解
 date: '2014-04-17'
-description: >-
-  Linux vmstat命令实战详解
-  vmstat命令是最常见的Linux/Unix监控工具，可以展现给定时间间隔的服务器的状态值,包括服务器的CPU使用率，内存使用，虚拟内存交换情况,IO读写情况。
+description: vmstat 监控工具的使用方法和详解，包括参数含义、实战示例和性能分析应用
 category: linux
 tags:
-  - nginx
-  - apache
-  - 存储
   - 监控告警
+  - linux-admin
+origin_url: http://www.cnblogs.com/ggjucheng/archive/2012/01/05/2312625.html
 draft: false
 source: evernote-local-db
 lang: zh

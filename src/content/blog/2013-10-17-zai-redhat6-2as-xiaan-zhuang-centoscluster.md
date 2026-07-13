@@ -1,40 +1,31 @@
 ---
-title: 在redhat6.2as下安装centoscluster集群
+title: RedHat 6.2 下安装 RHCS（CentOS Cluster）集群
 date: '2013-10-17'
-description: >-
-  一.  配置yum源 二、安装cluster套件 RHCS（Red Hat Cluster
-  Suite）是一个能够提供高可用性、高可靠性、负载均衡、存储共享且经济廉价的集群工具集合. 
-  LUCI：是一个基于web的集群配置方式，通过luci可以轻松的搭建一个功能强大的集群系统。
+description: Red Hat Cluster Suite（RHCS）的搭建实践，包括 LUCI 管理界面、集群节点配置、故障转移、iSCSI 共享存储和 GFS 文件系统的集成
 category: linux
 tags:
-  - apache
-  - iptables
-  - selinux
-  - shell-scripting
-  - lvm
+  - 集群
+  - 高可用
+  - 负载均衡
+  - 存储
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-- 一. 配置yum源
 
-- 二、安装cluster套件
+## RHCS（Red Hat Cluster Suite）概述
 
-1. RHCS（Red Hat Cluster Suite）是一个能够提供高可用性、高可靠性、负载均衡、存储共享且经济廉价的集群工具集合.
+RHCS 是一个能够提供高可用性、高可靠性、负载均衡、存储共享且经济廉价的集群工具集合。
 
-LUCI：是一个基于web的集群配置方式，通过luci可以轻松的搭建一个功能强大的集群系统。
+- **LUCI**：基于 Web 的集群配置方式，通过 LUCI 可以轻松搭建功能强大的集群系统
+- **CLVM**：Cluster 逻辑卷管理，是 LVM 的扩展，允许集群中的机器使用 LVM 来管理共享存储
+- **CMAN**：分布式集群管理器
 
-CLVM：Cluster逻辑卷管理，是LVM的扩展，这种扩展允许cluster中的机器使用LVM来管理共享存储。
+## 实验规划
 
-CMAN：分布式集群管理器。
-
-实验规划：节点两台，管理主机一台
-
-节点一：192.168.0.54 （desktop54.example.com）
-
-节点二：192.168.0.85 （desktop85.example.com）
-
-管理主机：192.168.0.22 （desktop22.example.com）
+- 节点一：192.168.0.54（desktop54.example.com）
+- 节点二：192.168.0.85（desktop85.example.com）
+- 管理主机：192.168.0.22（desktop22.example.com）
 
 一、【准备工作】
 
