@@ -2,8 +2,7 @@
 title: 合法IP地址分类
 date: '2014-02-17'
 description: >-
-  所谓合法IP地址，是指由IP地址管理部门分配的、能够被路由至Internet、并且在Internet中是唯一的，可以被Internet中的其他主机访问到的IP地址。
-  企业网络若欲实现Internet服务，就必须至少拥一个合法的IP地址。
+  IP 地址分为 A/B/C/D/E 五类，各类应用场景及范围不同；特殊 IP 地址包括网络地址、广播地址、回送地址；私有 IP 地址段保留用于内部网络，通过 NAT 可实现 Internet 共享。
 category: network
 tags:
   - 网络排查

@@ -1,10 +1,7 @@
 ---
-title: 我得grafana配置
+title: 我的 Grafana 配置
 date: '2018-03-21'
-description: >-
-  架构配置： org---user---act(角色) 每个org是完全独立隔离的，相当于另一套环境，要独立配置数据源等一切。 
-  admin才有权限配置org，如下图 这里切换org team应该是org内的角色细分。  配置用户 配置influxdb数据源。 
-  这里注意要用proxy模式。
+description: Grafana 多租户架构配置笔记。覆盖 Organization、User、Team 角色管理，InfluxDB 数据源配置（Proxy 模式），告警方式配置（Webhook/钩子）。
 category: monitoring
 tags:
   - 监控告警
@@ -12,15 +9,30 @@ draft: false
 source: evernote-local-db
 lang: zh
 ---
-架构配置：
-org---user---act(角色)
-每个org是完全独立隔离的，相当于另一套环境，要独立配置数据源等一切。
-admin才有权限配置org，如下图
-这里切换org
-team应该是org内的角色细分。
-配置用户
-配置influxdb数据源。
-这里注意要用proxy模式。如果需要用户名密码则先到influxdb中启用认证功能。
-将influxdb的数据作图
-配置告警，先配置告警方式信息（短信，webhook等）
-我这里配置的是钩子形式，因为邮件需要配置smtp。钩子就是直接调用一个url做事情。这个url是我的一个cgi，负责发送短信的。注意只支持post和put，post却有没给data信息，所以我没做成，只能配置成无参数的cgi。
+
+## 架构配置
+
+Grafana 的多租户层级：`Organization` → `User` → `Team`（角色细分）
+
+**关键特性**：
+
+- 每个 Organization 完全独立隔离，相当于另一套独立环境
+- 每个 Organization 需要独立配置数据源等一切
+- 只有 admin 权限才能配置 Organization
+- Team 是 Organization 内的角色细分
+
+## 配置步骤
+
+1. **配置用户**：创建用户并分配 Organization
+
+2. **配置 InfluxDB 数据源**：
+   - 使用 **Proxy 模式**（重要）
+   - 如果需要用户名密码，先在 InfluxDB 中启用认证功能
+
+3. **将 InfluxDB 数据作图**：基于配置的数据源创建 Dashboard
+
+4. **配置告警**：
+   - 先配置告警通知方式（短信、webhook 等）
+   - 支持多种形式：邮件（需配置 SMTP）、Webhook（钩子）
+   - Webhook 为直接调用指定 URL，仅支持 POST 和 PUT 方法
+   - 注意：POST 请求如无 data 参数，则需配置无参数的 CGI 接口

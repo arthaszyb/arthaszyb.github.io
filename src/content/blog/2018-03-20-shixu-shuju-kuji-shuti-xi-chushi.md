@@ -1,9 +1,7 @@
 ---
 title: 时序数据库技术体系 – 初识InfluxDB
 date: '2018-03-20'
-description: >-
-  2017年12月8日 范欣欣 时序数据库 在上篇文章 《时序数据库体系技术 – 时序数据存储模型设计》
-  中笔者分别介绍了多种时序数据库在存储模型设计上的一些考虑，其中OpenTSDB基于HBase对维度值进行了全局字典编码优化，Druid采用列式存储并实现了Bitmap索引以及局部字典编码优化
+description: InfluxDB 数据模型与系统架构深度分析。覆盖 Measurement、Tags、Fields、Point、Series 核心概念，以及 Database、Retention Policy、Shard Group、Shard 的逻辑组织与分片策略。
 category: monitoring
 tags:
   - 存储
@@ -11,9 +9,7 @@ draft: false
 source: evernote-local-db
 lang: zh
 ---
-2017年12月8日
-范欣欣
-时序数据库
+
 在上篇文章
 《时序数据库体系技术 – 时序数据存储模型设计》
 中笔者分别介绍了多种时序数据库在存储模型设计上的一些考虑，其中OpenTSDB基于HBase对维度值进行了全局字典编码优化，Druid采用列式存储并实现了Bitmap索引以及局部字典编码优化，InfluxDB和Beringei都将时间线挑了出来，大大降低了Tag的冗余。在这几种时序数据库中，InfluxDB无疑显的更加专业。接下来笔者将会针对InfluxDB的基本概念、内核实现等进行深入的分析。本篇文章先行介绍一些相关的基本概念。

@@ -1,35 +1,47 @@
 ---
-title: druid集群监控方案
+title: Druid 集群监控方案
 date: '2018-05-14'
-description: 选择了prometheus方案。 采用operations-software-druidexporter为客户端采集器。
+description: "Druid 集群监控使用 Prometheus + druid_exporter 方案。druid_exporter 是 Python 组件，采集 Druid 指标并暴露 HTTP 接口给 Prometheus。"
 category: monitoring
 tags:
-  - python
-  - ssl-tls
-  - hadoop
-  - java
+  - druid
   - 监控告警
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-选择了prometheus方案。采用operations-software-druid_exporter为客户端采集器。具体方法：
-部署operations-software-druid_exporter，这个是一个python组件，只支持py3，所以先安装py3，然后下载该组件，启动
-nohup /usr/local/app/imply/yau-tmp/python3/bin/python3 operations-software-druid_exporter-master/druid_exporter/exporter.py
-&
-具体可以参见该组件的github页面
-https://github.com/wikimedia/operations-software-druid_exporter
-该组件启动后实际启动了一个8000端口的http服务，druid支持发送http请求的方式去发送指标信息。在druid的节点通用配置如下：
-conf/druid/_common/common.runtime.properties
+
+使用 Prometheus + druid_exporter 进行 Druid 集群监控。
+
+## 部署 druid_exporter
+
+druid_exporter 是 Python 组件，仅支持 Python 3。安装后启动：
+
+```bash
+nohup /usr/local/app/imply/yau-tmp/python3/bin/python3 operations-software-druid_exporter-master/druid_exporter/exporter.py &
+```
+
+参考：https://github.com/wikimedia/operations-software-druid_exporter
+
+启动后在 8000 端口提供 HTTP 服务。
+
+## Druid 配置
+
+在 `conf/druid/_common/common.runtime.properties` 中配置：
+
+```properties
 # Monitoring
 druid.monitoring.monitors=["io.druid.java.util.metrics.JvmMonitor"]
 druid.emitter=http
-druid.emitter.http.recipientBaseUrl=
-http://hadoop-master:8000
-这里url即写为expoter组件的地址和端口即可。
-重启druid后生效，可curl http://hadoop-master:8000/metrics查看指标监控信息。
-配置grafana视图吧
-目前不支持JVM指标
-另外还有个官方推荐的方案：
-druid-metrics-to-kafka
-，需要配合kafka和druid本身
+druid.emitter.http.recipientBaseUrl=http://hadoop-master:8000
+```
+
+重启 Druid 后生效。查看指标：
+
+```bash
+curl http://hadoop-master:8000/metrics
+```
+
+## 其他方案
+
+官方推荐的另一个方案：druid-metrics-to-kafka，需要配合 Kafka。

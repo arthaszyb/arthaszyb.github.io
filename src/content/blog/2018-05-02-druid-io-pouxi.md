@@ -1,16 +1,10 @@
 ---
-title: druid.io剖析
+title: Druid I/O 分析笔记
 date: '2018-05-02'
-description: >-
-  收藏 jonathanloda 发表于 12个月前 阅读 578 收藏 15 点赞 0 评论 0 摘要: 剖析优酷广告团队的实时olap系统druid.io
-  druid.io剖析 简介 druid作为现在最有潜力的海量数据实时分析系统，在优酷广告团队中扮演者非常重要的角色 整体架构
+description: "关于 Druid I/O 操作和性能优化的笔记。包括数据存储、读写机制、性能调优等内容。"
 category: monitoring
 tags:
-  - mysql
-  - memcached
-  - ssl-tls
-  - hadoop
-  - 存储
+  - druid
 draft: false
 source: evernote-local-db
 lang: zh

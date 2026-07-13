@@ -1,0 +1,15 @@
+{"file": "2018-04-12-druid-defa-songshu-juhe-chaxun-shuju.md", "type": "repost", "actions": ["boilerplate-removed", "condensed", "desc-rewritten", "tags-cleaned"], "flags": ["condensed"], "before_bytes": 9265, "after_bytes": 5164}
+{"file": "2018-04-13-4-druid-shuju-sheru-1-csdn.md", "type": "normal", "actions": ["desc-rewritten", "tags-cleaned"], "flags": [], "before_bytes": 13077, "after_bytes": 12893}
+{"file": "2018-04-13-druid-tranquility-shiyong-shangpian-aoxiang-fly.md", "type": "repost", "actions": ["boilerplate-removed", "condensed", "desc-rewritten", "tags-cleaned"], "flags": ["repost-no-url"], "before_bytes": 3456, "after_bytes": 2573}
+{"file": "2018-04-30-hdfs-deji-zhongfang-wenfang-shi-zhuyi.md", "type": "thin", "actions": ["boilerplate-removed", "drafted"], "flags": ["drafted"], "before_bytes": 198, "after_bytes": 196}
+{"file": "2018-05-02-druid-io-pouxi.md", "type": "normal", "actions": ["desc-rewritten", "tags-cleaned"], "flags": [], "before_bytes": 11162, "after_bytes": 10932}
+{"file": "2018-05-02-druid-jiqun-dajian-deyi-xiezhong-yaode.md", "type": "normal", "actions": ["desc-rewritten", "tags-cleaned"], "flags": [], "before_bytes": 21108, "after_bytes": 21279}
+{"file": "2018-05-02-kafka-zhuyao-canshu-xiangjie.md", "type": "normal", "actions": ["desc-rewritten", "tags-cleaned"], "flags": [], "before_bytes": 11695, "after_bytes": 11579}
+{"file": "2018-05-03-mouhu-lianwang-dachang-kafka-zuijia-shijian.md", "type": "normal", "actions": ["desc-rewritten", "tags-cleaned"], "flags": [], "before_bytes": 8424, "after_bytes": 8179}
+{"file": "2018-05-04-kafka-dejian-kongda-jian-yau.md", "type": "normal", "actions": ["desc-rewritten", "tags-cleaned"], "flags": [], "before_bytes": 3870, "after_bytes": 5579}
+{"file": "2018-05-14-druid-jiqun-jiankong-fangan.md", "type": "thin", "actions": ["boilerplate-removed", "formatted", "desc-rewritten"], "flags": [], "before_bytes": 1449, "after_bytes": 1213}
+{"file": "2018-05-26-druid-shuji-yuedu-jilu.md", "type": "thin", "actions": ["boilerplate-removed", "formatted", "desc-rewritten"], "flags": [], "before_bytes": 1558, "after_bytes": 1307}
+{"file": "2018-05-26-druid-xuexi-biji-4-shuju-sheru.md", "type": "normal", "actions": ["desc-rewritten", "tags-cleaned"], "flags": [], "before_bytes": 11910, "after_bytes": 11666}
+{"file": "2018-05-29-druid-io-2-druid-jieshao.md", "type": "normal", "actions": ["desc-rewritten", "tags-cleaned"], "flags": [], "before_bytes": 14606, "after_bytes": 14312}
+{"file": "2018-06-14-grafana-zhongzhi-admin-mima.md", "type": "thin", "actions": ["boilerplate-removed", "formatted", "desc-rewritten"], "flags": [], "before_bytes": 1274, "after_bytes": 930}
+{"file": "2018-07-03-zabbix-agent-active-zhudong-moshi-peizhi.md", "type": "thin", "actions": ["boilerplate-removed", "formatted", "desc-rewritten"], "flags": [], "before_bytes": 3056, "after_bytes": 1820}

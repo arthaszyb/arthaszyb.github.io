@@ -1,19 +1,17 @@
 ---
-title: druid集群搭建的一些重要的坑
+title: Druid 集群搭建的重要坑
 date: '2018-05-02'
-description: 问题分类总结..
+description: "Druid 集群搭建过程中遇到的问题总结。包括数据可视化页面加载失败、数据导入卡顿、服务无法访问、内存溢出等各类问题的排查和解决方案。"
 category: monitoring
 tags:
-  - apache
-  - mysql
-  - rsync
-  - ssl-tls
+  - druid
   - hadoop
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-问题分类总结.. 系统资源问题 海量数据自身配置优化问题 版本bug 依赖组件问题
+
+Druid 集群搭建过程中遇到的问题分类：系统资源问题、海量数据自身配置优化问题、版本 Bug、依赖组件问题。
 ```bash
 #一些重要的坑记录
 ##数据可视化页面加载失败，提示{"error":"could not get customization","message":"select `payload` from `pivot-store-customizations` where `key` = 'x' - ER_NO_SUCH_TABLE: Table 'druid.pivot-store-customizations' doesn't exist"}

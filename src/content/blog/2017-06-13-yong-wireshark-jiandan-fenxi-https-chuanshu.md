@@ -1,9 +1,8 @@
 ---
-title: 用Wireshark简单分析HTTPS传输过程-抓包过程
+title: '用 Wireshark 分析 HTTPS 传输过程'
 date: '2017-06-13'
 description: >-
-  2017 年 6 月 13 日 14:40 用Wireshark简单分析HTTPS传输过程-抓包过程 常运 2014-07-09 +6 共 1727558
-  人围观 ，发现 18 个不明物体 系统安全 上次写的文章 理解SSL（https）中的对称加密与非对称加密 ，一些小伙伴们说要如果有抓包过程
+  通过 Wireshark 抓包观察 HTTPS（TLS）完整握手过程：TLS Hello → 证书交换 → 服务端 SYN → 对称密钥加密 → 数据交互；展示协议栈如何从公钥加密协商切换到对称密钥加密。
 category: network
 tags:
   - ssl-tls
@@ -11,31 +10,13 @@ tags:
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: http://www.freebuf.com/articles/system/37900.html
 ---
-2017
-年
-6
-月
-13
-日
-14:40
-用Wireshark简单分析HTTPS传输过程-抓包过程
-常运
-2014-07-09
-+6
-共
-1727558
-人围观 ，发现
-18
-个不明物体
-系统安全
-上次写的文章
-理解SSL（https）中的对称加密与非对称加密
-，一些小伙伴们说要如果有抓包过程，也就是有图片了解下过程比较好，所以有了这篇文章，写得不好的地方希望大家能提出建议呀，以能改正。
-实验环境：
-操作系统：Kali linux 1.06 64位
-软件：Wireshark
-实验目的：查看https的协议传输过程。
+## 实验环境
+
+- 操作系统：Kali linux 1.06 64位
+- 软件：Wireshark
+- 实验目的：查看 HTTPS 的协议传输过程
 一、打开软件，
 二、打开后，选择菜单下的edit的Prefenrces，选择protocols下的ssl（因为我们要观测的是https的传输过程），点击开始：
 三、开始监听https传输数据：
@@ -51,8 +32,3 @@ lang: zh
 然后就是浏览器与服务器的交互过程：
 1、服务器用自己的私匙解密了你发送的钥匙。然后用这把对称加密的钥匙给你请求的URL链接解密。
 2、服务器用你发的对称钥匙给你请求的网页加密。你也有相同的钥匙就可以解密发回来的网页了。
-文章写到这就应该结束了，本文写的不是很完善，主要是写个大概过程，写得不好的地方敬请大家多谅解，本文主要是希望研究这方面的小伙伴能互相学习下。
-来自
-<
-http://www.freebuf.com/articles/system/37900.html
->

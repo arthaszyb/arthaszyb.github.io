@@ -1,11 +1,11 @@
 ---
-title: HDFS的几种访问方式。 注意只能通过namenode节点访问成功。
+title: HDFS 的几种访问方式
 date: '2018-04-30'
+description: 关于 HDFS 访问方式的笔记。
 category: monitoring
 tags:
   - hadoop
-draft: false
+draft: true
 source: evernote-local-db
 lang: zh
 ---
-

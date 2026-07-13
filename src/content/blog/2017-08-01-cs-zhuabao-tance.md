@@ -1,10 +1,8 @@
 ---
-title: cs抓包探测
+title: 'CS 抓包探测规则'
 date: '2017-08-01'
 description: >-
-  cs 抓包探测 2017 年 8 月 1 日 11:44 规则，注意不要只抓回包或去包： ip.dst == 111.30.135.186 or
-  ip.dst == 123.151.176.26 or ip.dst == 123.151.71.34 or ip.dst ==
-  219.133.60.246 or
+  使用 Wireshark 过滤规则进行 CS（某管家）命令字抓包分析；规则涵盖双向流量（源地址和目的地址均包含）；注意 CS 协议为了穿透网络设备采用 HTTP 头封装。
 category: network
 tags:
   - 网络排查
@@ -12,17 +10,14 @@ draft: false
 source: evernote-local-db
 lang: zh
 ---
-cs
-抓包探测
-2017
-年
-8
-月
-1
-日
-11:44
-规则，注意不要只抓回包或去包：
+
+## 抓包过滤规则
+
+Wireshark 过滤规则（注意双向包）：
+
+```bash
 ip.dst == 111.30.135.186 or ip.dst == 123.151.176.26 or ip.dst == 123.151.71.34 or ip.dst == 219.133.60.246 or ip.dst == 183.3.235.42 or ip.src == 111.30.135.186 or ip.src == 123.151.176.26 or ip.src == 123.151.71.34 or ip.src == 219.133.60.246 or ip.src == 183.3.235.42
+```
 为啥
 cmd
 是

@@ -1,17 +1,10 @@
 ---
-title: Druid学习笔记（4）数据摄入总结
+title: Druid 学习笔记 - 数据摄入
 date: '2018-05-26'
-description: >-
-  2017年12月13日 18:09:25 阅读数：1212 概述 Druid的数据摄入主要包括两大类： 实时输入摄入：包括Pull,Push两种
-  Pull:需要启动一个RealtimeNode节点，通过不同的Firehose摄取不同种类的数据源。 
-  Push:需要启动Tranquility或是Kafka索引服务。
+description: "Druid 数据摄入 (Ingestion) 的学习笔记。涉及数据格式、schema 配置、摄入规范等核心概念。"
 category: monitoring
 tags:
-  - apache
-  - ssl-tls
-  - hadoop
-  - 存储
-  - 高可用
+  - druid
 draft: false
 source: evernote-local-db
 lang: zh

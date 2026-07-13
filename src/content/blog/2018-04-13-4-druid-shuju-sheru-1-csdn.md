@@ -1,33 +1,15 @@
 ---
-title: 4-Druid数据摄入-1 - CSDN博客
+title: Druid 数据摄入笔记
 date: '2018-04-13'
-description: >-
-  博客 学院 下载 GitChat 论坛 问答 商城 VIP 活动 招聘 ITeye 码云 CSTO   写博客  发Chat 登录 注册
-  4-Druid数据摄入-1 翻译 2017年11月19日 12:06:50 标签： Druid .  .
+description: "Druid 数据摄入的官方文档整理。包括数据格式支持（JSON/CSV/TSV）、dataSchema 组件结构、DataSchema/ioConfig/tuningConfig 配置。"
 category: monitoring
 tags:
-  - mysql
-  - redis
-  - python
+  - druid
   - hadoop
-  - 存储
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-博客
-学院
-下载
-GitChat
-论坛
-问答
-商城
-VIP
-活动
-招聘
-ITeye
-码云
-CSTO
 
 
 写博客

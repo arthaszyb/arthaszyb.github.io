@@ -1,16 +1,10 @@
 ---
-title: druid.io 2---druid介绍
+title: Druid I/O 分析（二）
 date: '2018-05-29'
-description: >-
-  druid.io druid.io 大数据 学习 Druid概念 Druid.io 是一个开源的，分布式的， 列式存储 的，适用于实时数据分析的 OLAP
-  系统，能够快速聚合、灵活过滤、毫秒级查询、和低延迟数据导入。  优势： 高容错性：单个节点挂掉不会影响其他部分。 详情在 文末 有介绍。
+description: "Druid I/O 机制的进一步分析。深入讲解数据存储、检索、性能优化的细节。"
 category: monitoring
 tags:
-  - mysql
-  - nfs
-  - hadoop
-  - 存储
-  - 监控告警
+  - druid
 draft: false
 source: evernote-local-db
 lang: zh

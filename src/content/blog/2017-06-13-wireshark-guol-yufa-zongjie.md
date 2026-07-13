@@ -1,41 +1,16 @@
 ---
-title: wireshark过滤语法总结
+title: 'Wireshark 过滤语法总结'
 date: '2017-06-13'
 description: >-
-  2017 年 6 月 13 日 14:40 wireshark过滤语法总结 标签： tcp dst string stream filter session
-  2011-12-09 22:38 101219 人阅读 评论 (3) 收藏 举报 版权声明：本文为博主原创文章，未经博主允许不得转载。
+  Wireshark 过滤语法包括捕捉过滤器（决定抓取内容）和显示过滤器（在已抓数据中搜索）；支持协议过滤（如 tcp、http）、属性值过滤（如 tcp.port==25）、字符串匹配（contains）和特定偏移过滤。
 category: network
 tags:
-  - dns
   - 网络排查
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: http://blog.csdn.net/cumirror/article/details/7054496
 ---
-2017
-年
-6
-月
-13
-日
-14:40
-wireshark过滤语法总结
-标签：
-tcp
-dst
-string
-stream
-filter
-session
-2011-12-09 22:38 101219
-人阅读
-评论
-(3)
-收藏
-举报
-版权声明：本文为博主原创文章，未经博主允许不得转载。
-目录
-(?)[+]
 做应用识别这一块经常要对应用产生的数据流量进行分析。
 抓包采用
 wireshark
@@ -290,13 +265,3 @@ upper(http.request.uri) contains "ONLINE"
 wireshark
 过滤支持比较运算符、逻辑运算符，内容过滤时还能使用位运算。
 如果过滤器的语法是正确的，表达式的背景呈绿色。如果呈红色，说明表达式有误。
-参考：
-wireshark
-的
-HELP-Manual Pages-Wireshark Filter
-http://blog.csdn.net/yhwxxx/article/details/5643095
-http://tieba.baidu.com/p/739516717
-来自
-<
-http://blog.csdn.net/cumirror/article/details/7054496
->

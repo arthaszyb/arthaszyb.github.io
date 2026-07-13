@@ -1,18 +1,30 @@
 ---
-title: druid书籍阅读记录
+title: Druid 书籍阅读记录
 date: '2018-05-26'
-description: >-
-  1.列数据库定义，时序数据库定义 2.druid特点，产品对比
-  3.druid快写快读的基础原因：不同于关系型数据的B+树的索引结构，LSM-tree利用了磁盘基本特点（顺序操作性能远高于随机操作），使用两部分类树的数据结构存储数据（P64）。
+description: "Druid 相关书籍阅读笔记。涉及列数据库、时序数据库定义，Druid 特点对比，LSM-tree 架构和性能特性，集群各节点职责。"
 category: monitoring
 tags:
-  - 存储
+  - druid
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-1.列数据库定义，时序数据库定义
-2.druid特点，产品对比
-3.druid快写快读的基础原因：不同于关系型数据的B+树的索引结构，LSM-tree利用了磁盘基本特点（顺序操作性能远高于随机操作），使用两部分类树的数据结构存储数据（P64）。实时节点采用类LSM-tree架构使得druid保证数据的高速写入，并提供快速的实时查询。
-4.历史节点会先检查自己本身有的segments，如果coor服务分配给他的segs没找到，则会从deepst下载到本地，需要大内存以提高查询效率。broker节点一般只要两个即可，其也会提供自己的内存作为缓存。
-5.与实时节点工作相同，还存在着索引服务来制造segment数据文件，索引服务相对实时节点的优点是不仅支持pull，还支持push，还支持API方式灵活配置任务，完成segment的副本数量控制。索引服务实际包含overlord+middle服务，overlod负责分配任务，middle干活。实时节点在新版本中已经被索引服务取代，因为存在单点问题，
+
+Druid 相关书籍阅读笔记。
+
+## 基本概念
+
+- 列数据库定义、时序数据库定义
+- Druid 特点、产品对比
+
+## Druid 快写快读的基础
+
+不同于关系型数据库的 B+ 树索引结构，Druid 使用 LSM-tree，利用磁盘的基本特性（顺序操作性能远高于随机操作），采用两部分树的数据结构存储数据。实时节点采用类 LSM-tree 架构，保证高速写入和快速实时查询。
+
+## 集群节点职责
+
+**历史节点**：先检查本地 segments，若 coordinator 分配的 segments 找不到，则从 deep storage 下载到本地（需要大内存以提高查询效率）。
+
+**Broker 节点**：通常两个即可，提供内存作为缓存。
+
+**索引服务**：与实时节点工作相同，但优势是支持 pull、push，还支持 API 灵活配置任务，能控制 segment 副本数量。包含 Overlord（分配任务）和 MiddleManager（执行任务）。实时节点因单点问题，已被索引服务取代。
