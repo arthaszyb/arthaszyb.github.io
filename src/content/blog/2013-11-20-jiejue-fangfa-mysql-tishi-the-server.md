@@ -1,52 +1,89 @@
 ---
-title: '[解决方法]MySql提示:The server quit without updating PID file(…)失败'
+title: MySQL "server quit without updating PID file" 错误解决
 date: '2013-11-20'
-description: >-
-  Linux专题 REKFAN.COM 2012-08-13 14109浏览 2评论 服务器症状：
-  今天网站web页面提交内容到数据库，发现出错了，一直提交不了，数找了下原因，发现数据写不进去！
-  第一反应，重启mysql数据库，一直执行中，停止不了也启动不了，直觉告诉我磁盘满了 ！
+description: "MySQL启动失败提示PID文件错误的7种常见原因和解决方法汇总。"
 category: database
 tags:
   - mysql
-  - selinux
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-Linux专题
-REKFAN.COM
-2012-08-13
-14109浏览
-2评论
-服务器症状：
-今天网站web页面提交内容到数据库，发现出错了，一直提交不了，数找了下原因，发现数据写不进去！第一反应，重启mysql数据库，一直执行中，停止不了也启动不了，直觉告诉我磁盘满了 ！用df命令查了下，果然磁盘满了，因为当时分区采用系统默认，不知道为什么不能自动扩容！以后在处理这个问题！如图所示：
-[root@rekfan ~]# df
-文件系统 1K-块 已用 可用 已用% 挂载点
-/dev/mapper/vg_rekfan-lv_root
-51606140 47734848 1249852 100% /
-tmpfs 1953396 88 1953308 1% /dev/shm
-/dev/sda1 495844 37062 433182 8% /boot
-/dev/mapper/vg_rekfan-lv_home
-229694676 191796 217835016 1% /home
-[root@rekfan ~]#
-删除了些没用的日志后，重新启动数据库还是出错。
-http://blog.rekfan.com/?p=186
-[root@rekfan mysql]# service mysql restart
-MySQL server PID file could not be found![失败]
-Starting MySQL…The server quit without updating PID file (/usr/local/mysql/data/rekfan.pid).[失败]
-google了下 ，问题可能的原因有多种，具体什么原因最好的办法是先查看下错误日志：
-1.可能是/usr/local/mysql/data/rekfan.pid文件没有写的权限
-解决方法 ：给予权限，执行 “chown -R mysql:mysql /var/data” “chmod -R 755 /usr/local/mysql/data” 然后重新启动mysqld！
-2.可能进程里已经存在mysql进程
-解决方法：用命令“ps -ef|grep mysqld”查看是否有mysqld进程，如果有使用“kill -9 进程号”杀死，然后重新启动mysqld！
-3.可能是第二次在机器上安装mysql，有残余数据影响了服务的启动。
-解决方法：去mysql的数据目录/data看看，如果存在mysql-bin.index，就赶快把它删除掉吧，它就是罪魁祸首了。本人就是使用第三条方法解决的 ！
-http://blog.rekfan.com/?p=186
-4.mysql在启动时没有指定配置文件时会使用/etc/my.cnf配置文件，请打开这个文件查看在[mysqld]节下有没有指定数据目录(datadir)。
-解决方法：请在[mysqld]下设置这一行：datadir = /usr/local/mysql/data
-5.skip-federated字段问题
-解决方法：检查一下/etc/my.cnf文件中有没有没被注释掉的skip-federated字段，如果有就立即注释掉吧。
-6.错误日志目录不存在
-解决方法：使用“chown” “chmod”命令赋予mysql所有者及权限
-7.selinux惹的祸，如果是centos系统，默认会开启selinux
-解决方法：关闭它，打开/etc/selinux/config，把SELINUX=enforcing改为SELINUX=disabled后存盘退出重启机器试试。
+
+MySQL 启动时出现 `The server quit without updating PID file` 错误的常见原因和解决办法。
+
+## 方案1：PID 文件权限不足
+
+```bash
+chown -R mysql:mysql /var/data
+chmod -R 755 /usr/local/mysql/data
+service mysqld restart
+```
+
+## 方案2：MySQL 进程仍在运行
+
+检查是否有僵尸进程：
+
+```bash
+ps -ef | grep mysqld
+kill -9 <PID>  # 杀死进程
+service mysqld restart
+```
+
+## 方案3：mysql-bin.index 冲突
+
+第二次安装 MySQL 时，残余数据会影响启动。进入数据目录删除：
+
+```bash
+cd /usr/local/mysql/data
+rm -f mysql-bin.index
+service mysqld restart
+```
+
+## 方案4：配置文件中未指定数据目录
+
+MySQL 启动时默认使用 `/etc/my.cnf`，需要验证数据目录设置：
+
+```bash
+# /etc/my.cnf 中 [mysqld] 段需要有
+datadir = /usr/local/mysql/data
+```
+
+## 方案5：skip-federated 字段问题
+
+检查 `/etc/my.cnf` 中是否有未注释的 `skip-federated` 字段，若有则注释掉：
+
+```
+# skip-federated
+```
+
+## 方案6：错误日志目录不存在
+
+使用命令赋予权限和所有者：
+
+```bash
+chown -R mysql:mysql /usr/local/mysql/data
+chmod -R 755 /usr/local/mysql/data
+```
+
+## 方案7：SELinux 阻止（CentOS）
+
+CentOS 默认开启 SELinux，可能阻止 MySQL 启动。修改配置：
+
+```bash
+# 编辑 /etc/selinux/config
+SELINUX=disabled
+
+# 重启机器
+reboot
+```
+
+## 快速诊断
+
+查看 MySQL 错误日志获得更详细信息：
+
+```bash
+tail -f /usr/local/mysql/data/error.log
+```
+
+根据具体错误信息选择对应的解决方案。

@@ -1,407 +1,161 @@
 ---
-title: CentOS 7 安装KVM，并创建虚拟机
+title: CentOS 7 安装 KVM 并创建虚拟机
 date: '2018-01-31'
-description: >-
-  2018 年 1 月 31 日 11:53 CentOS 7 安装KVM，并创建虚拟机 原创 2017年01月09日 08:41:39 标签： centos
-  / kvm / qemu / 虚拟机 8771 使用KVM（基于内核的虚拟机）+ QEMU的虚拟化。  需要具有Intel VT或AMD-V功能的CPU。
+description: 在 CentOS 7 上使用 KVM 和 QEMU 进行虚拟化部署，包括 KVM 安装、网桥配置、虚拟机创建等完整步骤。
 category: container-virt
 tags:
-  - systemd
   - kvm
-  - nfs
-  - elasticsearch
-  - 存储
+  - systemd
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: http://blog.csdn.net/wh211212/article/details/54135565
 ---
-2018
-年
-1
-月
-31
-日
-11:53
-CentOS 7 安装KVM，并创建虚拟机
-原创
-2017年01月09日 08:41:39
-标签：
-centos
-/
-kvm
-/
-qemu
-/
-虚拟机
-8771
-使用KVM（基于内核的虚拟机）+ QEMU的虚拟化。 需要具有Intel VT或AMD-V功能的CPU。
-安装KVM
-[root
-@kvm
--centos7 ~]
-# yum -y install qemu-kvm libvirt virt-install bridge-utils
-#
-确保模块已加载
-[root
-@kvm
--centos7 ~]
-# lsmod | grep kvm
-kvm_intel
-170181
-0
-kvm
-554609
-1
-kvm_intel
-irqbypass
-13503
-1
-kvm
-[root
-@kvm
--centos7~]
-# systemctl start libvirtd
-[root
-@kvm
--centos7~]
-# systemctl enable libvirtd
-为KVM虚拟机配置桥接网络
-参考：
-http://blog.csdn.net/wh211212/article/details/54135565
+
+## 环境要求
+
+- CPU 支持虚拟化（Intel VT 或 AMD-V）
+
+## 安装 KVM
+
+```bash
+yum -y install qemu-kvm libvirt virt-install bridge-utils
+```
+
+验证模块已加载：
+
+```bash
+lsmod | grep kvm
+# kvm_intel             170181  0
+# kvm                   554609  1 kvm_intel
+# irqbypass             13503  1 kvm
+```
+
+启动 libvirt 服务：
+
+```bash
+systemctl start libvirtd
+systemctl enable libvirtd
+```
+
+## 配置桥接网络
+
+为 KVM 虚拟机配置桥接网络以访问外部网络。
+
 实验环境：
-OS：CentOS Linux release 7.3.1611 (Core)
-Network：双网卡bonding
-硬件：DELL R420，16G 1CPU 4核
-#
-网卡配置，新建
-ifcfg-bro
-，然后修改相关配置如下：
-[root@kvm-centos7 ~]
-# cd /etc/sysconfig
-etwork-scripts/
-[root@kvm-centos7 network-scripts]
-# cat ifcfg-br0
-DEVICE
-="br0"
-ONBOOT
-="yes"
-TYPE
-="Bridge"
-BOOTPROTO
-=static
-IPADDR
-=192.168.1.133
-#
-自定义
-NETMASK
-=255.255.255.0
-GATEWAY
-=192.168.1.1
-DEFROUTE
-=yes
-# ifcfg-bond0
-配置文件修改
-[root@kvm-centos7 network-scripts]
-# cat ifcfg-bond0
-DEVICE
-=bond0
-TYPE
-=Ethernet
-NAME
-=bond0
-BONDING_MASTER
-=yes
-BOOTPROTO
-=none
-BRIDGE
-=br0
-ONBOOT
-=yes
-BONDING_OPTS
-="mode=5 miimon=100"
-桥接网络配置完成重启网络服务，查看ifconfig如下：
-[root
-@kvm
--centos7 network-scripts]
-# systemctl restart network
-1
-查看ifconfig，看网络服务是否正常
-创建虚拟机
-安装GuestOS并创建虚拟机。此示例显示安装CentOS 7
-通过网络在文本模式上安装GuestOS，虚拟机的映像默认放置在/var/lib/libvirt/images作为存储池，但本示例显示创建和使用新的存储池。
-[root@kvm-centos7~]# mkdir -p /var/kvm/images #
-创建新的存储池
+- OS：CentOS Linux release 7.3.1611 (Core)
+- 网络：双网卡 bonding
+- 硬件：DELL R420, 16G 内存, 4 核 CPU
+
+### 创建网桥配置文件
+
+编辑 `/etc/sysconfig/network-scripts/ifcfg-br0`：
+
 ```bash
-[root@kvm-centos7 ~]# virt-install \
---name elk \
---ram
+DEVICE="br0"
+ONBOOT="yes"
+TYPE="Bridge"
+BOOTPROTO=static
+IPADDR=192.168.1.133
+NETMASK=255.255.255.0
+GATEWAY=192.168.1.1
+DEFROUTE=yes
 ```
-4096
-\
---disk path=
-/var/kvm/images/elk
-.img,size=
-30
-\
---vcpus
-2
-\
+
+### 配置 bonding（可选）
+
+编辑 `/etc/sysconfig/network-scripts/ifcfg-bond0`：
+
 ```bash
---os-type linux \
---os-variant rhel7 \
---network bridge=br
+DEVICE=bond0
+TYPE=Ethernet
+NAME=bond0
+BONDING_MASTER=yes
+BOOTPROTO=none
+BRIDGE=br0
+ONBOOT=yes
+BONDING_OPTS="mode=5 miimon=100"
 ```
-0
-\
+
+重启网络服务：
+
 ```bash
---graphics none \
---console pty,target_type=serial \
---location
+systemctl restart network
 ```
-'
-http://mirrors.aliyun.com/centos/7/os/x86_64/
-'
-\
---extra-args
-'console=ttyS0,115200n8 serial'
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-正常加载状态如下：
-上面指定的相关参数含义如下：更多参考man virt-install
---name
-指定虚拟机的名称
---ram
-指定
-Virtual Machine
---disk
-的内存量
-path = xxx
-，
-size = xxx
-'path ='
-⇒
-指定虚拟机
-size ='
-⇒
-指定虚拟机的磁盘数量
---vcpus
-指定虚拟
-CPU
---os-type
-指定
-GuestOS
-的类型
---os-variant
-指定
-GuestOS
-的类型
--
-可能确认列表中使用以下命令
-osinfo-query os
---network
-指定虚拟机的网络类型
---graphics
-指定图形的类型。如果设置为
-“
-无
-”
-，则意味着非图形。
---console
-指定控制台类型
---location
-指定安装的位置，其中
-from
---extra-args
-指定在内核中设置的参数
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-在文本模式下安装，与常见的安装步骤相同。安装完成后，首先重新启动，然后登录提示如下所示。
-重新安装kvm虚拟机，记录安装步骤
-virt
--
-install
--
-d
---
-virt
--
-type=kvm
---
-name=aniu
--
-saas
--
-1
---
-vcpus=8
---
-memory=12288
---
-location=/media/CentOS
--
-7
--
-x86_64
--
-Minimal
--
-1611
-.
-iso
---
-disk path=/dev/cl/aniu
--
-saas
--
-1
---
-network bridge=br0
---
-graphics none
---
-extra
--
-args='console=ttyS0'
---
-force
-1
-2
-注：命令行安装操作比较麻烦，注意多看提示。
-下面附上笔者网卡配置信息
-网桥配置
-[root
-@aniu
--saas network-scripts]
-# cat ifcfg-br0
-DEVICE
-=
-"br0"
-TYPE
-=
-"Bridge"
-BOOTPROTO
-=
-"none"
-DEFROUTE
-=
-"yes"
-NAME
-=
-"br0"
-ONBOOT
-=
-"yes"
-IPADDR
-=
-"192.168.0.205"
-PREFIX
-=
-"24"
-GATEWAY
-=
-"192.168.0.1"
-DNS1
-=
-"114.114.114.114"
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-网卡配置
-[root
-@aniu
--saas network-scripts]
-# cat ifcfg-em1
-TYPE
-=
-"Ethernet"
-NAME
-=
-"em1"
-UUID
-=
-"999a275e-eac8-4323-bdf8-f7c7434b7737"
-DEVICE
-=
-"em1"
-ONBOOT
-=
-"yes"
-BRIDGE
-=
-"br0"
-1
-2
-3
-4
-5
-6
-7
-location参数笔者建议换成http或者nfs的加载系统镜像。
-安装成功界面如下图：
-安装完成后，由于安装的时候没有配置网络，发现虚拟机也没有自动分配网络，就添加了虚拟机网络，参考如下：
-[root@localhost network-scripts]
-# cat ifcfg-eth0
-TYPE
-=Ethernet
-BOOTPROTO
-=static
-DEFROUTE
-=yes
-PEERDNS
-=yes
-PEERROUTES
-=yes
-IPV4_FAILURE_FATAL
-=no
-NAME
-=eth0
-UUID
-=a38ceceb-5f4e-4d08-a108-d83c176ea85b
-DEVICE
-=eth0
-ONBOOT
-=yes
-IPADDR
-="192.168.0.206"
-PREFIX
-="24"
-GATEWAY
-="192.168.0.1"
-DNS1
-="114.114.114.114"
-来自
-<
-http://blog.csdn.net/wh211212/article/details/54141412
->
+
+## 创建虚拟机
+
+### 创建存储目录
+
+```bash
+mkdir -p /var/kvm/images
+```
+
+### 使用 virt-install 安装虚拟机
+
+通过网络安装 CentOS 7：
+
+```bash
+virt-install \
+  --name elk \
+  --ram 4096 \
+  --disk path=/var/kvm/images/elk.img,size=30 \
+  --vcpus 2 \
+  --os-type linux \
+  --os-variant rhel7 \
+  --network bridge=br0 \
+  --graphics none \
+  --console pty,target_type=serial \
+  --location 'http://mirrors.aliyun.com/centos/7/os/x86_64/' \
+  --extra-args 'console=ttyS0,115200n8 serial'
+```
+
+关键参数说明：
+
+| 参数 | 说明 |
+|---|---|
+| `--name` | 虚拟机名称 |
+| `--ram` | 虚拟机内存（MB） |
+| `--disk path=xxx,size=xxx` | 磁盘路径和大小（GB） |
+| `--vcpus` | 虚拟 CPU 数 |
+| `--os-type` | GuestOS 类型（linux/windows） |
+| `--os-variant` | GuestOS 具体版本（可用 `osinfo-query os` 查询） |
+| `--network` | 网络类型（bridge=桥接） |
+| `--graphics` | 图形界面（none=无） |
+| `--console` | 控制台类型 |
+| `--location` | 安装源位置（HTTP/NFS） |
+| `--extra-args` | 内核启动参数 |
+
+### 虚拟机网络配置
+
+安装完成后，配置虚拟机内的网卡。编辑虚拟机内的 `/etc/sysconfig/network-scripts/ifcfg-eth0`：
+
+```bash
+TYPE=Ethernet
+BOOTPROTO=static
+DEFROUTE=yes
+PEERDNS=yes
+PEERROUTES=yes
+IPV4_FAILURE_FATAL=no
+NAME=eth0
+UUID=a38ceceb-5f4e-4d08-a108-d83c176ea85b
+DEVICE=eth0
+ONBOOT=yes
+IPADDR="192.168.0.206"
+PREFIX="24"
+GATEWAY="192.168.0.1"
+DNS1="114.114.114.114"
+```
+
+## 虚拟机安装另一种方法
+
+通过 XML 配置文件方式创建虚拟机：
+
+```bash
+# 编辑 vm.xml
+virsh define vm.xml    # 定义虚拟机（不启动）
+virsh list --all       # 查看虚拟机列表
+virsh start vm_name    # 启动虚拟机
+```
+
+这种方式需要 KVM 模块已加载（某些特殊环境如 tlinux 可能不支持）。

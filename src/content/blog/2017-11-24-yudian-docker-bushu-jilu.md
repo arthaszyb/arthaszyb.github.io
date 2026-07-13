@@ -1,73 +1,56 @@
 ---
-title: 御点docker部署记录
+title: 御点 Docker 部署记录
 date: '2017-11-24'
-description: >-
-  御点 docker 部署记录 2017 年 11 月 24 日 17:41 安装 docker 环境 用基础镜像创建一个容器； 在该容器中部署好御点环境。 
-  yum install -y killall perl unzip sudo ；以及其他相关。
+description: 御点（企业应用）Docker 部署全流程。基于 CentOS 6.9 基础镜像创建和配置容器，导出、迁移到新宿主机，网络配置注意事项。
 category: container-virt
 tags:
-  - iptables
   - docker
-  - dns
+  - iptables
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-御点
-docker
-部署记录
-2017
-年
-11
-月
-24
-日
-17:41
-安装
-docker
-环境
+
+## 构建镜像
+
+基于 CentOS 6.9 拉取和创建容器：
+
 ```bash
 docker pull centos:6.9
 docker run --name z1 -it centos:6.9 /bin/bash
 ```
-用基础镜像创建一个容器；
-在该容器中部署好御点环境。
-yum install
--y
-killall
-perl unzip sudo
-；以及其他相关。
+
+在容器内安装必要的包：
+
+```bash
+yum install -y killall perl unzip sudo
+```
+
+退出并提交容器为新镜像：
+
+```bash
 exit
-退出该容器
-docker commit
-fa2a420b2863 enter_prise_v0.1
-保存该容器状态为一个新本地镜像。
+docker commit fa2a420b2863 enter_prise_v0.1
+```
+
+## 镜像迁移
+
+导出容器为 tar 文件：
+
+```bash
 docker export 888ab1b10154 > enterPrise.tar
-将容器导出为一个
-tar
-文件用于后面迁移到其他宿主机中。
-将该
-tar
-文件传送到新宿主机。
+```
+
+在新宿主机上导入镜像：
+
+```bash
 cat enterPrise.tar | docker import - my/enterprise:0.1
-在新宿主机中建立业务本地镜像。注意新镜像名中不能包含大些字母，会失败的。
-依据新镜像创建新容器。
-遗留问题：
-新宿主机的
-docker
-容器网络模式需要配置好，
-host
-模式默认在容器中
-ifconfig
-无任何输出。且服务都有
-bind
-地址。
-服务
-bind
-地址建议统一改为
-0.0.0.0
-，因为迁移后
-ip
-都会变化，为减少迁移成本。注意好
-iptables
-配置，否则可能有安全风险。
+```
+
+注意：镜像名必须是小写字母。
+
+## 配置要点
+
+- Docker 容器网络模式需要配置，host 模式下 `ifconfig` 可能无输出
+- 服务 bind 地址统一改为 `0.0.0.0`，便于迁移时 IP 变更
+- 务必配置 iptables 规则以防安全风险

@@ -1,36 +1,15 @@
 ---
-title: Docker学习之路（六）用commit命令创建镜像
+title: Docker学习之路：用commit命令创建镜像
 date: '2017-11-23'
-description: >-
-  2017 年 11 月 23 日 11:44 Aomine 2015年02月27日发布 赞 | 6 收藏 | 27 57.1k 次浏览
-  假期快要结束了，干点正事，接着Docker的学习。
+description: 使用 docker commit 命令创建镜像。包括创建 Docker 账号、commit 命令语法、镜像提交、镜像查看和运行等步骤。
 category: container-virt
 tags:
-  - apache
   - docker
-  - ssl-tls
-  - git
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: https://segmentfault.com/a/1190000002567459
 ---
-2017
-年
-11
-月
-23
-日
-11:44
-```bash
-Docker学习之路（六）用commit命令创建镜像
-docker
-```
-Aomine
-2015年02月27日发布
-赞 | 6
-收藏 | 27
-57.1k
-次浏览
 假期快要结束了，干点正事，接着Docker的学习。
 构建镜像
 构建镜像的两种方法：
@@ -117,8 +96,3 @@ docker run
 $ sudo docker
 run
 -t -i aoct/apache2 /bin/bash
-【本人的学习笔记，主要是对《我的第一本Docker书》、《Docker —— 从入门到实践》的学习记录，引用了很多书上的话和例子，并结合其他各种资源的学习。我使用的是windows 7， docker 1.3.2。】
-来自
-<
-https://segmentfault.com/a/1190000002567459
->

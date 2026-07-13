@@ -1,72 +1,144 @@
 ---
-title: 'mysqldump导出－－数据+结构+（函数+存储过程） 2011-12-01 09:43:40'
+title: mysqldump 导出数据、结构、函数和存储过程
 date: '2013-12-04'
-description: >-
-  mysqldump导出－－数据+结构+（函数+存储过程） 2011-12-01 09:43:40 分类： Mysql/postgreSQL
-  mysql锁表、锁库操作 今天在解决数据库同步异常的时候用到了flush tables with read lock
-  这个命令，于是顺便就学习了下锁表的相关知识。
+description: "mysqldump备份导出的各种用法汇总，包括全库备份、指定库表备份、结构和数据分离、以及导出Excel等。"
 category: database
 tags:
   - mysql
-  - 存储
   - 备份恢复
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-mysqldump导出－－数据+结构+（函数+存储过程）
-2011-12-01 09:43:40
-分类：
-Mysql/postgreSQL
-mysql锁表、锁库操作
-今天在解决数据库同步异常的时候用到了flush tables with read lock 这个命令，于是顺便就学习了下锁表的相关知识。
-1.FLUSH TABLES WITH READ LOCK
-这个命令是全局读锁定，执行了命令之后所有库所有表都被锁定只读。一般都是用在数据库联机备份，这个时候数据库的写操作将被阻塞，读操作顺利进行。
-解锁的语句也是unlock tables。
-2.LOCK TABLES
-tbl_name
-[AS
-alias
-] {READ [LOCAL] | [LOW_PRIORITY] WRITE}
-这个命令是表级别的锁定，可以定制锁定某一个表。例如： lock tables test read; 不影响其他表的写操作。
-解锁语句也是unlock tables。
-这两个语句在执行的时候都需要注意个特点，就是 隐式提交的语句。在退出mysql终端的时候都会隐式的执行unlock tables。也就是如果要让表锁定生效就必须一直保持对话。
-P.S. MYSQL的read lock和wirte lock
-read-lock:允许其他并发的读请求，但阻塞写请求，即可以同时读，但不允许任何写。也叫共享锁
-write-lock:不允许其他并发的读和写请求，是排他的(exclusive)。也叫独占锁
-mysqldump--导出工具
-#导出某个数据库－－结构+数据
-shell>mysqldump -h192.168.161.124 -uroot -pxxxxxx --opt db_name |gzip -9 > /db_bakup/db_name.gz
-#导出某个数据库的表－－结构+数据+函数+存储过程
-shell>mysqldump -h192.168.161.124 -uroot -pxxxxxx --opt -R db_name |gzip -9 > /db_backup/db_name.gz
-#导出某个数据库的表－－结构+数据+函数(functions)+存储过程(procedures)+事件（events)
-shell>mysqldump -h192.168.161.124 -uroot -pxxxxxx --opt -R -E db_name |gzip -9 > /db_backup/db_name.gz
+
+## 基础备份命令
+
+### 导出某个数据库（结构+数据）
+
 ```bash
-#导出多个数据库
-shell>mysqldump -h192.168.161.124 -uroot -pxxxxxx --opt --databases db_name1 db_name2 db_name3 |gzip -9 > /db_backup/mul_db.gz
-#导出所有的数据库
-shell>mysqldump -h192.168.161.124 -uroot -pxxxxxx --opt --all-databases |gzip -9 > /db_bak/all_db.gz
-#导出某个数据库的结构
-shell>mysqldump -h192.168.161.124 -uroot -pxxxxxx --opt --no-data db_name|gzip -9 > /db_bak/db_name.strcut.gz
-#导出某个数据库的数据
-shell>mysqldump -h192.168.161.124 -uroot -pxxxxxx --opt --no-create-info db_name|gzip -9 > /db_bak/db_naem.data.gz
-#导出某个数据库的某张表
+mysqldump -h192.168.161.124 -uroot -pxxxxxx --opt db_name | gzip -9 > /db_backup/db_name.gz
 ```
-shell>mysqldump -h192.168.161.124 -uroot -pxxxxxx --opt db_name tbl_name |gzip -9 > /db_bak/db_name.tal_name.gz
+
+### 包含函数和存储过程
+
 ```bash
-# 导出某个数据库的某张表的结构
-shell>mysqldump -h192.168.161.124 -uroot -pxxxxxx --opt --no-data db_name tal_name | gzip -9 > /db_bak/db_name.tal_name.struct.gz
-#导出某个数据库的某张表的数据
-shell>mysqldump -h192.168.161.124 -uroot -pxxxxxx --opt --no-create-info db_name tbl_name | gzip -9 > /db_bak/db_name.tbl_name.data.gz
-##--opt==--add-drop-table + --add-locks + --create-options + --disables-keys + --extended-insert + --lock-tables + --quick + --set+charset
-##默认使用--opt，--skip-opt禁用--opt参数
-#--add-drop-database 增加创建库的语句
+mysqldump -h192.168.161.124 -uroot -pxxxxxx --opt -R db_name | gzip -9 > /db_backup/db_name.gz
+# -R: 包含存储过程和函数
 ```
-将数据表导出为excel格式
-select * from test into outfile '/tmp/reg.xls'
-编码转换
-因为excel默认编码是GB3212,数据中有中文是需进行转换,转换命令
+
+### 包含事件、函数和存储过程
+
+```bash
+mysqldump -h192.168.161.124 -uroot -pxxxxxx --opt -R -E db_name | gzip -9 > /db_backup/db_name.gz
+# -E: 包含事件
+```
+
+## 多库和全库备份
+
+### 导出多个数据库
+
+```bash
+mysqldump -h192.168.161.124 -uroot -pxxxxxx --opt --databases db_name1 db_name2 db_name3 | gzip -9 > /db_backup/mul_db.gz
+```
+
+### 导出所有数据库
+
+```bash
+mysqldump -h192.168.161.124 -uroot -pxxxxxx --opt --all-databases | gzip -9 > /db_backup/all_db.gz
+```
+
+## 结构和数据分离
+
+### 只导出结构
+
+```bash
+mysqldump -h192.168.161.124 -uroot -pxxxxxx --opt --no-data db_name | gzip -9 > /db_backup/db_name.struct.gz
+```
+
+### 只导出数据
+
+```bash
+mysqldump -h192.168.161.124 -uroot -pxxxxxx --opt --no-create-info db_name | gzip -9 > /db_backup/db_name.data.gz
+```
+
+## 指定表的导出
+
+### 导出某个表（结构+数据）
+
+```bash
+mysqldump -h192.168.161.124 -uroot -pxxxxxx --opt db_name tbl_name | gzip -9 > /db_backup/db_name.tbl_name.gz
+```
+
+### 导出某个表的结构
+
+```bash
+mysqldump -h192.168.161.124 -uroot -pxxxxxx --opt --no-data db_name tbl_name | gzip -9 > /db_backup/db_name.tbl_name.struct.gz
+```
+
+### 导出某个表的数据
+
+```bash
+mysqldump -h192.168.161.124 -uroot -pxxxxxx --opt --no-create-info db_name tbl_name | gzip -9 > /db_backup/db_name.tbl_name.data.gz
+```
+
+## --opt 参数说明
+
+`--opt` 是组合参数，等价于：
+
+```
+--add-drop-table +
+--add-locks +
+--create-options +
+--disable-keys +
+--extended-insert +
+--lock-tables +
+--quick +
+--set-charset
+```
+
+默认启用，用 `--skip-opt` 禁用。其他有用参数：
+
+- `--add-drop-database`：添加 DROP DATABASE 语句
+
+## 导出为 Excel
+
+### 导出为 XLS 格式
+
+```bash
+SELECT * FROM test INTO OUTFILE '/tmp/reg.xls';
+```
+
+### 编码转换
+
+Excel 默认编码为 GB2312，导出的 UTF-8 数据需转换：
+
+```bash
 iconv -futf8 -tgb2312 -oreg2.xls reg.xls
-转换如果失败：
-iconv: illegal input sequence at position 1841 类似于这样的错误，先把reg.xls下载下来，这个时候文件是utf-8编码的，用excel打开，乱码。把reg.xls以文本方式打开，然后另存为，在编码选择ANSI编码，保存。乱码问题就解决了.
-mysql --default-character-set=latin1 -hgamedb.app.dngj.db -upcmgr_rw -prw3a+1 -P10000 pcmgr_downloader -e "select supply_id,pub_channel_name,channel,sub_channel,supplyid_info,purpose,attribute,if_push_duba,if_guid_filter,if_install,if_prompting,show_ui,reserve_c from pcmgr_supplyid">pcmgr_supplyid.txt
+```
+
+如转换失败（字符编码问题），可用 Excel 直接打开 XLS 文件，以文本模式另存为 ANSI 编码即可解决乱码。
+
+## MySQL 锁表操作
+
+### 全局读锁
+
+```sql
+FLUSH TABLES WITH READ LOCK;
+UNLOCK TABLES;
+```
+
+全局读锁会锁定所有库的所有表为只读，用于联机备份。写操作被阻塞，读操作正常进行。
+
+### 表级锁
+
+```sql
+LOCK TABLE tbl_name [AS alias] {READ [LOCAL] | [LOW_PRIORITY] WRITE};
+UNLOCK TABLES;
+```
+
+表级锁可以锁定特定表，支持 READ 和 WRITE 两种模式：
+
+- **READ 锁**（共享锁）：允许其他读请求，阻塞写请求
+- **WRITE 锁**（独占锁）：阻塞其他读和写请求
+
+**注意**：锁定语句具有隐式提交特性，退出 MySQL 终端时自动解锁。要使锁保持生效，必须保持当前连接。

@@ -1,41 +1,16 @@
 ---
 title: Docker教程：Docker镜像导出及迁移
 date: '2017-11-24'
-description: >-
-  2017 年 11 月 24 日 10:05 Docker教程：Docker镜像导出及迁移 标签： 迁移 存储 docker 2016-05-06
-  11:36 25993 人阅读 评论 (1) 收藏 举报 分类： Docker（8）
+description: Docker 镜像的导出、导入与迁移。包括 Docker 目录结构分析、容器/镜像的 export/import、镜像迁移到不同磁盘分区的完整步骤。
 category: container-virt
 tags:
   - docker
-  - dns
   - rsync
-  - vim
-  - 存储
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: http://blog.csdn.net/pipisorry/article/details/51330126
 ---
-2017
-年
-11
-月
-24
-日
-10:05
-Docker教程：Docker镜像导出及迁移
-标签：
-迁移
-存储
-docker
-2016-05-06 11:36 25993
-人阅读
-评论
-(1)
-收藏
-举报
-分类：
-Docker（8）
-版权声明：本文为博主皮皮http://blog.csdn.net/pipisorry原创文章，未经博主允许不得转载。
 目录
 (?)[+]
 http://
@@ -154,10 +129,3 @@ none tmpfs 100M 44K 100M 1% /run/user
 [
 修改Docker镜像的存储位置
 ]
-from:
-http://blog.csdn.net/pipisorry/article/details/51330126
-ref:
-来自
-<
-http://blog.csdn.net/pipisorry/article/details/51330126
->

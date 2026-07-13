@@ -1,29 +1,15 @@
 ---
 title: 迈出使用Docker的第一步，学习第一个Docker容器
 date: '2015-06-22'
-description: >-
-  您的评价 : 收藏该经验 阅读目录 本文摘自《第一本 Docker 书》 在本文中，我们将迈出使用Docker的第一步，学习第一个Docker容器。
-  本章还会介绍如何与Docker进行交互的基本知识。
+description: Docker 容器基础操作入门。包括验证 Docker 就绪、创建和管理容器的生命周期、命名、重启、日志、进程管理、守护式容器、自动重启策略。
 category: container-virt
 tags:
   - docker
-  - ssl-tls
-  - vim
-  - 存储
-  - 监控告警
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-您的评价
-:
-收藏该经验
-阅读目录
-本文摘自《第一本
-Docker
-书》
-在本文中，我们将迈出使用Docker的第一步，学习第一个Docker容器。本章还会介绍如何与Docker进行交互的基本知识。
-1 确保Docker已经就绪
+## 确保 Docker 已经就绪
 首先，我们会查看Docker是否能正常工作，然后学习基本的Docker的工作流：创建并管理容器。我们将浏览容器的典型生命周期：从创建、管理到停止，直到最终删除。
 第一步，查看
 docker
