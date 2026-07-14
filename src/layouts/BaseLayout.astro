@@ -2,6 +2,7 @@
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import { site } from '../data/site';
+import theme from '../data/theme.json';
 import '../styles/global.css';
 
 interface Props {
@@ -25,6 +26,21 @@ const {
 
 const pageTitle = title ? `${title} - ${site.title}` : site.title;
 const canonicalURL = new URL(Astro.url.pathname, site.url).toString();
+
+/* 主题覆写（src/data/theme.json，可在 Pages CMS「主题与统计」里编辑）：
+   留空的项不输出任何 CSS，站点保持 global.css 的默认「暖纸面」设计。 */
+const themeCss = [
+  theme.accent?.light && `:root{--accent:${theme.accent.light};}`,
+  theme.accent?.dark && `:root[data-theme='dark']{--accent:${theme.accent.dark};}`,
+  theme.background?.colorLight && `:root{--bg:${theme.background.colorLight};}`,
+  theme.background?.colorDark && `:root[data-theme='dark']{--bg:${theme.background.colorDark};}`,
+  theme.background?.image &&
+    `body{background-image:url('${theme.background.image}');background-size:cover;background-position:center;background-attachment:fixed;}`,
+]
+  .filter(Boolean)
+  .join('');
+
+const goatcounter = theme.analytics?.goatcounter?.trim();
 
 const jsonLd =
   type === 'article'
@@ -108,6 +124,8 @@ const jsonLd =
     <meta name="twitter:description" content={description} />
 
     <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+    {themeCss && <style set:html={themeCss} />}
   </head>
   <body>
     <SiteHeader />
@@ -115,5 +133,18 @@ const jsonLd =
       <slot />
     </main>
     <SiteFooter />
+
+    {
+      /* GoatCounter 访问统计：theme.json 里填入站点代码后自动启用，
+         留空则完全不加载脚本。报表在 https://<code>.goatcounter.com 查看。 */
+      goatcounter && (
+        <script
+          is:inline
+          data-goatcounter={`https://${goatcounter}.goatcounter.com/count`}
+          async
+          src="https://gc.zgo.at/count.js"
+        />
+      )
+    }
   </body>
 </html>

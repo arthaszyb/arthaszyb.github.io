@@ -1,6 +1,9 @@
 import { glob } from 'astro/loaders';
 import type { Loader, LoaderContext } from 'astro/loaders';
 import getReadingTime from 'reading-time';
+import { loadHtmlPosts } from './html-loader';
+
+const BLOG_DIR = './src/content/blog';
 
 /**
  * Wraps the built-in glob loader to inject a computed `minutesRead` field.
@@ -17,9 +20,12 @@ import getReadingTime from 'reading-time';
  * Instead we compute reading time here, directly from each entry's raw
  * markdown body, right after the underlying glob loader populates the
  * store, and write it back into that entry's `data`.
+ *
+ * 同目录下的 *.html 文件也会被加载为文章（frontmatter + 原样渲染的
+ * HTML 正文），见 src/lib/html-loader.ts。
  */
 export function blogLoader(): Loader {
-  const base = glob({ pattern: '**/*.md', base: './src/content/blog' });
+  const base = glob({ pattern: '**/*.md', base: BLOG_DIR });
 
   return {
     name: 'blog-loader',
@@ -27,6 +33,8 @@ export function blogLoader(): Loader {
       await base.load(context);
 
       for (const entry of context.store.values()) {
+        // html 条目由 loadHtmlPosts 自行计算 minutesRead（先剥离标签）。
+        if (entry.filePath?.endsWith('.html')) continue;
         const body = entry.body ?? '';
         const readingTime = getReadingTime(body);
         const minutesRead = Math.max(1, Math.ceil(readingTime.minutes));
@@ -43,6 +51,9 @@ export function blogLoader(): Loader {
           deferredRender: entry.deferredRender,
         });
       }
+
+      // HTML 直发文章：与 markdown 同目录、同 schema，正文原样渲染。
+      await loadHtmlPosts(context, BLOG_DIR);
     },
   };
 }

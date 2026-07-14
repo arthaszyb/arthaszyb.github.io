@@ -1,0 +1,42 @@
+---
+title: HTML 直发示例文章
+date: '2026-07-14'
+description: 演示如何把 HTML 文件直接作为文章发布（不转换 Markdown），把 draft 改为 false 即可上线。
+category: misc
+tags:
+  - meta
+draft: true
+lang: zh
+---
+<p>
+  这篇文章的源文件是 <code>src/content/blog/2026-07-14-html-zhifa-shili.html</code>：
+  顶部写一段与 Markdown 相同的 frontmatter，之后的 HTML 正文构建时<strong>原样渲染</strong>。
+</p>
+
+<h2>它能做什么</h2>
+<p>
+  列表、标签、主题分类、RSS、相关文章、站内搜索都与 Markdown 文章一致；
+  h2 / h3 会自动生成目录锚点。可以内嵌任意 HTML 结构，包括脚本驱动的交互内容：
+</p>
+
+<h3>内联样式与脚本示例</h3>
+<div style="border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.25rem;">
+  <p style="margin: 0 0 0.5rem;">下面的按钮由本文件内嵌的脚本驱动：</p>
+  <button id="demo-btn" type="button">点我 +1</button>
+  <span id="demo-count">0</span>
+</div>
+<script>
+  (function () {
+    var n = 0;
+    document.getElementById('demo-btn').addEventListener('click', function () {
+      document.getElementById('demo-count').textContent = String(++n);
+    });
+  })();
+</script>
+
+<h2>使用方式</h2>
+<p>
+  在 Pages CMS 管理台的「文章（HTML 直发）」里新建，或直接把 <code>.html</code>
+  文件放进 <code>src/content/blog/</code>。上传完整 HTML 文档也可以——构建时只保留
+  <code>&lt;body&gt;</code> 里的内容。
+</p>
