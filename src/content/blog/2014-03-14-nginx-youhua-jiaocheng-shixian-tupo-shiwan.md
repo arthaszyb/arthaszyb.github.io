@@ -1,13 +1,10 @@
 ---
-title: Nginx优化教程 实现突破十万并发
+title: Nginx 优化教程 (实现突破十万并发)
 date: '2014-03-14'
-description: nginx指令中的优化（配置文件） workerprocesses 8; nginx进程数，建议按照cpu数目来指定，一般为它的倍数。
+description: Nginx 性能优化配置，包括 worker 进程、连接数、文件缓存、内核参数调优等，以及 TCP 连接、TIME_WAIT 等网络优化技巧。
 category: web-infra
 tags:
   - nginx
-  - php
-  - 存储
-  - 网络排查
 draft: false
 source: evernote-local-db
 lang: zh

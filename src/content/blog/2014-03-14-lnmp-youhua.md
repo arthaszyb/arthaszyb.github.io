@@ -1,16 +1,12 @@
 ---
-title: LNMP优化
+title: LNMP 优化
 date: '2014-03-14'
-description: >-
-  本文不涉及大型web架构，旨在单台服务器上通过各种手段最大化的优化和加速lnmp，适合单台服务器或者vps站长们使用。
-  笔者水平有限，要是有更好的优化手段请留言，我会不断完善此架构。
+description: 单台服务器 LNMP 性能优化方案，包括 Nginx FastCGI 缓存、PHP opcode 缓存、TCMalloc 内存优化、Gzip 压缩、php-fpm 调优、慢日志监控等。
 category: web-infra
 tags:
   - nginx
   - mysql
-  - memcached
   - php
-  - 监控告警
 draft: false
 source: evernote-local-db
 lang: zh

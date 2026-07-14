@@ -1,15 +1,11 @@
 ---
-title: lVS DR的体系结构与原理：
+title: LVS DR 的体系结构与原理
 date: '2014-02-13'
-description: >-
-  为了阐述方便，我根据官方原理图另外制作了一幅图，如下图所示：VS/DR的体系结构：
-  我将结合这幅原理图及具体的实例来讲解一下LVS-DR的原理，包括数据包、数据帧的走向和转换过程。
+description: LVS DR (Direct Routing) 模式工作原理详解，包括数据包转发流程、Director 和 RealServer 的交互、MAC 地址转换、ARP 抑制等关键技术点。
 category: web-infra
 tags:
-  - lvs
-  - keepalived
   - 负载均衡
-  - 网络排查
+  - lvs
 draft: false
 source: evernote-local-db
 lang: zh

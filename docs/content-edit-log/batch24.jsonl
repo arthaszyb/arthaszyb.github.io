@@ -1,0 +1,15 @@
+{"file":"2013-10-14-rhcs5-weihu.md","type":"normal","actions":["desc-rewritten","tags-cleaned","suspect-artifact-fixed","code-blocks-added"],"flags":[],"before_bytes":0,"after_bytes":0}
+{"file":"2013-10-15-rhcs-gainian-pian.md","type":"normal","actions":["desc-rewritten","tags-cleaned","list-normalized","formatting-fixed"],"flags":[],"before_bytes":0,"after_bytes":0}
+{"file":"2013-10-17-rhcs5-bushu.md","type":"normal","actions":["desc-rewritten","tags-cleaned","list-normalized"],"flags":[],"before_bytes":0,"after_bytes":0}
+{"file":"2013-10-21-jiexi-rhcs-gaoke-yongji-qun-ha.md","type":"repost","actions":["title-cleaned","desc-rewritten","tags-cleaned","condensed","origin_url-added"],"flags":["condensed"],"before_bytes":21392,"after_bytes":2847}
+{"file":"2013-10-21-redhat-jiqun-taojian-gaoke-yong-fuzai.md","type":"repost","actions":["desc-rewritten","tags-cleaned","condensed"],"flags":["condensed"],"before_bytes":21250,"after_bytes":2350}
+{"file":"2014-01-16-zongjie-nginx-peizhi-wenjian-nginx-conf.md","type":"normal","actions":["title-cleaned","desc-rewritten","tags-cleaned"],"flags":[],"before_bytes":0,"after_bytes":0}
+{"file":"2014-02-08-1-1-rhcs-qunji-zhuangtai-chakan.md","type":"repost","actions":["title-cleaned","desc-rewritten","tags-cleaned"],"flags":[],"before_bytes":0,"after_bytes":0}
+{"file":"2014-02-08-rhel6-gfs-web-ha-shixian.md","type":"normal","actions":["title-cleaned","desc-rewritten","tags-cleaned"],"flags":[],"before_bytes":0,"after_bytes":0}
+{"file":"2014-02-10-jiejue-centos6-xiaan-zhuang-ipvsadm-1.md","type":"normal","actions":["title-cleaned","desc-rewritten","tags-cleaned"],"flags":[],"before_bytes":0,"after_bytes":0}
+{"file":"2014-02-12-liyong-piranha-shixian-web-fuzai-junheng.md","type":"repost","actions":["title-cleaned","desc-rewritten","tags-cleaned","origin_url-added"],"flags":[],"before_bytes":0,"after_bytes":0}
+{"file":"2014-02-12-piranha-lvs-goujian-fuzai-junheng-zy.md","type":"thin","actions":["title-cleaned","desc-rewritten","tags-cleaned"],"flags":[],"before_bytes":0,"after_bytes":0}
+{"file":"2014-02-13-2-14-gongzuo-amoeba-xuexi-amoeba.md","type":"thin","actions":["title-rewritten","desc-rewritten","tags-cleaned","drafted"],"flags":["drafted"],"before_bytes":0,"after_bytes":0}
+{"file":"2014-02-13-lvs-dr-deti-xijie-gouyu-yuanli.md","type":"normal","actions":["title-cleaned","desc-rewritten","tags-cleaned"],"flags":[],"before_bytes":0,"after_bytes":0}
+{"file":"2014-03-14-lnmp-youhua.md","type":"normal","actions":["title-cleaned","desc-rewritten","tags-cleaned"],"flags":[],"before_bytes":0,"after_bytes":0}
+{"file":"2014-03-14-nginx-youhua-jiaocheng-shixian-tupo-shiwan.md","type":"normal","actions":["title-cleaned","desc-rewritten","tags-cleaned"],"flags":[],"before_bytes":0,"after_bytes":0}

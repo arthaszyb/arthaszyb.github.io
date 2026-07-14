@@ -1,13 +1,11 @@
 ---
-title: piranha+lvs构建负载均衡（zy笔记）
+title: Piranha + LVS 构建负载均衡 (zy 笔记)
 date: '2014-02-12'
-description: '1.在两台dr服务器上yum install piranha,会依赖安装httpd,php和ipvsadm.  2.dr服务器上开启ip转发。'
+description: Piranha 负载均衡器和 Real Server 的安装配置步骤，包括 IP 转发、ARP 抑制、VIP 配置等关键设置。
 category: web-infra
 tags:
-  - apache
-  - lvs
-  - php
   - 负载均衡
+  - lvs
 draft: false
 source: evernote-local-db
 lang: zh

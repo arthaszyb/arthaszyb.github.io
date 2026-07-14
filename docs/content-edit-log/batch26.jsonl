@@ -1,0 +1,11 @@
+{"file":"2015-08-24-nginx-xuni-zhuji-genju-butong-deyu.md","type":"normal","actions":["description-rewritten","boilerplate-removed","artifact-fixed"],"flags":[],"after_bytes":3024}
+{"file":"2015-09-09-shell-jiaoben-fenxi-nginx-rizhi-fangwen.md","type":"normal","actions":["description-rewritten","boilerplate-removed","code-structured","linebreak-merged","ampersand-fixed"],"flags":[],"after_bytes":2542}
+{"file":"2016-05-12-nginx-huanjing-xia-http-he-https.md","type":"normal","actions":["title-cleaned","description-rewritten","code-structured"],"flags":[],"after_bytes":1459}
+{"file":"2016-05-12-taobao-quanzhan-https-baiwan-yemian-gaizao.md","type":"repost","actions":["title-cleaned","description-rewritten","content-condensed","tags-adjusted","origin_url-added"],"flags":["condensed"],"before_bytes":8500,"after_bytes":2020}
+{"file":"2017-06-02-nginx-siceng-fuzai-junheng.md","type":"normal","actions":["description-rewritten","boilerplate-removed","code-structured","linebreak-merged"],"flags":[],"after_bytes":5496}
+{"file":"2018-02-05-object-deyi-cili-jie.md","type":"thin","actions":["description-rewritten","code-structured","minimal-explanation-added"],"flags":[],"after_bytes":631}
+{"file":"2018-02-06-oncall-xiaogong-juqian-duandai-majie-du.md","type":"normal","actions":["description-rewritten","html-tags-fixed","code-structured"],"flags":[],"after_bytes":5242}
+{"file":"2018-09-06-nginx-location-zhengze-biaoda-shiyu-pipei.md","type":"normal","actions":["description-rewritten","boilerplate-removed","code-structured","regex-fixed"],"flags":[],"after_bytes":2270}
+{"file":"2018-11-06-nginx-location-xiade-alias-yu-root.md","type":"repost","actions":["title-cleaned","description-rewritten","content-condensed","origin_url-added"],"flags":["condensed"],"before_bytes":3500,"after_bytes":2199}
+{"file":"2020-06-23-neiwang-huanjing-ruhe-jiancha-zhengshu-liande.md","type":"normal","actions":["description-rewritten","timestamp-removed","linebreak-merged","code-structured"],"flags":[],"after_bytes":4484}
+{"file":"2020-06-23-ssl-zhengshu-lian.md","type":"normal","actions":["description-rewritten","timestamp-removed","linebreak-merged","code-structured"],"flags":[],"after_bytes":2120}
