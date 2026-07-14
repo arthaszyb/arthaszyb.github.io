@@ -1,21 +1,14 @@
 ---
-title: linux 父进程被kill掉后子进程的状态
+title: Linux 父进程被 kill 后子进程的状态
 date: '2018-10-23'
-description: >-
-  2017年01月07日 03:02:36 outofmemo 阅读数：5477更多 个人分类： linux 第一种情况： \[root@qht2 ~\]#
-  ps -ef | grep httpd root 3799 1 0 10:41 pts/0 00:00:00 /usr/sbin/nss\pcache
-  off
+description: "父进程被杀死后，子进程的不同命运：成为孤儿进程被 init 接管，或被销毁。"
 category: linux
 tags:
-  - apache
-  - ssl-tls
+  - linux-admin
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-2017年01月07日 03:02:36 [outofmemo](https://me.csdn.net/outofmemo) 阅读数：5477更多
-
-个人分类： [linux](https://blog.csdn.net/outofmemo/article/category/6330053)
 
 第一种情况：
 

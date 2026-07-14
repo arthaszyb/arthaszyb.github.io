@@ -1,22 +1,14 @@
 ---
-title: 如何通过反向 SSH 隧道访问 NAT 后面的 Linux 服务器
+title: 通过反向 SSH 隧道访问 NAT 后的 Linux 服务器
 date: '2018-06-13'
-description: >-
-  HTML Content 作者： Dan Nanni 译者： LCTT 나원호 | 2015-08-08 13:50 评论: 3 收藏: 7 HTML
-  Content 你在家里运行着一台 Linux 服务器，它放在一个 NAT 路由器或者限制性防火墙后面。 现在你想在外出时用 SSH 登录到这台服务器。
+description: "在 NAT 路由器或防火墙后面的 Linux 服务器，无法直接从外网 SSH 访问。使用反向 SSH 隧道（reverse SSH tunnel）可实现远程访问。"
 category: linux
 tags:
-  - systemd
   - ssh
-  - php
-  - ssl-tls
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-HTML Content
-
-# 如何通过反向 SSH 隧道访问 NAT 后面的 Linux 服务器
 
 作者： [Dan Nanni](http://xmodulo.com/access-linux-server-behind-nat-reverse-ssh-tunnel.html) 译者： [LCTT](https://linux.cn/lctt/) [나원호](https://linux.cn/lctt/ictlyh) | 2015-08-08 13:50 评论: [3](https://linux.cn/portal.php?mod=comment&id=5975&idtype=aid "查看全部评论") 收藏: 7
 

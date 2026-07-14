@@ -1,102 +1,192 @@
 ---
-title: 修改Apache最大连接数/apache并发数
+title: 修改Apache最大连接数和MySQL并发数
 date: '2015-01-29'
-description: >-
-  Apache优化步骤： 1 先查看apache的运行模式，查看命令：httpd -l Compiled in modules: core.c
-  prefork.c httpcore.c modso.c 这里可以看到运行模式是prefork模式。
+description: Apache 和 MySQL 连接数的优化配置。根据服务器硬件资源（CPU、内存、带宽）调整最大连接数参数，防止资源耗尽。
 category: web-infra
 tags:
   - apache
   - mysql
-  - shell-scripting
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-Apache优化步骤：
-1 先查看apache的运行模式，查看命令：httpd -l
+
+## Apache 最大连接数优化
+
+### 第一步：查看 Apache 运行模式
+
+```bash
+httpd -l
+```
+
+输出示例：
+```
 Compiled in modules:
 core.c
 prefork.c
 http_core.c
 mod_so.c
-这里可以看到运行模式是prefork模式。
-2 修改apache 的httpd-mpm.conf 配置
-打开 /usr/local/apache2/conf/extra/httpd-mpm.conf ,每个机器可能httpd-mpm.conf 可能不同，这里可以通过find 命令查询。
-第一次打开的时候默认配置是这样的。
+```
+
+此例运行模式为 prefork。
+
+### 第二步：修改 httpd-mpm.conf
+
+打开 `/usr/local/apache2/conf/extra/httpd-mpm.conf`（位置可能不同，用 find 查询）
+
+**原始默认配置**：
+
+```ini
 StartServers 5
 MinSpareServers 5
 MaxSpareServers 10
 MaxClients 150
 MaxRequestsPerChild 0
-其中：
-StartServers 表示空闲子进程的最小数量。如果当前空闲子进程数小于MinSpareServers，那么Apache将以最大美妙一个的速度产生新的子进程。此参数不要设置太大。
-MinSpareServers 设 置空闲子进程的最大数量。如果当前有超过MaxSpareServers 数量的空闲子进程，那么父进程将杀死多余的子进程。此参数不要设置太大，如果你 讲质量设置比MinSpareServers小，Apache将会自动将其修改成“MinSpareServers + 1”。
-MaxSpareServers 限 定同一时间客户最大接入请求的数量(单个进程并发线程数)。任何超过MaxClients限制的请求讲进入等候队列，一旦一个连接被释放，队列中的请求将 得到服务。要增大该值必须同事增大ServerLimit(ServerLimit待会再讲)。
-MaxClients 表示每个子进程在其生存期内允许伺候的最大请求数量。到达MaxRequestsPerChild的限制后，子进程将会结束。如果MaxRequestsPerChild为“0”，子进程将永远不会结束。
-MaxRequestsPerChild 设置为0 ，可以防止(偶然)内存泄漏无限进行，从而耗尽内存。给进程一个有限寿命，从而有助于当服务器负载减轻的时候减少活动进程的数量。
-3 现在看看需要怎么优化：
-连接数理论上是越大越好，但是得根据硬件，服务器的CPU，内存，带宽等因素，查看当前的apache连接数：
+```
+
+**参数说明**：
+
+- `StartServers`：启动时建立的子进程数
+- `MinSpareServers`：最小空闲进程数。不足时 Apache 最多每秒创建一个新进程
+- `MaxSpareServers`：最大空闲进程数。超过时父进程杀死多余进程
+- `MaxClients`：最大并发连接数限制。超过此数的请求进入等候队列
+- `MaxRequestsPerChild`：每个子进程最大请求数。达到后进程重启（防止内存泄露）
+- `ServerLimit`：MaxClients 上限值（默认 256）。超过需设置此参数，最大 20000
+
+### 第三步：计算最优并发数
+
+**计算当前 httpd 占用内存**：
+
+```bash
 ps aux | grep httpd | wc -l
-计算httpd 占用内存的平均数:
-ps aux | grep -v grep |awk '/httpd/{sum += $6;n++};END{print sum
-}'
-这个只是做个参考。计算后要减去服务器系统本身所需要的资源。
-比如内存2G，减去500M留给服务器，还有1.5G，那么可得到最大连接数：在8000左右。
-根据情况修改后的http-mpm.conf的prefork的配置后为：
+
+# 计算平均内存占用
+ps aux | grep -v grep | awk '/httpd/{sum += $6;n++};END{print sum/n}'
+```
+
+**设置策略**：
+- 留出系统基础资源（如 500MB）
+- 假设 httpd 平均占用 20-30MB
+- 公式：`最大连接数 = (总内存 - 系统占用) / 单进程占用内存`
+
+**示例**（2GB 内存）：
+```
+(2000MB - 500MB) / 30MB ≈ 50 个连接
+但不应该设这么低，建议保守估计 8000 左右
+```
+
+### 第四步：修改配置文件
+
+根据计算结果修改 `/usr/local/apache2/conf/extra/httpd-mpm.conf`：
+
+```ini
 StartServers 5
 MinSpareServers 5
 MaxSpareServers 10
 ServerLimit 5500
 MaxClients 5000
 MaxRequestsPerChild 100
-这里重点介绍下ServerLimit,必须放到MaxClients前，值要大于MaxClients。
-4 重启apache，再打开网站看看是否还会有慢的问题了。
-mysql优化，mysql默认连接数修改！！！
-查看连接数方法，在phpmyadmin里的sql输入
+```
+
+**关键点**：
+- `ServerLimit` 必须放在 `MaxClients` 前
+- `ServerLimit` 值要大于 `MaxClients`
+- `MaxRequestsPerChild` 设为 0 时进程永不重启，可能导致内存持续增长
+
+### 第五步：重启 Apache
+
+```bash
+apachectl stop
+apachectl start
+```
+
+**注意**：不能使用 `apachectl restart`，因为 ServerLimit 修改需要完整重启。
+
+## MySQL 并发连接数优化
+
+### 查看当前设置
+
+在 MySQL 或 PHPMyAdmin 中执行：
+
+```sql
+-- 查看当前连接数
 show status like '%max%';
-当前最大连接数
+
+-- 查看配置的最大连接数
 show variables like '%max%';
-最大连接数
-一.如果使用的是默认的my.cnf那就这样操作
-vi /etc/my.cnf
+```
+
+### 方法一：修改 my.cnf（标准配置）
+
+编辑 `/etc/my.cnf`：
+
+```ini
 [mysqld]
 set-variable=max_connections=1000
 set-variable=max_user_connections=500
 set-variable=wait_timeout=200
-//max_connections设置最大连接数为1000
-//max_user_connections设置每用户最大连接数为500
-//wait_timeout表示200秒后将关闭空闲（IDLE）的连接，但是对正在工作的连接不影响。
-然后保存退出，重启mysql服务后查看连接数。
-可以在phpmyadmin里的sql输入查询语句，或者输入/mysql安装路径/bin/mysqladmin -uroot -p variables "查看连接数"
-max_connections这个就是最大连接数
-二.如果各位大侠内存够大够猛的话（超过4G的话）可以这样操作
+```
+
+**参数说明**：
+- `max_connections`：最大连接数（默认 100）
+- `max_user_connections`：每个用户的最大连接数
+- `wait_timeout`：空闲连接等待时间（秒），超过则关闭连接
+
+**重启后验证**：
+
+```bash
+mysqladmin -uroot -p variables | grep max_connections
+```
+
+### 方法二：大内存服务器（4GB+）
+
+使用 Innodb-heavy 配置文件：
+
+```bash
 cp /usr/local/mysql/share/mysql/my-innodb-heavy-4G.cnf /etc/my.cnf
-然后更改my.cnf里的max_connections = 100这个数值可以调高！！！
-然后查看连接数更改情况
-----------------------------------------------------------------------------------------
-修改apache的最大连接数，方法如下：
-步骤一
-先修改 /path/apache/conf/httpd.conf文件。
-# vi httpd.conf
-将“#Include conf/extra/httpd-mpm.conf”前面的 “#” 去掉，保存。
-步骤二
-再修改 /path/apache/conf/extra/httpd-mpm.conf文件。
-# vi httpd-mpm.conf
-找到 这一行
-原：
-StartServers 5
-MinSpareServers 5
-MaxSpareServers 10
-MaxClients 150
-MaxRequestsPerChild 0
-修改后
-ServerLimit 1000
-StartServers 10
-MinSpareServers 5
-MaxSpareServers 15
-MaxClients 1000
-MaxRequestsPerChild 0
-注意：
-ServerLimit 该指令一定要放在第一行。
-修改后，一定不要apachectl restart，而是先 apachectl stop 然后再 apachectl start才可以。
+```
+
+然后修改 `my.cnf` 中的 `max_connections` 值调高即可。
+
+### 理论上限
+
+MySQL 连接数受系统限制，最多不能超过文件描述符数量。可查看：
+
+```bash
+ulimit -n
+```
+
+## 性能监控
+
+### Apache 连接检查
+
+```bash
+# 查看当前 Apache 进程数
+ps aux | grep httpd | wc -l
+
+# 查看 TCP 连接状态分布
+netstat -n | awk '/^tcp/ {++S[$NF]} END {for(a in S) print a, S[a]}'
+```
+
+### MySQL 连接检查
+
+```bash
+# 查看当前连接数
+mysqladmin -uroot -p status | grep Threads
+
+# 或登录 MySQL 后执行
+show processlist;
+```
+
+## 配置建议总结
+
+| 场景 | Apache MaxClients | MySQL max_connections |
+|------|-------------------|------------------------|
+| 小站点（1G 内存） | 100-200 | 100-200 |
+| 中型站点（4G 内存） | 500-1000 | 500-1000 |
+| 大型站点（8G+ 内存） | 2000-5000 | 1000-2000 |
+
+**通用原则**：
+- 不要盲目设置过高，影响整体性能
+- 定期监控实际连接使用率
+- 根据生产环境实际情况调整，宁可保守也不要溢出

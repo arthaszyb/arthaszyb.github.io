@@ -1,0 +1,15 @@
+{"file":"2014-07-15-wangluo-liuliang-jiankong.md","type":"thin","actions":["desc-rewritten","script-to-codeblock","note-added","tags-added"],"flags":[],"before_bytes":850,"after_bytes":750}
+{"file":"2014-07-25-shuchu-chengxu-houmian-buyao-dai-dev.md","type":"drafted","actions":["desc-rewritten","empty-content-removed"],"flags":["drafted"],"before_bytes":200,"after_bytes":125}
+{"file":"2014-08-19-grep-a-b-xiangjie.md","type":"thin","actions":["desc-added","format-restructured","tags-added"],"flags":[],"before_bytes":300,"after_bytes":380}
+{"file":"2014-09-11-shell-jiazai-peizhi-wenjian.md","type":"thin","actions":["desc-added","structure-improved","command-to-codeblock","typo-fixed","tags-updated"],"flags":[],"before_bytes":480,"after_bytes":650}
+{"file":"2014-10-23-piliang-xiugai-peizhi-wenjian-zhongde-canshu.md","type":"thin","actions":["desc-added","migration-artifact-fixed","script-merged","note-added"],"flags":["suspect-artifact"],"before_bytes":650,"after_bytes":580}
+{"file":"2015-04-03-bash-shell-zifu-chuanqie-ge.md","type":"normal","actions":["boilerplate-removed","desc-added","restructured-with-subsections"],"flags":[],"before_bytes":2800,"after_bytes":1400}
+{"file":"2015-04-30-zifu-chuanjie-qu.md","type":"repost","actions":["condensed","desc-rewritten","origin_url-added","subsections-added"],"flags":["condensed"],"before_bytes":1050,"after_bytes":680}
+{"file":"2015-07-01-shell-panduan-dangqian-zhixing-jiaoben-dejin.md","type":"normal","actions":["desc-added","restructured-qa-to-sections","command-to-codeblock","typo-fixed"],"flags":[],"before_bytes":1100,"after_bytes":1200}
+{"file":"2015-12-10-shell-zhongde-fudian-shubi-jiao.md","type":"repost","actions":["boilerplate-removed","condensed","desc-rewritten","origin_url-added"],"flags":["condensed"],"before_bytes":1500,"after_bytes":750}
+{"file":"2018-03-15-shell-jiaoben-shengcheng-suiji-mima-deruo.md","type":"repost","actions":["boilerplate-removed","condensed","repost-notice-removed","subsections-added"],"flags":["condensed","repost-no-url"],"before_bytes":2100,"after_bytes":1200}
+{"file":"2018-05-15-wangka-liuliang-jiankong.md","type":"thin","actions":["desc-added","migration-artifact-fixed","script-merged","note-added"],"flags":["suspect-artifact"],"before_bytes":1450,"after_bytes":1650}
+{"file":"2019-02-28-shell-yongbian-liangde-zhizuo-weixin-debian.md","type":"repost","actions":["boilerplate-removed","condensed","desc-rewritten","origin_url-added"],"flags":["condensed"],"before_bytes":600,"after_bytes":380}
+{"file":"2013-08-07-nginx-anzhuang-biji.md","type":"normal","actions":["boilerplate-removed","desc-added","migration-artifact-fixed","restructured"],"flags":[],"before_bytes":1000,"after_bytes":1100}
+{"file":"2013-10-08-nginx-dakai-mulu-liulan-gongneng-autoindex.md","type":"normal","actions":["desc-fixed","restructured-with-subsections","config-to-codeblock","tags-enhanced"],"flags":[],"before_bytes":650,"after_bytes":800}
+{"file":"2013-10-10-rhcs-bushu.md","type":"thin","actions":["desc-added","steps-restructured","command-to-codeblock","tags-added"],"flags":[],"before_bytes":550,"after_bytes":950}

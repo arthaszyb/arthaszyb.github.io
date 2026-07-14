@@ -1,67 +1,45 @@
 ---
-title: >-
-  安装ftp服务器（http服务器也可以，目的就是共享rpm目录，可将源目录软链接到共享目录下），将原文件存储在ftp上，然后安装网络yum，实现客户机可以从yum服务器上下载软件包
+title: FTP 和网络 yum 源配置
 date: '2018-03-05'
-description: >-
-  2018年3月5日 10:28
-  安装ftp服务器（http服务器也可以，目的就是共享rpm目录，可将源目录软链接到共享目录下），将原文件存储在ftp上，然后安装网络yum，实现客户机可以从yum服务器上下载软件包
-  客户机请求过程: 切换到服务器端 1：\[root@lyt ~\]# mkdir /mnt/cdrom/
+description: "搭建 FTP 服务器共享 RPM 包，配置网络 yum 源供客户端下载软件。"
 category: linux
 tags:
   - ftp
-  - vim
-  - 存储
-  - 集群
+  - linux-admin
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-2018年3月5日
 
-10:28
+## 服务器端配置
 
-- 安装ftp服务器（http服务器也可以，目的就是共享rpm目录，可将源目录软链接到共享目录下），将原文件存储在ftp上，然后安装网络yum，实现客户机可以从yum服务器上下载软件包
+挂载光盘并安装 FTP 服务：
 
-客户机请求过程:
+```bash
+mkdir /mnt/cdrom
+mount /dev/cdrom /mnt/cdrom
+cd /mnt/cdrom/Server
+rpm -ivh vsftpd-2.0.5-16.el5.i386.rpm
+cp -r /mnt/cdrom/. /var/ftp/pub/
+service vsftpd restart
+```
 
-- 切换到服务器端
+各源目录中都包含 repodata 目录（Repository metadata）。
 
-1：\[root@lyt ~\]# mkdir /mnt/cdrom/ #建立挂载点
+## 客户端配置
 
-- 2：\[root@lyt ~\]# mount /dev/cdrom /mnt/cdrom/ #挂载光盘
+创建 yum 仓库配置文件：
 
-3：\[root@lyt ~\]# cd /mnt/cdrom/Server/ #切换到该目录下
+```bash
+cd /etc/yum.repos.d/
+cp -p rhel-debuginfo.repo yum.repo
+vim yum.repo
+```
 
-- 4：\[root@lyt Server\]# rpm -ivh vsftpd-2.0.5-16.el5.i386.rpm #安装ftp服务器
+配置文件中指定服务器地址和源路径，然后：
 
-- 5：\[root@lyt ~\]# cp -r /mnt/cdrom/. /var/ftp/pub/ #将/mnt/cdrom/中的光盘文件全部拷贝到/var/ftp/pub/ 中
+```bash
+yum repolist
+```
 
-- 6：\[root@lyt Server\]# service vsftpd restart #重启ftp服务器
-
-7：在Server、VT、Cluster、ClusterStorage目录中都有一个repodata文件
-
-\[root@lyt VT\]# cd repodata/ #切换到repodata文件中，查看该目录
-
-![](/images/legacy/legacy-1f01531e8a.png)
-
-8：切换到客户端:
-
-- \[root@localhost ~\]# cd /etc/yum.repos.d/ #切换到改目录
-
-- \[root@localhost yum.repos.d\]# cp -p rhel-debuginfo.repo yum.repo #将rhel-debuginfo.repo 文件拷贝成yum.repo文件（注：新生成文件名必须以.repo结尾）
-
-- \[root@localhost yum.repos.d\]# vim yum.repo #编辑该文件，如下图：
-
-![](/images/legacy/legacy-9f5c78a3c6.png)
-
-\[root@localhost yum.repos.d\]# yum repolist #将记录每个软件包信息的文件primary.xml.gz下载到本地，如图
-
-![](/images/legacy/legacy-3b542764e3.png)
-
-测试：服务器端服务器更新了软件，在客户端查看软件包信息是否查看到该更新软件：
-
-9：切换到服务器端
-
-- 如图所示，通过ftp服务器：将下图的文件导入到/var/ftp/pub/Server目录中，图示已导入：
-
-![](/images/legacy/legacy-40cd3a9dad.png)
+验证配置，会自动下载 `primary.xml.gz` 等元数据。服务器更新软件后，客户端可查看到最新包列表。

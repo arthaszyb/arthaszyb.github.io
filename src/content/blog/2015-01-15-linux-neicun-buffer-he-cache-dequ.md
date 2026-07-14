@@ -1,114 +1,62 @@
 ---
 title: Linux 内存 buffer 和 cache 的区别
 date: '2015-01-15'
-description: '分类： Linux2011-06-01 13:08 15478人阅读 评论(0) 收藏 举报 cachebufferlinux存储聊天disk 一.'
+description: 解读 free 命令各项内存统计的含义、实际可用内存的计算方式，以及 buffer（块设备读写缓冲）与 cache（文件系统页缓存）的区别。
 category: linux
 tags:
+  - linux-admin
   - 存储
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: http://blog.csdn.net/tianlesoftware/article/details/6459044
 ---
-# [Linux 内存 buffer 和 cache 的区别](http://blog.csdn.net/tianlesoftware/article/details/6459044)
+## 一、内存使用说明
 
-分类： [Linux](http://blog.csdn.net/tianlesoftware/article/category/569752)2011-06-01 13:08 15478人阅读 [评论](http://blog.csdn.net/tianlesoftware/article/details/6459044#comments)(0) 收藏 [举报](http://blog.csdn.net/tianlesoftware/article/details/6459044#report)
+`free` 命令相对 top 提供了更简洁的内存使用视图（单位 KB）：
 
-[cache](http://www.csdn.net/tag/cache)[buffer](http://www.csdn.net/tag/buffer)[linux](http://www.csdn.net/tag/linux)[存储](http://www.csdn.net/tag/%e5%ad%98%e5%82%a8)[聊天](http://www.csdn.net/tag/%e8%81%8a%e5%a4%a9)[disk](http://www.csdn.net/tag/disk)
+```text
+[root@rac1 ~]# free
+             total    used     free   shared  buffers  cached
+Mem:        1035108 1008984   26124       0   124212   413000
+-/+ buffers/cache:   471772  563336
+Swap:       2096472  842320 1254152
+```
 
-一. 内存使用说明
+Linux 内存分配机制优先使用物理内存：物理内存有空闲时不会释放已占用内存，即使占用内存的程序已关闭，其内存仍用作缓存，以加快再次访问。
 
-Free 命令相对于top 提供了更简洁的查看系统内存使用情况：
+**Mem 行**：Total 物理内存总量、Used 分配给缓存（含 buffers 与 cache）使用的量、Free 未分配内存、Shared 共享内存、Buffers 分配但未用的 buffers、Cached 分配但未用的 cache。
 
-\[root@rac1 ~\]# free
+**-/+ buffers/cache 行**：Used 为实际使用的 buffers 与 cache 总量（即实际使用的内存总量）；Free 为未使用的 buffers/cache 与未分配内存之和（系统当前实际可用内存）。
 
-total used free shared buffers cached
+由此可得：
 
-Mem: 1035108 1008984 26124 0 124212 413000
+```text
+# 实际可用内存
+Free(-/+ buffers/cache) = Free(Mem) + buffers(Mem) + Cached(Mem)
+563336 = 26124 + 124212 + 413000
 
-\-/+ buffers/cache: 471772 563336
+# 已分配内存
+Used(Mem) = Used(-/+ buffers/cache) + buffers(Mem) + Cached(Mem)
+1008984 = 471772 + 124212 + 413000
 
-Swap: 2096472 842320 1254152
-
-这里显示的单位是KB。
-
-在linux的内存分配机制中，优先使用物理内存，当物理内存还有空闲时（还够用），不会释放其占用内存，就算占用内存的程序已经被关闭了，该程序所占用的内存用来做缓存使用，对于开启过的程序、或是读取刚存取过得数据会比较快。有关Linux内存机制参考：
-
-Linux 内存机制
-
-[http://blog.csdn.net/tianlesoftware/archive/2010/04/08/5463790.aspx](http://blog.csdn.net/tianlesoftware/archive/2010/04/08/5463790.aspx)
-
-Mem：表示物理内存统计。
-
-\-/+ buffers/cached：表示物理内存的缓存统计
-
-Swap：表示硬盘上交换分区的使用情况。只有mem被当前进程实际占用完,即没有了buffers和cache时，才会使用到swap。
-
-Mem 行（第一行）数据说明：
-
-Total：1035108KB。表示物理内存总大小。
-
-Used：1008984KB。表示总计分配给缓存（包含buffers 与cache ）使用的数量，但其中可能部分缓存并未实际使用。
-
-Free：26124KB。表示未被分配的内存。
-
-Shared：0kb。共享内存，一般系统不会用到。
-
-Buffers：124212KB。系统分配但未被使用的buffers 数量。
-
-Cached：413000KB。系统分配但未被使用的cache 数量。
-
-\-/+ buffers/cache 行（第二行）数据说明：
-
-Used：471772kb，实际使用的buffers 与cache 总量，也是实际使用的内存总量。
-
-Free: 563336kb, 未被使用的buffers 与cache 和未被分配的内存之和，这就是系统当前实际可用内存。
-
-根据以上分析，可以得出一下结论：
-
-1. 实际可用内存大小：
-
-Free（-/+ buffers/cache行）= Free(Mem)+buffers(Mem)+Cached(Mem);
-
-563336 = 26124 + 124212+ 413000
-
-2. 已经分配的内存大小：
-
-Used(Mem) = Used(-/+ buffers/cache)+ buffers(Mem) + Cached(Mem)
-
-1008984kb = 471772 + 124212 +413000
-
-3. 物理内存总大小
-
-total（Mem） = used(-/+ buffers/cache) + free(-/+ buffers/cache)
-
+# 物理内存总量
+total(Mem) = used(-/+ buffers/cache) + free(-/+ buffers/cache)
 1035108 = 471772 + 563336
+```
 
-二. buffer 与cache 的区别
+## 二、buffer 与 cache 的区别
 
-A buffer is something that has yet to be "written" to disk.
+> A buffer is something that has yet to be "written" to disk.
+> A cache is something that has been "read" from the disk and stored for later use.
 
-A cache is something that has been "read" from the disk and stored for later use.
+**Cache（高速缓存）**：位于 CPU 与主内存间、容量小但速度高的存储器。保存 CPU 刚用过或循环使用的数据，CPU 再次使用时可直接从 Cache 调用，减少等待。分 L1 Cache（集成在 CPU 内部）和 L2 Cache。
 
-2.1 Cache
+**Buffer（缓冲区）**：用于存储速度或优先级不同的设备之间传输的数据，减少进程相互等待，使从慢速设备读数据时快速设备的进程不中断。
 
-Cache：高速缓存，是位于CPU与主内存间的一种容量较小但速度很高的存储器。
+在 free 命令中：
 
-由于CPU的速度远高于主内存，CPU直接从内存中存取数据要等待一定时间周期，Cache中保存着CPU刚用过或循环使用的一部分数据，当CPU再次使用该部分数据时可从Cache中直接调用,这样就减少了CPU的等待时间,提高了系统的效率。
+- **buffer**：作为 buffer cache 的内存，是块设备的读写缓冲区，更靠近存储设备，或直接是 disk 的缓冲区。
+- **cache**：作为 page cache 的内存，是文件系统的缓存。
 
-Cache又分为一级Cache(L1 Cache)和二级Cache(L2 Cache)，L1 Cache集成在CPU内部，L2 Cache早期一般是焊在主板上,现在也都集成在CPU内部，常见的容量有256KB或512KB L2 Cache。
-
-2.2 Buffer
-
-Buffer：缓冲区，一个用于存储速度不同步的设备或优先级不同的设备之间传输数据的区域。通过缓冲区，可以使进程之间的相互等待变少，从而使从速度慢的设备读入数据时，速度快的设备的操作进程不发生间断。
-
-在Free命令中显示的buffer和cache，它们都是占用内存：
-
-buffer : 作为buffer cache的内存，是块设备的读写缓冲区，更靠近存储设备，或者直接就是disk的缓冲区。
-
-cache: 作为page cache的内存, 文件系统的cache，是memory的缓冲区
-
-如果 cache 的值很大，说明cache住的文件数很多。如果频繁访问到的文件都能被cache住，那么磁盘的读IO 必会非常小。
-
-整理自：
-
-[http://www.linuxdiyf.com/blog/?90293/action\_viewspace\_itemid\_3004.html](http://www.linuxdiyf.com/blog/?90293/action_viewspace_itemid_3004.html)
+如果 cache 值很大，说明被缓存的文件数很多。若频繁访问的文件都能被 cache 住，磁盘读 IO 就会非常小。

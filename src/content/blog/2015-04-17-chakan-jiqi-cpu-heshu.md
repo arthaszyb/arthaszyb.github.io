@@ -1,36 +1,25 @@
 ---
-title: 查看机器CPU核数
+title: 查看机器 CPU 核数
 date: '2015-04-17'
-description: >-
-  1 查看物理cpu个数 grep 'physical id' /proc/cpuinfo | sort -u 2 查看核心数量 grep 'core id'
-  /proc/cpuinfo | sort -u | wc -l 3 查看线程数 grep 'processor' /proc/cpuinfo | sort
-  -u
+description: 通过 /proc/cpuinfo 查看物理 CPU 个数、每颗 CPU 的核心数与总线程数的命令速查。
 category: linux
-tags: []
+tags:
+  - linux-admin
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-1. 1
+从 `/proc/cpuinfo` 中提取物理 CPU 个数、核心数与线程数：
 
-**查看物理cpu个数**
-
+```bash
+# 查看物理 CPU 个数
 grep 'physical id' /proc/cpuinfo | sort -u
 
-1. 2
-
-**查看核心数量**
-
+# 查看核心数量
 grep 'core id' /proc/cpuinfo | sort -u | wc -l
 
-1. 3
-
-**查看线程数**
-
+# 查看线程数
 grep 'processor' /proc/cpuinfo | sort -u | wc -l
+```
 
-1. 4
-
-**实例1**
-
-命令执行结果如图所示，根据结果得知，此服务器有1个cpu，6个核心，每个核心2线程，共12线程。
+例如某服务器的执行结果显示：1 个 CPU、6 个核心、每核心 2 线程，共 12 线程。

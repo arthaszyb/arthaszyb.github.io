@@ -1,28 +1,18 @@
 ---
-title: nux curl是一个利用URL规则在命令行下工作的文件传输工具。它支持文件的上传和下载，所以是综合传输工具，但按传统，习惯称url为下载工具。
+title: curl 命令参数与用法
 date: '2014-04-30'
-description: >-
-  一，curl命令参数 curl是 一个利用URL规则在命令行下工作的文件传输工具。
-  它支持文件的上传和下载，所以是综合传输工具，但按传统，习惯称url为下载工具 ，有好多我没有用过，也不知道翻译的对不对，如果有误的地方，还请指正。  查看
-  复制 打印 ?
+description: curl 是命令行下的文件传输工具，支持文件上传下载及多种协议。整理常用参数及实例用法。
 category: shell
 tags:
   - ftp
-  - php
+  - ssh
   - ssl-tls
-  - ai-agent
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: https://blog.51yip.com
 ---
-一，curl命令参数
-curl是
-一个利用URL规则在命令行下工作的文件传输工具。它支持文件的上传和下载，所以是综合传输工具，但按传统，习惯称url为下载工具
-，有好多我没有用过，也不知道翻译的对不对，如果有误的地方，还请指正。
-查看
-复制
-打印
-?
+## 常用参数
 -a/--append 上传文件时，附加到目标文件
 -A/--user-agent
 <

@@ -1,73 +1,68 @@
 ---
-title: Ubuntu中useradd和adduser的区别
+title: Ubuntu 中 useradd 和 adduser 的区别
 date: '2018-01-05'
-description: >-
-  2018年1月5日 9:47 Ubuntu中useradd和adduser的区别
-  在Ubuntu中创建新用户，通常会用到两个命令：useradd和adduser，虽然作用一样，但用法却不尽相同。 本文接下来便为读者带来具体的解释。
+description: "Ubuntu 创建用户的两种方法对比。useradd 是低级命令，参数繁琐但功能全面；adduser 是高级脚本，交互式操作，适合初级用户。"
 category: linux
-tags: []
+tags:
+  - linux-admin
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: http://os.51cto.com/art/201104/256231.htm
 ---
-2018年1月5日
 
-9:47
+## useradd
 
-**Ubuntu中useradd和adduser的区别**
+低级 ELF 可执行程序。直接操作系统文件，创建用户但不创建 home 目录、不设置密码、不分配 shell。
 
-在Ubuntu中创建新用户，通常会用到两个命令：useradd和adduser，虽然作用一样，但用法却不尽相同。本文接下来便为读者带来具体的解释。
+用法示例：
 
-作者：佚名来源：Linux社区|2011-04-20 09:07
+```bash
+sudo useradd test
+# 创建一个"三无"用户：无 home 目录、无密码、无 shell
 
-收藏
+sudo useradd -m -d /home/test -s /bin/bash -p passwd test
+# -m 创建 home 目录
+# -d 指定 home 目录路径
+# -s 指定 shell（如 /bin/bash）
+# -p 指定密码（但注意此方式 -p 后面的密码需事先加密）
+```
 
-分享
+### 常用参数
 
-**[【限时免费】年底最强一次云计算大会，看传统、社区、互联网企业如何碰撞？](http://www.51cto.com/act/cloud/home)**
+- `-b BASE_DIR`：指定 home 目录的基目录
+- `-d HOME_DIR`：指定 home 目录
+- `-g GID`：指定用户所属组
+- `-l`：不添加到 lastlog/faillog 数据库
+- `-M`：不创建 home 目录
+- `-r`：创建系统账户
+- `-s SHELL`：指定 shell
 
-在**Ubuntu**中创建新用户，通常会用到两个命令：**useradd**和**adduser**。虽然作用一样，但用法却不尽相同：
+## adduser
 
-1\. 使用useradd时，如果后面不添加任何[参数](http://bhanv.blog.51cto.com/729282/285491)选项，例如：#sudo useradd test创建出来的用户将是默认“三无”用户：一无Home Directory，二无密码，三无系统Shell。
+高级 Perl 脚本，交互式创建用户。系统逐步提示输入用户信息，更友好但过程较长。
 
-2\. 使用adduser时，创建用户的过程更像是一种人机对话，系统会提示你输入各种信息，然后会根据这些信息帮你创建新用户。
+```bash
+sudo adduser test
+# 交互式输入：全名、房间号、工作电话、家庭电话、其他信息、密码
+```
 
-useradd是一个ELF可执行程序；
+## 修改用户密码
 
-useradd会添加用户名，并创建和用户名相同的组名，但它并不在/home[目录](http://os.51cto.com/art/201101/242411.htm)下创建基于用户名的目录,也不提示创建新的密码。
+如果用 useradd 创建后需要设置密码，用 `usermod` 或 `passwd`：
 
-\-b, –base-dir BASE\_DIR 指定home目录的base目录
+```bash
+sudo usermod --password PASSWD username
+# 或
+sudo passwd username
+```
 
-\-d, –home-dir HOME\_DIR 指定home目录
+## 对比总结
 
-\-g, –gid GROUP 指定gid
-
-\-l, –no-log-init do not add the user to the lastlog and
-
-faillog databases
-
-不要把用户添加到lastlog和failog中, 这个用户的登录记录不需要记载
-
-\-M, –no-create-home 不要建立home目录
-
-\-p, –password PASSWORD 指定新用户的密码
-
-\-r, –system 建立一个系统帐号
-
-\-s, –shell SHELL 指定shell
-
-adduser -m -d /usr/system -s /bin/bash -p passwd system
-
-而adduser是一个[perl脚本](http://anxiongbo.blog.51cto.com/805770/166111), 可以交互式地设定一些用户参数
-
-问题:
-
-adduser的-p 参数 并不能shadow密码
-
-/usr/sbin/usermod 与 useradd的参数很类似
-
-usermod –password PASSWORD username
-
-总结上来讲，在Ubuntu中，adduser更适合初级使用者，因为不用去记那些繁琐的参数选项，只要跟着系统的提示一步一步进行下去就行，缺点就是整个创建过程比较复杂而漫长；而useradd比较适合有些高阶经验的使用者，往往一行命令加参数就能解决很多问题，所以创建起来十分方便。
-
-来自 <[http://os.51cto.com/art/201104/256231.htm](http://os.51cto.com/art/201104/256231.htm)\>
+| 特性 | useradd | adduser |
+|-----|---------|---------|
+| 类型 | 低级命令（ELF） | 高级脚本（Perl） |
+| 操作方式 | 单行命令 + 参数 | 交互式对话 |
+| 学习曲线 | 陡峭（参数众多） | 平缓（提示引导） |
+| 适合人群 | 高阶用户、脚本编程 | 初级用户、手动操作 |
+| 效率 | 高（自动化友好） | 低（交互式）|

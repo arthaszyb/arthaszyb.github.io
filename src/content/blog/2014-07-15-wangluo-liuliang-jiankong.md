@@ -1,10 +1,7 @@
 ---
 title: 网络流量监控
 date: '2014-07-15'
-description: >-
-  #!/bin/bash if [ -n "$1" ]; then ethname=$1 else ethname="eth0" fi i=0
-  sendo=ifconfig $ethname | grep bytes | awk '{print $6}' | awk -F : '{print
-  $2}'
+description: 基于 ifconfig 的网络流量监控脚本，实时显示网卡的发送/接收速率和平均流量。
 category: shell
 tags:
   - shell-scripting
@@ -13,6 +10,10 @@ draft: false
 source: evernote-local-db
 lang: zh
 ---
+
+通过 ifconfig 命令监控网络接口流量，每秒采集一次数据并计算发送/接收速率。
+
+```bash
 #!/bin/bash
 if [ -n "$1" ]; then
 eth_name=$1
@@ -40,9 +41,8 @@ total_ra=`expr $send_ra + $recv_ra`
 sendn=`ifconfig $eth_name | grep bytes | awk -F \( '{print $3}' | awk -F \) '{print $1}'`
 recvn=`ifconfig $eth_name | grep bytes | awk -F \( '{print $2}' | awk -F \) '{print $1}'`
 clear
-```bash
 echo "Last second : Send rate: $send_r Bytes/sec Recv rate: $recv_r Bytes/sec Total rate: $total_r Bytes/sec"
 echo "Average value: Send rate: $send_ra Bytes/sec Recv rate: $recv_ra Bytes/sec Total rate: $total_ra Bytes/sec"
 echo "Total traffic after startup: Send traffic: $sendn Recv traffic: $recvn"
-```
 done
+```

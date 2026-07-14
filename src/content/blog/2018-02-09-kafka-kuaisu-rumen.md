@@ -1,16 +1,11 @@
 ---
 title: Kafka快速入门
 date: '2018-02-09'
-description: >-
-  编译自 官方文档 Apache Kafka 是一个分布式消息发布订阅系统。 它最初由LinkedIn公司基于独特的设计实现为一个分布式的提交日志系统( a
-  distributed commit log)，，之后成为Apache项目的一部分。 Kafka系统快速、可扩展并且可持久化。
+description: Apache Kafka 分布式消息发布订阅系统入门。核心概念（Topic、Producer、Consumer、Broker）、日志分区设计、消费者组、容错机制、实操演示。
 category: bigdata
 tags:
   - apache
   - java
-  - 监控告警
-  - 备份恢复
-  - 集群
 draft: false
 source: evernote-local-db
 lang: zh

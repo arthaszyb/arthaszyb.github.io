@@ -1,10 +1,7 @@
 ---
 title: 测试网卡负载
 date: '2013-12-21'
-description: >-
-  修改eth2为要测试的网卡即可 typeset in inold difin difin1 difout1 packetold packet difpack
-  typeset out outold difout inold=$(cat /proc et/dev | grep eth2 | sed 's=^.:=='
-  |
+description: 监测网卡流量和数据包速率的 shell 脚本，支持自定义网卡名称。每秒采样一次，输出进出流量和丢包率。
 category: shell
 tags:
   - shell-scripting
@@ -13,29 +10,24 @@ draft: false
 source: evernote-local-db
 lang: zh
 ---
-修改eth2为要测试的网卡即可
+
+修改 eth2 为要测试的网卡即可：
+
 ```bash
 #! /bin/bash
 # Write by Neil.xu qq:37391319 email: xurongzhong@gmail.com
 # 2008-8-19 we need to monitor streams of LTS channels, so write this script
-```
 typeset in in_old dif_in dif_in1 dif_out1 packet_old packet dif_pack
 typeset out out_old dif_out
-in_old=$(cat /proc
-et/dev | grep eth2 | sed 's=^.*:==' | awk '{ print $1 }' )
-out_old=$(cat /proc
-et/dev | grep eth2 | sed 's=^.*:==' | awk '{ print $9 }')
-packet_old=$(cat /proc
-et/dev | grep eth2 | sed 's=^.*:==' | awk '{ print $2 }')
+in_old=$(cat /proc/net/dev | grep eth2 | sed 's=^.*:==' | awk '{ print $1 }' )
+out_old=$(cat /proc/net/dev | grep eth2 | sed 's=^.*:==' | awk '{ print $9 }')
+packet_old=$(cat /proc/net/dev | grep eth2 | sed 's=^.*:==' | awk '{ print $2 }')
 while true
 do
 sleep 1
-in=$(cat /proc
-et/dev | grep eth2 | sed 's=^.*:==' | awk '{ print $1 }')
-out=$(cat /proc
-et/dev | grep eth2 | sed 's=^.*:==' | awk '{ print $9 }')
-packet=$(cat /proc
-et/dev | grep eth2 | sed 's=^.*:==' | awk '{ print $2 }')
+in=$(cat /proc/net/dev | grep eth2 | sed 's=^.*:==' | awk '{ print $1 }')
+out=$(cat /proc/net/dev | grep eth2 | sed 's=^.*:==' | awk '{ print $9 }')
+packet=$(cat /proc/net/dev | grep eth2 | sed 's=^.*:==' | awk '{ print $2 }')
 dif_in=$((in-in_old))
 dif_in1=$((dif_in * 8 / 1024 / 1024 ))
 dif_out=$((out-out_old))
@@ -48,3 +40,4 @@ in_old=${in}
 out_old=${out}
 packet_old=${packet}
 done
+```

@@ -1,32 +1,17 @@
 ---
-title: KVM-网络配置
+title: KVM网络配置
 date: '2018-01-02'
-description: >-
-  2018 年 1 月 2 日 11:51 KVM-网络配置 eeslyyuan 关注 2015.12.13 20:58 字数 1153 阅读 5483评论
-  0喜欢 7 qemu支持的网络模式 qemu向客户机提供了如下四种不同模式的网络 1、基于网桥的虚拟网卡 2、基于nat的虚拟网络
-  3、QEMU内置的用户网络模式
+description: QEMU/KVM 虚拟机网络配置详解。四种网络模式（网桥、NAT、用户网络、直连）原理与实现，TAP 配置脚本、iptables NAT 规则、dnsmasq DHCP。
 category: container-virt
 tags:
-  - iptables
   - kvm
+  - iptables
   - dhcp
-  - ssl-tls
-  - 网络排查
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: https://www.jianshu.com/p/110b60c14a8b
 ---
-2018
-年
-1
-月
-2
-日
-11:51
-KVM-网络配置
-eesly_yuan
-关注
-2015.12.13 20:58* 字数 1153 阅读 5483评论 0喜欢 7
 qemu支持的网络模式
 qemu向客户机提供了如下四种不同模式的网络
 1、基于网桥的虚拟网卡
@@ -248,7 +233,3 @@ QEMU内部用户模式网络
 性能较差
 不支持部分网络功能，例如ICMP协议
 不能从宿主机和外部网络访问客户机
-来自
-<
-https://www.jianshu.com/p/110b60c14a8b
->

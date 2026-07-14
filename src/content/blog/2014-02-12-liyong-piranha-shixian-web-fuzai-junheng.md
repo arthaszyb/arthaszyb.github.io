@@ -1,31 +1,15 @@
 ---
-title: 利用Piranha实现Web负载均衡
+title: 利用 Piranha 实现 Web 负载均衡
 date: '2014-02-12'
-description: >-
-  分类： LVS 集群 HA 2013-01-17 09:59 141人阅读 评论 (0) 收藏 举报 一、背景知识 1、LVS架构的基本分类
-  （1）Virtual Server via Network Address Translation（VS/NAT）
-  通过网络地址转换，调度器重写请求报文的目标地址
+description: LVS 负载均衡架构的 VS/NAT、VS/DR、VS/TUN 三种模式原理和对比，以及基于 Piranha 的 NAT 方式负载均衡集群配置。
 category: web-infra
 tags:
-  - apache
+  - 负载均衡
   - lvs
-  - dns
-  - ftp
-  - shell-scripting
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-分类：
-LVS
-集群
-HA
-2013-01-17 09:59
-141人阅读
-评论
-(0)
-收藏
-举报
 一、背景知识
 1、LVS架构的基本分类
 （1）Virtual Server via Network Address Translation（VS/NAT）

@@ -1,17 +1,11 @@
 ---
-title: Heartbeat3.x
+title: Heartbeat 3.x 部署与配置
 date: '2014-01-23'
-description: >-
-  I 概念及工作原理 一、Heartbeat的概念组成以及工作原理 1、 heartbeat的概念
-  Heartbeat是Linux-HA项目中的一个组件，也是目前开源HA项目中最成功的一个例子, Linux-HA的全称是High-Availability
-  Linux,这个开源项目的目标是：通过社区开发者的共同努力
-category: web-infra
+description: Heartbeat 3.x 完整部署指南，涵盖组件拆分、安装配置、集群管理和故障转移测试，适用于 Linux 高可用集群搭建。
+category: linux
 tags:
-  - apache
-  - mysql
-  - nfs
-  - python
-  - drbd
+  - 高可用
+  - linux-admin
 draft: false
 source: evernote-local-db
 lang: zh

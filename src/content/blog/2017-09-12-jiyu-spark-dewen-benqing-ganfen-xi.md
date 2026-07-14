@@ -1,33 +1,19 @@
 ---
 title: 基于 Spark 的文本情感分析
 date: '2017-09-12'
-description: >-
-  2017 年 9 月 12 日 14:36 基于 Spark 的文本情感分析 xiaoli.he 发布于 2016-05-31 分类： 编程技术
-  阅读(147) 评论(0) IBM 公司在 2015 年对外宣告了一个新的 科技 和商务时代的来临—认知时代。
+description: 基于 Spark 构建的文本情感分析系统实现。从数据预处理、特征提取、模型训练到分类预测的完整流程，使用 Naïve Bayes 和 SVM 算法。
 category: bigdata
 tags:
   - python
-  - ssl-tls
   - hadoop
-  - 存储
   - java
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: http://www.liuhaihua.cn/archives/346066.html
 ---
-2017
-年
-9
-月
-12
-日
-14:36
-基于 Spark 的文本情感分析
-xiaoli.he 发布于 2016-05-31
-分类：
-编程技术
-阅读(147)
-评论(0)
+## 概述
+
 IBM
 公司在
 2015
@@ -268,13 +254,3 @@ SVMmodel = SVMWithSGD.train(training, iterations=100) predictionAndLabel = test.
 本文向读者详细的介绍了利用 Spark 构建文本情感分类系统的过程，从数据的清洗、转换，Spark 的 RDD 有 Filter、Map 方法可以轻松胜任；对于抽取文本特征，Spark 针对大规模数据的处理不仅在计算模型上有优化，还做了算法的优化，它利用哈希特征算法来实现 TF-IDF，从而能够支持上千万维的模型训练；对于选择分类模型，Spark 也实现好了常用的分类模型，调用起来非常方便。最后希望这篇
 文章
 可以对大家学习 spark 和文本分类有帮助。
-原文
-http
-://www.ibm.com/developerworks/cn/cognitive/
-lib
-rary/cc-1606-spark-seniment-analysis/index.html?ca=drs-
-PS：如果您想和业内技术大牛交流的话，请加qq群(527933790)或者关注微信公众 号(AskHarries)，谢谢！
-来自
-<
-http://www.liuhaihua.cn/archives/346066.html
->

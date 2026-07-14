@@ -1,9 +1,7 @@
 ---
-title: How to Install DRBD on CentOs 6.2
+title: 在 CentOS 6.2 上安装 DRBD
 date: '2013-11-06'
-description: >-
-  Published June 17, 2012 | By H.Ali RHEL 6 and has CentOs 6.2no more yum
-  repository for DRBD.
+description: 使用 ELRepo 仓库在 CentOS 6.2 上安装和配置 DRBD 的步骤，包括 elrepo 下载、安装和 DRBD 主从配置
 category: linux
 tags:
   - drbd
@@ -11,11 +9,8 @@ draft: false
 source: evernote-local-db
 lang: zh
 ---
-Published June 17, 2012 | By [H.Ali](http://www.broexperts.com/author/admin/)
 
-RHEL 6 and has CentOs 6.2no more yum repository for DRBD. if you want to Install DRBD on RHEL 6 you need a support contract with RedHat.
-
-We will use ELRepo repository to install DRBD on CentOs 6.2.
+RHEL 6 和 CentOS 6.2 不再有 DRBD 的 yum 仓库。如果想在 RHEL 6 上安装 DRBD，需要有 RedHat 支持合同。使用 ELRepo 仓库来在 CentOS 6.2 上安装 DRBD。
 
 **Step-1 : download elrep using wget**
 

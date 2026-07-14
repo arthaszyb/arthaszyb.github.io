@@ -1,42 +1,54 @@
 ---
 title: 字符串截取
 date: '2015-04-30'
-description: >-
-  http://hi.chinaunix.net/?20535598/viewspace-42324 字符串截取 rthought.jpg $ echo
-  ${MYVAR#fo} odforthought.jpg 记忆方法：当搜索最长匹配时，使用 ##（因为 ## 比 # 长）。 当搜索最短匹配时，使用 #。
+description: Bash 字符串截取的各种方法，包括从开头/末尾删除、子串提取、长短匹配等。
 category: shell
-tags: []
+tags:
+  - shell-scripting
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: http://hi.chinaunix.net/?20535598/viewspace-42324
 ---
-http://hi.chinaunix.net/?20535598/viewspace-42324
-字符串截取
+
+Bash 字符串截取技巧整理。
+
+## 从开头截取
+
+使用 `#` 删除最短匹配，`##` 删除最长匹配：
+
 ```bash
-$ MYVAR=foodforthought.jpg
-$ echo ${MYVAR##*fo}
+MYVAR=foodforthought.jpg
+echo ${MYVAR##*fo}    # 输出: rthought.jpg （最长匹配删除）
+echo ${MYVAR#*fo}     # 输出: odforthought.jpg （最短匹配删除）
 ```
-rthought.jpg
-$ echo ${MYVAR#*fo}
-odforthought.jpg
-记忆方法：当搜索最长匹配时，使用 ##（因为 ## 比 # 长）。当搜索最短匹配时，使用 #。如何记住使用"#"字符来从字符串开始部分出去？在美国键盘上，shift-4 是 "$"，他是 bash 变量扩展字符。在键盘上，紧靠 "$" 左边的是 "#"。这样，能够看到："#" 位于 "$" 的“开始处”，因此（根据我们的记忆法），"#" 从字符串的开始处除去字符。同理，使用"%"来从尾部截去字符串：
+
+**记忆法**：`#` 在 `$` 左边（键盘上），代表从字符串开始处删除。`##` 比 `#` 长，用于最长匹配。
+
+## 从末尾截取
+
+使用 `%` 删除最短匹配，`%%` 删除最长匹配：
+
 ```bash
-$ MYFOO="chickensoup.tar.gz"
-$ echo ${MYFOO%%.*}
+MYFOO="chickensoup.tar.gz"
+echo ${MYFOO%%.*}     # 输出: chickensoup （最长匹配删除）
+echo ${MYFOO%.*}      # 输出: chickensoup.tar
 ```
-chickensoup
-$ echo ${MYFOO%.*}
-更有另一种形式的变量扩展，来选择特定子字符串。
+
+**记忆法**：`%` 在键盘上，用于从字符串末尾删除。
+
+## 按位置和长度提取
+
 ```bash
-$ EXCLAIM=cowabunga
-$ echo ${EXCLAIM:0:3}
+EXCLAIM=cowabunga
+echo ${EXCLAIM:0:3}   # 输出: cow （从第 0 位开始，取 3 字符）
+echo ${EXCLAIM:3:7}   # 输出: abunga
 ```
-cow
-$ echo ${EXCLAIM:3:7}
-abunga
-请注意命令替换$()和截断字符串${}的区别
+
+## 实际应用
+
+```bash
 file="/data/download/DD0C17E310DDB4143CEAA584DA0917BEBD4FFD1800000000"
-echo ${file%/*}
-/data/download
-echo ${file##*/}
-DD0C17E310DDB4143CEAA584DA0917BEBD4FFD1800000000
+echo ${file%/*}       # 输出: /data/download （路径）
+echo ${file##*/}      # 输出: DD0C17E310DDB4143CEAA584DA0917BEBD4FFD1800000000 （文件名）
+```

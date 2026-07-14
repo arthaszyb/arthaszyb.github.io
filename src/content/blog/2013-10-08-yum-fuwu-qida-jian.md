@@ -1,37 +1,60 @@
 ---
-title: yum服务器搭建
+title: YUM 服务器搭建
 date: '2013-10-08'
-description: >-
-  安装ftp服务器（http服务器也可以，目的就是共享rpm目录，可将源目录软链接到共享目录下），将原文件存储在ftp上，然后安装网络yum，实现客户机可以从yum服务器上下载软件包
-  客户机请求过程: 切换到服务器端 1：[root@lyt ~]# mkdir /mnt/cdrom/ #建立挂载点
+description: 基于 FTP 或 HTTP 搭建本地 YUM 源，共享 RPM 包目录，让客户机可以从 YUM 服务器上下载和安装软件包
 category: linux
 tags:
   - ftp
-  - vim
-  - 存储
-  - 集群
+  - linux-admin
+  - rpm
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-安装ftp服务器（http服务器也可以，目的就是共享rpm目录，可将源目录软链接到共享目录下），将原文件存储在ftp上，然后安装网络yum，实现客户机可以从yum服务器上下载软件包
-客户机请求过程:
-切换到服务器端
-1：[root@lyt ~]# mkdir /mnt/cdrom/ #建立挂载点
-2：[root@lyt ~]# mount /dev/cdrom /mnt/cdrom/ #挂载光盘
-3：[root@lyt ~]# cd /mnt/cdrom/Server/ #切换到该目录下
-4：[root@lyt Server]# rpm -ivh vsftpd-2.0.5-16.el5.i386.rpm #安装ftp服务器
-5：[root@lyt ~]# cp -r /mnt/cdrom/. /var/ftp/pub/ #将/mnt/cdrom/中的光盘文件全部拷贝到/var/ftp/pub/ 中
-6：[root@lyt Server]# service vsftpd restart #重启ftp服务器
-7：在Server、VT、Cluster、ClusterStorage目录中都有一个repodata文件
-[root@lyt VT]# cd repodata/ #切换到repodata文件中，查看该目录
-8：切换到客户端:
+
+安装 FTP 服务器（HTTP 服务器也可以，目的就是共享 RPM 目录，可将源目录软链接到共享目录下），将原文件存储在 FTP 上，然后安装网络 YUM，实现客户机可以从 YUM 服务器上下载软件包。
+
+## 服务器端操作
+
 ```bash
-[root@localhost ~]# cd /etc/yum.repos.d/ #切换到改目录
-[root@localhost yum.repos.d]# cp -p rhel-debuginfo.repo yum.repo #将rhel-debuginfo.repo 文件拷贝成yum.repo文件（注：新生成文件名必须以.repo结尾）
-[root@localhost yum.repos.d]# vim yum.repo #编辑该文件，如下图：
-[root@localhost yum.repos.d]# yum repolist #将记录每个软件包信息的文件primary.xml.gz下载到本地，如图
+# 建立挂载点
+mkdir /mnt/cdrom/
+
+# 挂载光盘
+mount /dev/cdrom /mnt/cdrom/
+
+# 切换到光盘 Server 目录
+cd /mnt/cdrom/Server/
+
+# 安装 FTP 服务器
+rpm -ivh vsftpd-2.0.5-16.el5.i386.rpm
+
+# 将光盘文件全部拷贝到 /var/ftp/pub/ 中
+cp -r /mnt/cdrom/. /var/ftp/pub/
+
+# 重启 FTP 服务器
+service vsftpd restart
+
+# 查看 repodata 文件
+cd /mnt/cdrom/Server/repodata/
 ```
-测试：服务器端服务器更新了软件，在客户端查看软件包信息是否查看到该更新软件：
-9：切换到服务器端
-如图所示，通过ftp服务器：将下图的文件导入到/var/ftp/pub/Server目录中，图示已导入：
+
+## 客户端操作
+
+在 Server、VT、Cluster、ClusterStorage 目录中都有一个 repodata 文件。
+
+```bash
+# 切换到 yum 配置目录
+cd /etc/yum.repos.d/
+
+# 拷贝模板文件
+cp -p rhel-debuginfo.repo yum.repo
+
+# 编辑该文件（配置 FTP 服务器地址）
+vim yum.repo
+
+# 加载仓库列表
+yum repolist
+```
+
+**测试**：服务器端更新了软件后，在客户端查看软件包信息是否能看到更新的软件。通过 FTP 服务器将软件导入到 `/var/ftp/pub/Server` 目录中。

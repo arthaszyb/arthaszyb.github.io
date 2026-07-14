@@ -1,327 +1,154 @@
 ---
-title: KVM虚拟机virsh管理常用命令
+title: KVM 虚拟机 virsh 管理常用命令
 date: '2018-01-31'
-description: >-
-  2018 年 1 月 31 日 15:16 KVM虚拟机virsh管理常用命令 sa 发布于 2017-07-18 分类： 虚拟化技术 阅读(610)
-  评论(0) 有运维或运维开发方面的需求，可以联系博主QQ 452336092或Email:admin#centos.bz(收费) 文章目录 [ 隐藏 ]
+description: KVM 虚拟机管理详细指南，包括虚拟机基本操作、硬盘添加和扩容、内存 CPU 动态调整、虚拟机参数修改等完整命令集。
 category: container-virt
 tags:
   - kvm
   - lvm
-  - ssl-tls
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: https://www.centos.bz/2017/07/kvm-virsh-manage-command/
 ---
-2018
-年
-1
-月
-31
-日
-15:16
-KVM虚拟机virsh管理常用命令
-sa 发布于 2017-07-18
-分类：
-虚拟化技术
-阅读(610)
-评论(0)
-有运维或运维开发方面的需求，可以联系博主QQ 452336092或Email:admin#centos.bz(收费)
-文章目录
-[
-隐藏
-]
-管理kvm虚拟机
-给虚拟机添加硬盘
-改变虚拟机的参数
-删除虚拟机
-管理kvm虚拟机
-常用的虚拟机管理命令
-列出所有的虚拟机
-1
-virsh
-list --all
-显示虚拟机信息
-1
-virsh dominfo kvm-1
-显示虚拟机内存和cpu的使用情况
-1
-yum install virt-top -y
-2
-virt-top
-显示虚拟机分区信息
-1
-virt-df kvm-1
-关闭虚拟机（shutodwn）
-1
-virsh shutdown kvm-1
-启动虚拟机
-1
-virsh start kvm-1
-设置虚拟机（kvm-1）跟随系统自启
-1
-virsh autostart kvm-1
-关闭虚拟及自启
-1
-virsh autostart --disable kvm-1
-删除虚拟机
-1
-virsh undefine kvm-1
-通过控制窗口登录虚拟机
-virsh console kvm-1
-给虚拟机添加硬盘
-添加硬盘（lvm卷）或者USB到虚拟机上
-1
+
+## 虚拟机基本操作
+
+### 列出虚拟机
+
+```bash
+virsh list --all              # 列出所有虚拟机
+virsh dominfo kvm-1           # 显示虚拟机信息
+virt-top                      # 显示虚拟机内存和 CPU 使用情况（需先 yum install virt-top）
+virt-df kvm-1                 # 显示虚拟机分区信息
+```
+
+### 虚拟机状态管理
+
+```bash
+virsh shutdown kvm-1          # 关闭虚拟机（ACPI 关机）
+virsh start kvm-1             # 启动虚拟机
+virsh autostart kvm-1         # 设置虚拟机跟随系统自启
+virsh autostart --disable kvm-1  # 关闭虚拟机自启
+virsh undefine kvm-1          # 删除虚拟机
+virsh console kvm-1           # 通过控制窗口登录虚拟机
+```
+
+## 虚拟机存储管理
+
+### 添加物理磁盘或 LVM 卷
+
+```bash
+# 添加物理磁盘或 USB
 virsh attach-disk kvm-1 /dev/sdb vbd --driver qemu --mode shareable
-使用完成之后可以卸载usb
-1
+
+# 卸载磁盘
 virsh detach-disk kvm vdb
-添加lvm卷，并挂载
-```bash
-[root@sh-kvm-1 ~]# lvcreate -n kvm-1-data -L 50G vg_shkvm1
-[root@sh-kvm-1 ~]# virsh attach-disk kvm-1 /dev/vg_shkvm1/kvm-1-data vdb --driver qemu --mode shareable
 ```
-Disk attached successfully
+
+### 添加 LVM 卷并挂载
+
 ```bash
-# 登录到kvm-1上查看lvm是否已经被挂载
-[root@sh-kvm-1 ~]# virsh console kvm-1 # 输入kvm-1的用户和密码
-[root@sh-kvm-1-1 ~]# fdisk -l # 查看硬盘挂载情况
+# 在宿主机创建 LVM 卷
+lvcreate -n kvm-1-data -L 50G vg_shkvm1
+
+# 添加到虚拟机
+virsh attach-disk kvm-1 /dev/vg_shkvm1/kvm-1-data vdb --driver qemu --mode shareable
+
+# 在虚拟机内查看
+virsh console kvm-1
+fdisk -l                      # 查看硬盘挂载情况
 ```
-Disk /dev/vda: 21.5 GB, 21474836480 bytes
-16 heads, 63 sectors/track, 41610 cylinders
-Units = cylinders of 1008 * 512 = 516096 bytes
-Sector size (logical/physical): 512 bytes / 512 bytes
-I/O size (minimum/optimal): 512 bytes / 512 bytes
-Disk identifier: 0x00058197
-Device Boot
-Start
-End
-Blocks
-Id
-System
-/dev/vda1
-*
-3
-1018
-512000
-83
-Linux
-Partition 1 does not end on cylinder boundary.
-/dev/vda2
-1018
-41611
-20458496
-8e
-Linux LVM
-Partition 2 does not end on cylinder boundary.
-Disk /dev/mapper/VolGroup-lv_root: 18.8 GB, 18798870528 bytes
-255 heads, 63 sectors/track, 2285 cylinders
-Units = cylinders of 16065 * 512 = 8225280 bytes
-Sector size (logical/physical): 512 bytes / 512 bytes
-I/O size (minimum/optimal): 512 bytes / 512 bytes
-Disk identifier: 0x00000000
-Disk /dev/mapper/VolGroup-lv_swap: 2147 MB, 2147483648 bytes
-255 heads, 63 sectors/track, 261 cylinders
-Units = cylinders of 16065 * 512 = 8225280 bytes
-Sector size (logical/physical): 512 bytes / 512 bytes
-I/O size (minimum/optimal): 512 bytes / 512 bytes
-Disk identifier: 0x00000000
-Disk /dev/vdb: 53.7 GB, 53687091200 bytes
-# 新添加的硬盘
-16 heads, 63 sectors/track, 104025 cylinders
-Units = cylinders of 1008 * 512 = 516096 bytes
-Sector size (logical/physical): 512 bytes / 512 bytes
-I/O size (minimum/optimal): 512 bytes / 512 bytes
-Disk identifier: 0x00000000
-格式化新添加的vdb，并添加到lvm组中
+
+### 新磁盘格式化和 LVM 扩展
+
 ```bash
-# 对新添加的硬盘分区
-[root@sh-kvm-1-1 ~]# fdisk /dev/vdb
+# 对新磁盘分区
+fdisk /dev/vdb
+
+# 创建物理卷
+pvcreate /dev/vdb1
+
+# 扩展逻辑卷组
+vgextend VolGroup /dev/vdb1
+
+# 查看逻辑卷组信息
+vgs                           # 显示 VG 容量和可用空间
 ```
-Device contains neither a valid DOS partition table, nor Sun, SGI or OSF disklabel
-Building a new DOS disklabel with disk identifier 0xf04b6807.
-Changes will remain in memory only, until you decide to write them.
-After that, of course, the previous content won't be recoverable.
-Warning: invalid flag 0x0000 of partition table 4 will be corrected by w(rite)
-WARNING: DOS-compatible mode is deprecated. It's strongly recommended to
-switch off the mode (command 'c') and change display units to
-sectors (command 'u').
-Command (m for help): m
-# 查看帮助
-Command action
-a
-toggle a bootable flag
-b
-edit bsd disklabel
-c
-toggle the dos compatibility flag
-d
-delete a partition
-l
-list known partition types
-m
-print this menu
-n
-add a new partition
-o
-create a new empty DOS partition table
-p
-print the partition table
-q
-quit without saving changes
-s
-create a new empty Sun disklabel
-t
-change a partition's system id
-u
-change display/entry units
-v
-verify the partition table
-w
-write table to disk and exit
-x
-extra functionality (experts only)
-Command (m for help): n
-#添加一个分区
-Command action
-e
-extended
-p
-primary partition (1-4)
-p
-#选择添加一个扩展分区
-Partition number (1-4):
-Value out of range.
-Partition number (1-4): 1
-First cylinder (1-104025, default 1):
-Using default value 1
-Last cylinder, +cylinders or +size{K,M,G} (1-104025, default 104025):
-Using default value 104025
-Command (m for help): t
-#改变分区的格式
-Selected partition 1
-Hex code (type L to list codes): 8e
-#改成lvm
-Changed system type of partition 1 to 8e (Linux LVM)
-Command (m for help): w
-# 保存更改
-root@sh-kvm-1-1 ~]# mkfs.ext4 /dev/vdb1
-# 格式化分区
-mke2fs 1.41.12 (17-May-2010)
-Filesystem label=
-OS type: Linux
-Block size=4096 (log=2)
-Fragment size=4096 (log=2)
-Stride=0 blocks, Stripe width=0 blocks
-3276800 inodes, 13107142 blocks
-655357 blocks (5.00%) reserved for the super user
-First data block=0
-Maximum filesystem blocks=4294967296
-400 block groups
-32768 blocks per group, 32768 fragments per group
-8192 inodes per group
-Superblock backups stored on blocks:
-32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208,
-4096000, 7962624, 11239424
-Writing inode tables: done
-Creating journal (32768 blocks): done
-Writing superblocks and filesystem accounting information: done
-This filesystem will be automatically checked every 28 mounts or
-180 days, whichever comes first.
-Use tune2fs -c or -i to override.
+
+## 虚拟机参数调整
+
+### 修改内存
+
 ```bash
-[root@sh-kvm-1-1 ~]# pvc reate /dev/vdb1
-# 创建pv
-```
-vdb
-vdb1
-```bash
-[root@sh-kvm-1-1 ~]# vgextend VolGroup /dev/vdb
-# 扩展lvm vg
-```
-vdb
-vdb1
-[root@sh-kvm-1-1 ~]# vgs
-VG
-#PV #LV #SN Attr
-VSize
-VFree
-VolGroup
-2
-2
-0 wz--n- 69.50g 50.00g
-# 从上面能看出，新添加的 已经加到lvm组中
-改变虚拟机的参数
-通过命令行更改创建之后虚拟机的内存，cpu等信息
-更改内存
-```bash
-# 1. 查看虚拟机当前内存
-[root@sh-kvm-1 ~]# virsh dominfo kvm-1 | grep memory
-```
-Max memory:
-4194304 KiB
-Used memory:
-4194304 KiB
-# 2、动态设置内存为512MB，内存减少
+# 查看当前内存
+virsh dominfo kvm-1 | grep memory
+
+# 动态设置内存为 512MB（单位必须是 KB）
 virsh setmem kvm-1 524288
-```bash
-# 注意单位必须是KB
-# 3、查看内存变化
-# virsh dominfo kvm-1 | grep memory
+
+# 增加内存需要停止虚拟机
+virsh shutdown kvm-1
+virsh edit kvm-1              # 修改 <memory> 标签
+virsh create /etc/libvirt/qemu/kvm-1/kvm-1.xml  # 启动虚拟机
 ```
-Max memory: 14194304 KiB
-Used memory: 524288 kiB
-# 4、内存增加
+
+### 修改 CPU
+
+修改 CPU 数需要停止虚拟机：
+
+```bash
 virsh shutdown kvm-1
-virsh edit kvm-1
-# 直接更改memory
-virsh create /etc/libvirt/demu/kvm-1/xml
-# 之后操作1,2,3步骤增加内存
-更改CPU
-需要修改配置文件，因此需要停止虚拟机
+virsh edit kvm-1              # 修改 <vcpu> 标签（如改成 4）
+virsh create /etc/libvirt/qemu/kvm-1/kvm-1.xml
+```
+
+### 硬盘扩容
+
+```bash
+# 创建 10GB 新文件
+dd if=/dev/zero of=/vm-images/vm1-add.img bs=1M count=10240
+
+# 停止虚拟机
+virsh shutdown vm1
+
+# 编辑虚拟机配置，添加新硬盘（复制粘贴现有硬盘配置，修改 target 和 source）
+virsh edit vm1
+```
+
+**建议**：使用 `virsh attach-disk` 命令动态添加硬盘更简便。
+
+## 虚拟机删除
+
+```bash
+# 第一步：停掉虚拟机
 virsh shutdown kvm-1
-virsh edit kvm-1
-#
-2
-# 4
-&
-gt; 2
-virsh create /etc/libvirt/demu/kvm-1/xml
-硬盘扩容
-1. Create a 10-GB non-sparse file:
-# dd if=/dev/zero of=/vm-images/vm1-add.img bs=1M
-count
-=10240
-2. Shutdown the VM:
-# virsh shutdown vm1
-3. Add an extra entry for ‘disk’ in the VM's XML file in /etc/libvirt/qemu. You can look copy
-&
-amp; paste
-the entry for your mail storage device and just change the target and address tags. For example:
-# virsh edit vm1
-<
-address />
-Add:
-<
-address />
-# 这里建议使用上面的添加硬盘的方式添加
-删除虚拟机
-第一步，停掉虚拟机
-1
-virsh shutdown kvm-1
-第二步
-1
+
+# 第二步：强制关闭（如果 shutdown 失败）
 virsh destroy kvm-1
-第三步
-1
+
+# 第三步：删除虚拟机配置
 virsh undefine kvm-1
-第四部
-1
-```bash
+
+# 第四步：删除磁盘（可选，不建议自动删除以防数据丢失）
 rm /dev/vg_shkvm1/kvm-1
-# 不建议删除硬盘
 ```
-来自
-<
-https://www.centos.bz/2017/07/kvm-virsh-manage-command/
->
+
+## 常用命令速查
+
+```bash
+virsh list --all                    # 列出所有虚拟机
+virsh dominfo <vm>                  # 显示虚拟机信息
+virsh dumpxml <vm>                  # 导出虚拟机配置
+virsh start <vm>                    # 启动虚拟机
+virsh shutdown <vm>                 # 关闭虚拟机
+virsh destroy <vm>                  # 强制关闭
+virsh undefine <vm>                 # 删除虚拟机
+virsh edit <vm>                     # 编辑虚拟机配置
+virsh domstate <vm>                 # 显示虚拟机状态
+virsh suspend <vm>                  # 暂停虚拟机
+virsh resume <vm>                   # 恢复虚拟机
+virsh console <vm>                  # 进入虚拟机控制台
+virsh vncdisplay <vm>               # 查看 VNC 端口
+virsh snapshot-create-as --domain <vm> --name <name>  # 创建快照
+```

@@ -1,75 +1,110 @@
 ---
-title: 安装过程
+title: MySQL 5.5.29 源码编译安装
 date: '2013-08-07'
-description: >-
-  mysql5.5.29源码包的安装 Mysql5.5.29源码包的安装(此版本用cmake编译的)： 1.安装cmake, cd cmake-2.8.5
-  ./bootstarp Make & & make install 2.安装mysql5.5.29 解压源码包，编译安装 cd mysql-5.5.28
+description: "MySQL 5.5.29 源码包的编译安装步骤，包括 CMake 构建、配置参数、初始化数据库和基本管理命令。"
 category: database
 tags:
   - mysql
-  - 存储
-  - 备份恢复
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-mysql5.5.29源码包的安装
-Mysql5.5.29源码包的安装(此版本用cmake编译的)：
-1.安装cmake, cd cmake-2.8.5
-./bootstarp
-Make
-&
-&
-make install
-2.安装mysql5.5.29
+
+MySQL 5.5.29 源码包的安装（此版本用 CMake 编译）。
+
+## 环境准备
+
 ```bash
-#mkdir-p /test/usr/local/mysql #建立mysql安装目录
-#mkdir-p /test/usr/local/data/mysql #建立mysql数据库目录
-#groupadd mysql #添加mysql组
-#useradd -g msyql msyql #添加一个mysql用户并加入到mysql组中
-#chown-R mysql.mysql /test/usr/local/data/mysql #将/data/mysql目录的所有权赋予mysql组中的mysql用户
+# 建立安装目录和数据目录
+mkdir -p /test/usr/local/mysql
+mkdir -p /test/usr/local/data/mysql
+
+# 创建 mysql 用户和组
+groupadd mysql
+useradd -g mysql mysql
+
+# 赋予权限
+chown -R mysql.mysql /test/usr/local/data/mysql
 ```
-解压源码包，编译安装
-cd mysql-5.5.28 #进入解压后mysql目录
-cmake \ #开始编译
--DCMAKE_INSTALL_PREFIX= /usr/local/mysql \ #安装到 /test/usr/local/mysql目录\
--DMYSQL_DATADIR= /usr/local/data/mysql \ #数据存放到 /test/usr/local/data/mysql目录\
--DMYSQL_UNIX_ADDR= /usr/local/data/mysql/mysqld.sock \ #sock存放到 /test/usr/local/data/mysql目录\
--DWITH_INNOBASE_STORAGE_ENGINE=1 \ #innoDB引擎\
--DENABLED_LOCAL_INFILE=1 \
--DDEFAULT_CHARSET=utf8 \ #字符集\
--DDEFALUT_CHARSETS=all \ #支持所有字符集\
--DWITH_BLACKHOLE_STORAGE_ENGINE=1 \
--DWITH_ARCHIVE_STORAGE_ENGINE=1 \
--DEXTRA_CHARSETS=all \
--DMYSQL_TCP_PORT=3306 \
--DWITH_DEBUG=0\
-(最后正确的配置cmake -DCMAKE_INSTALL_PREFIX=/usr/local/mysql -DINSTALL_DATADIR=/usr/local/mysql/data -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci -DEXTRA_CHARSETS=all -DENABLED_LOCAL_INFILE=1 -DWITH_INNOBASE_STORAGE_ENGINE=1 -DDEFALUT_CHARSETS=all)
-make
-&
-&
-make install #编译通过过，安装
-初始化MySQL
+
+## 安装 CMake
+
 ```bash
-cp support-files/my-medium.cnf /etc/my.cnf #复制配置文件
-cp support-files/mysql.server /etc/init.d/mysqld #复制启动脚本
+cd cmake-2.8.5
+./bootstrap
+make && make install
+```
+
+## 编译安装 MySQL
+
+```bash
+cd mysql-5.5.28
+
+# 推荐的 cmake 配置（最终版本）
+cmake -DCMAKE_INSTALL_PREFIX=/usr/local/mysql \
+  -DINSTALL_DATADIR=/usr/local/mysql/data \
+  -DDEFAULT_CHARSET=utf8 \
+  -DDEFAULT_COLLATION=utf8_general_ci \
+  -DEXTRA_CHARSETS=all \
+  -DENABLED_LOCAL_INFILE=1 \
+  -DWITH_INNOBASE_STORAGE_ENGINE=1 \
+  -DDEFALUT_CHARSETS=all
+
+# 编译和安装
+make && make install
+```
+
+## 初始化数据库
+
+```bash
+# 复制配置文件
+cp support-files/my-medium.cnf /etc/my.cnf
+cp support-files/mysql.server /etc/init.d/mysqld
 chmod 755 /etc/init.d/mysqld
-cd /usr/local/mysql #进入安装目录
-./scripts/mysql_install_db --user=mysql --basedir=/usr/local/mysql --datadir=/data/mysql/ #初始化数据库
+
+# 初始化数据库
+cd /usr/local/mysql
+./scripts/mysql_install_db --user=mysql --basedir=/usr/local/mysql --datadir=/data/mysql/
+
+# 启动服务
+/etc/init.d/mysqld start
 ```
-/etc/init.d/mysqld start #启动数据库
-Mysql配置
-chkconfig --add mysqld #添加系统服务
-chkconfig mysqld on #添加开机启动
-export PATH=$PATH:/test/usr/local/mysql/bin #添加环境变量
+
+## 系统配置
+
 ```bash
-echo 'PATH=$PATH:/test/usr/local/mysql/bin' >> /etc/profile
-service mysqld start/stop
+# 添加系统服务和开机启动
+chkconfig --add mysqld
+chkconfig mysqld on
+
+# 添加环境变量
+echo ‘PATH=$PATH:/test/usr/local/mysql/bin’ >> /etc/profile
 ```
-最后测试进程：netstat -tnl | grep 3306
-删除匿名账号:delete from mysql.user where host=’localhost’ and user=’’;
-Flush privileges;
-指定账号密码：set password for ‘root’@’localhost’=password(‘123456’);
-ps:安装之前要安装好工具包吧。
-一般备份都用:mysqldump --opt XX > /XXXX
-mysqldump -prichinfo -A -E -R >/tmp/data.sql （一般不用用户参数，-A表示备份所有数据库，-E表示备份事件，-R表示备份存储过程）
+
+## 验证和管理
+
+```bash
+# 验证服务运行
+netstat -tnl | grep 3306
+
+# 删除匿名用户
+mysql -u root -p
+DELETE FROM mysql.user WHERE host=’localhost’ AND user=’’;
+FLUSH PRIVILEGES;
+
+# 设置 root 密码
+SET PASSWORD FOR ‘root’@’localhost’ = PASSWORD(‘123456’);
+```
+
+## 备份
+
+```bash
+# 基础备份
+mysqldump --opt XX > /XXXX
+
+# 完整备份（所有数据库、事件、存储过程）
+mysqldump -A -E -R >/tmp/data.sql
+# -A：所有数据库
+# -E：事件
+# -R：存储过程
+```

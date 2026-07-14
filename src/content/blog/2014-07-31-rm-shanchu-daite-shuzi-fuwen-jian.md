@@ -1,25 +1,30 @@
 ---
-title: rm删除带特殊字符文件
+title: rm删除带特殊字符的文件
 date: '2014-07-31'
-description: >-
-  如果文件名带 ‘-’ 或者‘--’这样的字符，删除办法为： rm -- 文件名 如文件名为：-h.tgz 如果用普通方法去删除：rm -h.tgz
-  结果错误：rm: invalid option -- h Try \rm --help' for more information.
+description: "当文件名以-或--开头时，rm会误认为是选项参数。使用rm -- 文件名可以告诉rm停止解析选项，后面的参数作为文件名处理。"
 category: linux
-tags: []
+tags:
+  - shell-scripting
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-如果文件名带 ‘-’ 或者‘--’这样的字符，删除办法为：
 
+当文件名带 `-` 或 `--` 这样的字符时，`rm` 会误认为是命令选项。使用 `--` 标记来停止选项解析：
+
+```bash
 rm -- 文件名
+```
 
-如文件名为：-h.tgz
+例如文件名为 `-h.tgz`：
 
-如果用普通方法去删除：rm -h.tgz
+```bash
+# 错误方式（-h被认为是选项）
+rm -h.tgz
+# 错误：rm: invalid option -- h
 
-结果错误：rm: invalid option -- h
+# 正确方式
+rm -- -h.tgz
+```
 
-Try \`rm --help' for more information.
-
-可以用：rm -- -h.tgz，则能成功删除。
+`--` 表示"停止解析选项"，之后的参数全部按文件名处理。

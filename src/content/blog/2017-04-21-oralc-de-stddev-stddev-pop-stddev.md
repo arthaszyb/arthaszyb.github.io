@@ -1,21 +1,15 @@
 ---
-title: ORALC的STDDEV、STDDEV_POP、STDDEV_SAMP等函数 - 潇湘隐者 - 博客园
+title: 'ORACLE 标准差函数：STDDEV vs STDDEV_POP'
 date: '2017-04-21'
 description: >-
-  星期五, 四月 21, 2017 5:25 下午 已剪辑自 :
-  http://www.cnblogs.com/kerrycode/archive/2011/06/03/2063860.html
-  今天一个同事碰到一个问题：用SQL求一个指标的计算公式： 其中 Xi 即指标， X — 指标均值， N 是指标个数
-category: network
+  ORACLE 中 STDDEV、STDDEV_POP、STDDEV_SAMP 的区别与计算公式对比；STDDEV 与 STDDEV_SAMP 基本一致（除单行数据外），STDDEV_POP 采用不同的分母。
+category: database
 tags: []
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: http://www.cnblogs.com/kerrycode/archive/2011/06/03/2063860.html
 ---
-星期五, 四月 21, 2017
-5:25 下午
-已剪辑自
-:
-http://www.cnblogs.com/kerrycode/archive/2011/06/03/2063860.html
 今天一个同事碰到一个问题：用SQL求一个指标的计算公式：
 其中
 Xi

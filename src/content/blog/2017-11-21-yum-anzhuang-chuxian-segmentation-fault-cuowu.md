@@ -1,30 +1,25 @@
 ---
 title: yum安装出现Segmentation fault错误解决方法
 date: '2017-11-21'
-description: '2017年11月21日 11:09 网上绝大部分解决方法是什么libz库的版本问题，都是错的。'
+description: '解决 yum 报 Segmentation fault 错误，需要重建 RPM 数据库而非更新 libz 库。'
 category: linux
-tags:
-  - ssl-tls
+tags: []
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: https://serverfault.com/questions/256385/yum-segmentation-fault-in-centos
 ---
-2017年11月21日
+yum 安装时出现 Segmentation fault 错误。网上多数解决方案说是 libz 库版本问题，但这是错的。
 
-11:09
+## 解决方法
 
-网上绝大部分解决方法是什么libz库的版本问题，都是错的。正确答案是：
+重建 RPM 数据库：
 
-解决方法：
-
-rm -rf /var/lib/rpm/\_\_db.\*
-
+```bash
+rm -rf /var/lib/rpm/__db.*
 rpm --rebuilddb
-
 yum clean all
-
 yum makecache
+```
 
-来自 <[https://serverfault.com/questions/256385/yum-segmentation-fault-in-centos](https://serverfault.com/questions/256385/yum-segmentation-fault-in-centos)\>
-
-大神链接见上面。
+执行后重新尝试 yum 操作。

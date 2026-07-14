@@ -1,18 +1,23 @@
 ---
-title: nmap扫描网段内的所有IP
+title: nmap 扫描网段内的所有 IP
 date: '2018-08-31'
-description: >-
-  2013年01月03日 12:14:39 阅读数：47664更多 个人分类： Linux sudo nmap -sP -PI -PT
-  192.168.1.0/24
+description: "使用 nmap 扫描内网网段，发现所有在线主机 IP 地址。"
 category: linux
 tags:
-  - ssl-tls
+  - 网络排查
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-2013年01月03日 12:14:39 阅读数：47664更多
 
-个人分类： [Linux](https://blog.csdn.net/adream307/article/category/772741)
+使用 nmap 发现网段内所有在线的 IP：
 
+```bash
 sudo nmap -sP -PI -PT 192.168.1.0/24
+```
+
+参数说明：
+- `-sP`：ping 扫描，仅检测在线主机
+- `-PI`：使用 ICMP 请求
+- `-PT`：使用 TCP 请求
+- `192.168.1.0/24`：扫描范围（子网掩码 /24 表示 192.168.1.1 - 192.168.1.254）

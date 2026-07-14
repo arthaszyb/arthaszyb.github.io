@@ -1,16 +1,10 @@
 ---
-title: （总结）Nginx配置文件nginx.conf中文详解
+title: Nginx 配置文件 nginx.conf 中文详解
 date: '2014-01-16'
-description: >-
-  2012-12 14 （总结）Nginx配置文件nginx.conf中文详解 PS： Nginx
-  使用有两三年了，现在经常碰到有新用户问一些很基本的问题，我也没时间一一回答，今天下午花了点时间，结合自己的使用经验，把Nginx的主要配置参数说明分享一下，也参考了一些网络的内容
+description: Nginx 配置文件参数详解，包括运行用户、进程数、日志定义、工作模式、http 服务器配置、upstream 配置、server 块、location 块等核心配置说明。
 category: web-infra
 tags:
   - nginx
-  - apache
-  - php
-  - tomcat
-  - 负载均衡
 draft: false
 source: evernote-local-db
 lang: zh

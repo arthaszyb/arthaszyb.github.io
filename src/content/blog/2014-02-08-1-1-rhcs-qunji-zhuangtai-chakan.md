@@ -1,13 +1,11 @@
 ---
-title: 1.1. RHCS群集状态查看(clustat)
+title: RHCS 群集状态查看 (clustat)
 date: '2014-02-08'
-description: 1.1.  群集状态查看(clustat) The clustat command displays the status of the cluster.
+description: clustat、cman_tool、group_tool 三种 RHCS 集群状态查看工具的用法和参数说明，包括集群成员状态、节点信息、fence 状态等监控。
 category: web-infra
 tags:
-  - ai-agent
-  - 监控告警
-  - 高可用
   - 集群
+  - 高可用
 draft: false
 source: evernote-local-db
 lang: zh

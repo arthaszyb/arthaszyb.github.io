@@ -1,69 +1,47 @@
 ---
 title: shell中的浮点数比较
 date: '2015-12-10'
-description: 博客分类： Bash Shell shell 比较浮点数 由于程序需要，我要判断一个浮点数是否大于另一个浮点数。
+description: Shell 中使用 bc 命令进行浮点数比较的方法，解决整数比较命令不支持小数的问题。
 category: shell
 tags:
   - shell-scripting
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: http://bbs.chinaunix.net/thread-1093131-1-1.html
 ---
-博客分类：
-Bash Shell
-shell
-比较浮点数
-由于程序需要，我要判断一个浮点数是否大于另一个浮点数。
-大概情况描述如下：
-变量 mya的值为一个两位小数，这个值是这么取的：
-Shell代码
-[nigelzeng@ubuntu ~]$ df -h
-Filesystem Size Used Avail Use% Mounted on
-/dev/sda1
-5
-.7G
-3
-.0G
-2
-.5G
-55
-% /
-[nigelzeng@ubuntu ~]$df -h | grep xvda2 | awk
-'{print $2}'
-| sed
-'s/G//'
-5.7
-mya=` df -h | grep xvda2 | awk '{print $2}' | sed 's/G//' `
-然后我希望让它跟4进行判断，
-一开始是想利用整数来进行判断，但是不行：
-Shell代码
-[nigelzeng@ubuntu ~]$if [ $mya -le
-4
-]; then echo
-"ok"
-;else echo
-"fail"
-; fi
--bash: [:
-5.7
-: integer expression expected
-shell 会报错，提示integer expression expected，
-只能判断整数，而不是5.7这个浮点数。
-但是shell里面是没有变量类型的，所以需要想个别的办法。
-参考了CU里的大牛们的建议，这样写这个比较就可以了：
-Shell代码
-[nigelzeng@ubuntu ~]$if [ $(echo
-"$mya
-<
-= 4"
-|bc) =
-1
-]; then echo
-"ok"
-;else echo
-"fail"
-;fi
-这里借助了bc这个命令（bc是一个计算器，Bash内置了对整数四则运算的支持，但是并不支持浮点运算，而bc命令可以很方便的进行浮点运算，当然整数运算也不再话下。）
-很久不写shell。。。要慢慢熟悉了
-参考：
-http://bbs.chinaunix.net/thread-1093131-1-1.html
+
+Shell 的 `[ ]` 整数比较不支持浮点数。例如：
+
+```bash
+mya=5.7
+if [ $mya -le 4 ]; then echo "ok"; else echo "fail"; fi
+```
+
+报错：`integer expression expected`
+
+## 解决方案：使用 bc 命令
+
+bc 是计算器工具，支持浮点运算。用 bc 的结果判断：
+
+```bash
+mya=5.7
+if [ $(echo "$mya <= 4" | bc) = 1 ]; then
+  echo "ok"
+else
+  echo "fail"
+fi
+```
+
+bc 在浮点数比较时返回 1（真）或 0（假），适合用在条件判断中。
+
+## 提取浮点数示例
+
+从 df 命令输出中提取磁盘大小（如 5.7G）：
+
+```bash
+mya=`df -h | grep xvda2 | awk '{print $2}' | sed 's/G//'`
+# 结果：5.7
+```
+
+然后使用上述 bc 方法进行比较。

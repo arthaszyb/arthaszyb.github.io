@@ -1,14 +1,12 @@
 ---
-title: RHEL6_GFS_Web_HA实现
+title: RHEL6 GFS Web HA 实现
 date: '2014-02-08'
-description: '1.'
+description: RHEL6 上基于 GFS 共享存储和集群的 Web 高可用实现，涵盖实验环境配置、iSCSI 存储、集群初始化、GFS 挂载等步骤。
 category: web-infra
 tags:
-  - apache
-  - iptables
-  - dns
-  - lvm
-  - vim
+  - 集群
+  - 高可用
+  - 存储
 draft: false
 source: evernote-local-db
 lang: zh

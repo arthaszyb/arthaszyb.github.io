@@ -1,0 +1,15 @@
+{"file":"2018-01-22-redis-xuexi-biji-wu-jiyu-redis.md","type":"normal","actions":["frontmatter-rewritten","boilerplate-removed","structured","desc-rewritten"],"flags":[],"before_bytes":11800,"after_bytes":9200}
+{"file":"2018-01-24-redis-jiqun-shiyong-mima-yanzheng-yau.md","type":"thin","actions":["frontmatter-rewritten","boilerplate-removed","structured"],"flags":[],"before_bytes":650,"after_bytes":520}
+{"file":"2019-01-09-mysql-zhujian-suoyin-weiyi-suoyin-putong.md","type":"normal","actions":["frontmatter-rewritten","boilerplate-removed","structured","tags-cleaned"],"flags":[],"before_bytes":3500,"after_bytes":3200}
+{"file":"2013-10-08-yum-fuwu-qida-jian.md","type":"thin","actions":["frontmatter-rewritten","desc-rewritten","tags-cleaned","structured"],"flags":[],"before_bytes":1100,"after_bytes":1050}
+{"file":"2013-10-10-iscsi-peizhi.md","type":"thin","actions":["frontmatter-rewritten","desc-rewritten","tags-cleaned","structured"],"flags":[],"before_bytes":1800,"after_bytes":1650}
+{"file":"2013-10-16-linux-xia-iptables-peizhi-xiangjie.md","type":"repost","actions":["origin-url-added","condensed","desc-rewritten","tags-cleaned"],"flags":["condensed"],"before_bytes":11500,"after_bytes":5800}
+{"file":"2013-10-17-zai-redhat6-2as-xiaan-zhuang-centoscluster.md","type":"normal","actions":["frontmatter-rewritten","boilerplate-removed","partial-structured"],"flags":[],"before_bytes":18200,"after_bytes":16500}
+{"file":"2013-11-06-how-to-install-drbd-on-centos.md","type":"normal","actions":["frontmatter-rewritten","boilerplate-removed"],"flags":[],"before_bytes":5200,"after_bytes":4950}
+{"file":"2013-12-17-linux-nfs-peizhi-xiaojie.md","type":"normal","actions":["frontmatter-rewritten","boilerplate-removed","tags-cleaned"],"flags":[],"before_bytes":8300,"after_bytes":7900}
+{"file":"2013-12-31-sshfs-guazai-yuancheng-mulu.md","type":"thin","actions":["frontmatter-rewritten","tags-cleaned"],"flags":[],"before_bytes":2100,"after_bytes":1950}
+{"file":"2014-01-17-mei-10-miaozhi-xingyi-cijiao-bende.md","type":"thin","actions":["frontmatter-rewritten","tags-updated"],"flags":[],"before_bytes":850,"after_bytes":780}
+{"file":"2014-02-10-kelong-yige-xinde-jiqi-hou-xuyao-2.md","type":"thin","actions":["drafted","frontmatter-rewritten"],"flags":["drafted"],"before_bytes":180,"after_bytes":200}
+{"file":"2014-02-10-kelong-yige-xinde-jiqi-hou-xuyao.md","type":"thin","actions":["drafted","frontmatter-rewritten"],"flags":["drafted"],"before_bytes":180,"after_bytes":200}
+{"file":"2014-03-14-linux-xitong-youhua.md","type":"normal","actions":["frontmatter-rewritten","boilerplate-removed","tags-cleaned"],"flags":[],"before_bytes":6800,"after_bytes":6300}
+{"file":"2014-04-17-linux-vmstat-mingling-shizhan-xiangjie.md","type":"repost","actions":["origin-url-added","frontmatter-rewritten","tags-cleaned"],"flags":["repost-no-compression"],"before_bytes":7200,"after_bytes":7100}

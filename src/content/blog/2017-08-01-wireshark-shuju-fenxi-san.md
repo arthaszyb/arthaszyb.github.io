@@ -1,27 +1,17 @@
 ---
-title: Wireshark 数据分析（三）
+title: Wireshark 数据分析 —— TCP 层字段详解
 date: '2017-08-01'
-description: >-
-  Wireshark 数据分析（三） 2017 年 8 月 1 日 10:51 TCP层分析
-  传输控制协议，为数据提供可靠的端到端传输，处理数据的顺序和错误恢复，保证数据能够到达其应到达的地方 Transmission Control
-  Protocol, Src Port: 52745 (52745), Dst
+description: TCP 报文字段详细解析，包括端口、序列号、确认号、窗口、flags 等的含义和作用。
 category: network
 tags:
   - 网络排查
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: http://blog.csdn.net/u011414200/article/details/47948401
 ---
-Wireshark
-数据分析（三）
-2017
-年
-8
-月
-1
-日
-10:51
-TCP层分析
+
+## TCP 层分析
 传输控制协议，为数据提供可靠的端到端传输，处理数据的顺序和错误恢复，保证数据能够到达其应到达的地方
 1. Transmission Control Protocol, Src Port: 52745 (52745), Dst Port: 80 (80), Seq: 1, Ack: 1, Len: 202
 总信息，源端口52745, 目的端口80 ( HTTP ) , 序号1, ACK 设置1，长度为202
@@ -226,7 +216,3 @@ SACK选项 ，选项长度: 可变。实际最多不超过4组边界值
 MSS是可以通过SYN段进行协商的但它并不是任何条件下都可以协商的，如果一方不接受来自另一方的MSS值（不带MMS选项即代表不接受），则MSS就定为默认值536字节
 Timestamp时间戳选项
 时间戳选项使发送方在每个报文段中放置一个时间戳值。接收方在确认中返回这个数值，从而允许发送方为每一个收到的 A C K计算RT T（我们必须说“每一个收到的 A C K”而不是“每一个报文段”，是因为T C P通常用一个A C K来确认多个报文段）。我们提到过目前许多实现为每一个窗口只计算一个 RT T，对于包含8个报文段的窗口而言这是正确的。然而，较大的窗口大小则需要进行更好的RT T计算。 时间戳是一个单调递增的值。由于接收方只需要回显收到的内容，因此不需要关注时间戳单元是什么。这个选项不需要在两个主机之间进行任何形式的时钟同步。
-来自
-<
-http://blog.csdn.net/u011414200/article/details/47948401
->

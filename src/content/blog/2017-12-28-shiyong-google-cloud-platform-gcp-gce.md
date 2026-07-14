@@ -1,38 +1,15 @@
 ---
-title: 使用Google Cloud Platform(GCP GCE)安装SSR+BBR教程
+title: 使用 Google Cloud Platform (GCP) 安装 SSR+BBR
 date: '2017-12-28'
-description: >-
-  2017 年 12 月 28 日 18:01 使用Google Cloud Platform(GCP GCE)安装SSR+BBR教程 技术 /
-  2017-05-29 / 34 条评论 文章目录 [隐藏] 一、注册GCP 二、创建实例 三、初步配置 四、配置SS以及BBR 五、效果 六、问题及参考
-  GCP是原GCE
+description: 在 GCP 上创建虚拟机实例并配置 SSR 和 BBR 加速的完整步骤。
 category: network
 tags:
-  - ssh
-  - ssl-tls
+  - linux-admin
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: https://suiyuanjian.com/124.html
 ---
-2017
-年
-12
-月
-28
-日
-18:01
-使用Google Cloud Platform(GCP GCE)安装SSR+BBR教程
-技术
-/ 2017-05-29 /
-34 条评论
-文章目录
-[隐藏]
-一、注册GCP
-二、创建实例
-三、初步配置
-四、配置SS以及BBR
-五、效果
-六、问题及参考
-GCP是原GCE，其优美的界面和丰富的功能深得各类程序员的喜好。近日发现Google Cloud Platform对大陆优化好，并且送300美金（12个月）的礼品卡。特此一试，效果甚好，故收集教程并集合关于Google Cloud Platform(GCP GCE)安装SS+BBR。
 一、注册GCP
 进入
 https://cloud.google.com/free/
@@ -110,7 +87,3 @@ BBR相关问题：
 --随缘箭·版权所有：
 使用Google Cloud Platform(GCP GCE)安装SSR+BBR教程
 --
-来自
-<
-https://suiyuanjian.com/124.html
->

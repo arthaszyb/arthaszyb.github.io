@@ -1,124 +1,57 @@
 ---
-title: python中文转换url编码
+title: Python中文转换URL编码
 date: '2017-06-07'
-description: >-
-  2017 年 6 月 7 日 14:37 python中文转换url编码 2009-09-05 21:45:43 标签： 休闲 中文转换url编码 职场
-  今天要处理百度贴吧的东西。 想要做一个关键词的list，每次需要时，直接添加 到list里面就可以了。
+description: 使用 urllib 模块进行中文与 URL 编码的相互转换，处理不同字符集（GBK 和 UTF-8）的编码差异。
 category: python
 tags:
   - python
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: http://dashen2009.blog.51cto.com/714741/199157
 ---
-2017
-年
-6
-月
-7
-日
-14:37
-python中文转换url编码
-2009-09-05 21:45:43
-标签：
-休闲
-中文转换url编码
-职场
-今天要处理百度贴吧的东西。想要做一个关键词的list，每次需要时，直接添加 到list里面就可以了。但是添加到list里面是中文的情况（比如‘丽江’），url的地址编码却是'%E4%B8%BD%E6%B1%9F'，因此需 要做一个转换。这里我们就用到了模块urllib。
-```bash
+
+## urllib 编码/解码
+
+使用 urllib 模块中的 `quote()` 和 `unquote()` 处理中文 URL 编码：
+
+```python
 >>> import urllib
 >>> data = '丽江'
->>> print data
-```
-丽江
->>> data
-'\xe4\xb8\xbd\xe6\xb1\x9f'
->>>
-urllib.quote
-(data)
+>>> urllib.quote(data)
 '%E4%B8%BD%E6%B1%9F'
-那我们想转回去呢？
 >>> urllib.unquote('%E4%B8%BD%E6%B1%9F')
 '\xe4\xb8\xbd\xe6\xb1\x9f'
->>> print
-urllib.unquote
-('%E4%B8%BD%E6%B1%9F')
+>>> print urllib.unquote('%E4%B8%BD%E6%B1%9F')
 丽江
-细心的同学会发现贴吧url中出现的是%C0%F6%BD%AD，而非'%E4%B8%BD%E6%B1%9F'，其实是编码问题。百度的是gbk，其他的一般网站比如google就是utf8的。所以可以用下列语句实现。
-```bash
->>> import sys,urllib
+```
+
+## 处理不同编码
+
+不同网站使用的字符集不同（百度贴吧使用 GBK，Google 等多数网站使用 UTF-8）。同一汉字在不同编码下的 URL 形式不同。
+
+```python
+>>> import sys, urllib
 >>> s = '丽江'
 >>> urllib.quote(s.decode(sys.stdin.encoding).encode('gbk'))
-```
 '%C0%F6%BD%AD'
 >>> urllib.quote(s.decode(sys.stdin.encoding).encode('utf8'))
 '%E4%B8%BD%E6%B1%9F'
->>>
-另一个方法
-#
-!/
-usr
-/
-bin
-/
-python
-import
-urllib
-import
-sys
-string
-=
-sys
-.
-argv
-[
-1
-]
-string
-=
-unicode
-(
-string
-,
-"gbk"
-)
-utf8_string
-=
-string
-.
-encode
-(
-"utf-8"
-)
-gbk_string
-=
-string
-.
-encode
-(
-"gbk"
-)
-gbk
-=
-urllib
-.
-quote
-(
-gbk_string
-)
-utf8
-=
-urllib
-.
-quote
-(
-utf8_string
-)
-print
-gbk
-print
-utf8
-来自
-<
-http://dashen2009.blog.51cto.com/714741/199157
->
+```
+
+## 脚本示例
+
+```python
+#!/usr/bin/python
+import urllib
+import sys
+
+string = sys.argv[1]
+string = unicode(string, "gbk")
+utf8_string = string.encode("utf-8")
+gbk_string = string.encode("gbk")
+gbk = urllib.quote(gbk_string)
+utf8 = urllib.quote(utf8_string)
+print gbk
+print utf8
+```

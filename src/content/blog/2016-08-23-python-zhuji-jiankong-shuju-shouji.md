@@ -1,23 +1,16 @@
 ---
 title: Python主机监控数据收集
 date: '2016-08-23'
-description: >-
-  原创 2016-08-23 智文 OpenSkill 收集服务器主机信息目的，方便一目了然的去查看，执行dmidecode 感觉比较乱。
-  下面程序可以通过split函数等切片方式进行编写。
+description: Python 脚本收集服务器硬件和网络信息（IP、厂商、型号、SN、CPU、内存等），用 dmidecode、ifconfig、/proc 等。
 category: python
 tags:
-  - vmware
   - python
   - 监控告警
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-原创
-2016-08-23
-智文
-OpenSkill
-收集服务器主机信息目的，方便一目了然的去查看，执行dmidecode 感觉比较乱。下面程序可以通过split函数等切片方式进行编写。
+服务器硬件信息收集脚本笔记。用 dmidecode、ifconfig、/proc 等系统命令和文件解析服务器配置。
 目前我想了解的信息是：
 1、IP地址（vender）
 2、服务器厂商（vender）
@@ -33,8 +26,7 @@ return data
 def getDmi():
 p = Popen(['dmidecode'], stdout=PIPE)
 data = p.stdout.read()
-return
-data
+return data
 def parseData(data):
 parsed_data = []
 new_line = ''
@@ -69,8 +61,7 @@ dic['sn'] = dmi_dic['Serial Number'].strip()[:10]
 return dic
 if __name__ == '__main__':
 data_ip = getIfconfig()
-parsed_data_ip =
-parseData(data_ip)
+parsed_data_ip = parseData(data_ip)
 print parseIfconfig(parsed_data_ip)
 data_dmi = getDmi()
 parsed_data_dmi = parseData(data_dmi)
@@ -98,8 +89,7 @@ return data
 def getDmi():
 p = Popen(['dmidecode'], stdout=PIPE)
 data = p.stdout.read()
-return
-data
+return data
 def parseData(data):
 parsed_data = []
 new_line = ''
@@ -174,8 +164,7 @@ ip = parseIfconfig(parsed_data_ip)
 data_dmi = getDmi()
 parsed_data_dmi = parseData(data_dmi)
 dmi = parseDmi(parsed_data_dmi)
-hostname = getHostname('/etc/sysconfig
-etwork')
+hostname = getHostname('/etc/sysconfig/network')
 osver = getOSver('/etc/issue')
 cpu = getCpu('/proc/cpuinfo')
 mem = getMemory('/proc/meminfo')

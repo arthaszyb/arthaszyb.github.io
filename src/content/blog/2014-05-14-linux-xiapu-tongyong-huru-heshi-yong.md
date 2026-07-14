@@ -1,9 +1,7 @@
 ---
 title: linux下普通用户如何使用80端口启动程序
 date: '2014-05-14'
-description: >-
-  大家都知道默认情况下linux的1024以下端口是只有root用户才有权限占用，于是我们的tomcat，apache，nginx等等程序如果想要用普通用户来占用80端口的话就会抛出permission
-  denied的异常。  解决办法有两种： 1.使用非80端口启动程序，然后再用iptables做一个端口转发。
+description: 普通用户无权占用1024以下端口，但可通过setuid给可执行文件赋权限，或用iptables做端口转发来解决。
 category: linux
 tags:
   - nginx
@@ -14,31 +12,46 @@ draft: false
 source: evernote-local-db
 lang: zh
 ---
-大家都知道默认情况下linux的1024以下端口是只有root用户才有权限占用，于是我们的tomcat，apache，nginx等等程序如果想要用普通用户来占用80端口的话就会抛出permission denied的异常。
+
+默认情况下，Linux 的 1024 以下端口只有 root 用户才有权限占用，这会导致 tomcat、apache、nginx 等程序用普通用户启动时抛出 permission denied 异常。
 
 解决办法有两种：
 
-1.使用非80端口启动程序，然后再用iptables做一个端口转发。
+**1. 使用非 80 端口启动，通过 iptables 做端口转发**
 
-2.假设我们需要启动的程序是nginx，那么这么做也可以达到目的。
+**2. 为可执行文件赋 setuid 权限**
 
-一开始我们查看nginx的权限描述：
+假设需要启动 nginx，步骤如下：
 
-\-rwxr-xr-x 1 nginx dev 2408122 Sep 5 16:01 nginx
+首先查看 nginx 的权限描述：
 
-这个时候必然是无法正常启动的。
+```bash
+ls -l nginx
+```
 
-首先修改文件所属用户为root：
+输出：`-rwxr-xr-x 1 nginx dev 2408122 Sep 5 16:01 nginx`
 
+这个时候无法正常启动。
+
+修改文件所属用户为 root：
+
+```bash
 chown root nginx
+```
 
-然后再加上s权限：
+然后加上 setuid（s）权限：
 
+```bash
 chmod u+s nginx
+```
 
-再次查看权限描述的时候：
+再次查看权限描述：
 
-\-rwsr-xr-x 1 root root 2408122 Sep 5 16:01 nginx
+```bash
+ls -l nginx
+```
+
+输出：`-rwsr-xr-x 1 root root 2408122 Sep 5 16:01 nginx`
 
 这个时候再启动就没问题了。
 

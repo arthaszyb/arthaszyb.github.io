@@ -1,46 +1,17 @@
 ---
-title: BBR算法实测
+title: BBR 拥塞控制算法实测
 date: '2017-12-28'
-description: >-
-  BBR 算法实测 2017 年 12 月 28 日 19:56 环境： Google 云 GCE ，东亚 a 区 发行版： CentOS6 原系统：
-  3.10.0-514.26.2 原算法： cubic 升级后： 4.14.9-1.el7 新算法： BBr 注意：该算法优化作用仅限于数据发送者。
+description: 在 Google Cloud 上升级内核启用 BBR 算法，对比测试下载速度提升，记录遇到的坑和解决方案。
 category: network
 tags:
-  - ssh
-  - ssl-tls
+  - linux-admin
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: https://flyfish.im/studynotes/1335.html
 ---
-BBR
-算法实测
-2017
-年
-12
-月
-28
-日
-19:56
-环境：
-Google
-云
-GCE
-，东亚
-a
-区
-发行版：
-CentOS6
-原系统：
-3.10.0-514.26.2
-原算法：
-cubic
-升级后：
-4.14.9-1.el7
-新算法：
-BBr
-注意：该算法优化作用仅限于数据发送者。如果你要下载，那么要给目的服务器启用该算法，如果你要上传，则给你自己开启
-bbr
-。
+
+BBR 算法优化作用仅限于数据发送方。需要在下载时给目的服务器启用，上传时在本机启用。
 下载速度对比（约提升
 4
 ~5

@@ -1,12 +1,11 @@
 ---
-title: 解决CentOS6下安装ipvsadm-1.26报错
+title: 解决 CentOS6 下安装 ipvsadm-1.26 报错
 date: '2014-02-10'
-description: >-
-  这次在CentOS6.2中测试安装缺发现一点小问题，特意记录一下： ipvsadm-1.26.tar.gz (for kernel 2.6.28-rc3
-  or later) - February 8, 2011 [root@host2 ~]# uname -r 2.6.32-220.el6.x8664
+description: CentOS6.2 安装 ipvsadm-1.26 时因缺少 netlink 依赖库导致编译失败的解决方法。
 category: web-infra
 tags:
-  - shell-scripting
+  - 负载均衡
+  - lvs
 draft: false
 source: evernote-local-db
 lang: zh

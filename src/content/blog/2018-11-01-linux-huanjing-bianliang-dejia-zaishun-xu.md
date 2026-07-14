@@ -1,21 +1,14 @@
 ---
-title: linux环境变量的加载顺序
+title: Linux 环境变量的加载顺序和优先级
 date: '2018-11-01'
-description: HTML Content linux linux 当使用export设置环境变量的时候，注意前面的环境变量会覆盖后面设置的环境变量。
+description: "使用 export 设置环境变量时，前面定义的变量会覆盖后面定义的同名变量。PATH 等变量的顺序直接影响命令查找和优先级。"
 category: linux
 tags:
-  - java
+  - shell-scripting
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-HTML Content
-
-# linux环境变量的加载顺序
-
-[linux](http://sqtds.github.io/tags/linux/)
-
-[linux](http://sqtds.github.io/categories/linux/)
 
 当使用export设置环境变量的时候，注意前面的环境变量会覆盖后面设置的环境变量。
 

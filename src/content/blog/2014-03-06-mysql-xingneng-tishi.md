@@ -1,73 +1,160 @@
 ---
-title: MySQL 性能提示
+title: MySQL 性能优化提示
 date: '2014-03-06'
-description: 这里罗列了一些基本的 MySQL 性能提示，但不是放之四海而皆准，需要根据实际的应用情况而决定。
+description: "MySQL性能优化的设计、查询、存储引擎和配置建议汇总，需根据实际应用情况调整。"
 category: database
 tags:
   - mysql
-  - 存储
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-这里罗列了一些基本的 MySQL 性能提示，但不是放之四海而皆准，需要根据实际的应用情况而决定。
-【设计】
-使用标准化设计（数据库三范式），记住表的联合查询(join)性能不会差
-选择合适的字符集，虽然UTF16无所不能，但需要两倍的存储；UTF8适合各种字符，但比latin1慢，尽可能选用latin1(此条不适合中文)
-utf8_general_ci
-略快于 utf8_unicode.ci
-字段尽可能使用
-NOT NULL
-为所有的 SELECT 查询创建索引
-索引
-提升查询的性能，但降低插入数据的性能，因此不要做无用的和重复的索引
-【查询】
-尽可能使用最小的数据类型，例如一些状态字段用 tinyint 而不是 int
-尽可能避免
-IN (…)
-查询
-尽可能避免
+
+MySQL 性能优化的基本原则和具体建议。
+
+## 数据库设计优化
+
+1. **使用标准化设计**：遵循数据库三范式，表的联合查询（JOIN）性能不会差
+
+2. **选择合适的字符集**：
+   - `utf8_general_ci` 略快于 `utf8_unicode_ci`
+   - UTF-16 可以处理所有字符但需要 2 倍存储
+   - UTF-8 支持各种字符但比 latin1 慢
+   - 尽可能使用 latin1（除非需要中文等特殊字符）
+
+3. **字段设计**：
+   - 所有字段尽可能使用 `NOT NULL`
+   - 使用最小的数据类型（如状态字段用 TINYINT 而非 INT）
+
+4. **索引策略**：
+   - 为所有 SELECT 查询字段创建适当的索引
+   - 索引提升查询性能但降低插入性能
+   - 避免无用的和重复的索引
+
+## 查询优化
+
+### 避免的查询模式
+
+```sql
+-- 避免 IN 查询
+WHERE id IN (1, 2, 3, 4, 5)
+
+-- 避免 ORDER BY RAND()
 ORDER BY RAND()
-查询
-当你需要在一些唯一索引的表中插入数据前使用 SELECT 进行判断记录是否存在时，请使用
-INSERT … ON DUPLICATE KEY UPDATE …
-方法来替代.
-如果你的应用需要经常写数据库，那么请使用 InnoDB 引擎，否则用 MyISAM，这里有一个比较的
-文章
-。
-不要在大表中使用
-LIMIT xxxx1, xxxx2
-，特别是当 xxxx1 参数值特别大的时候，可尽量通过 WHERE 来限制结果集，然后使用
-LIMIT xxxx2
-方式.
-不使用已被废弃的方法
-避免在 LIKE 查询中使用 % 前缀，例如 LIKE '%oschina' ，这将使索引无效
-如果有大量的数据需要一次性插入，最好对这些 INSERT 语句进行合并以便批量插入
-Prefer
-GROUP BY
-over DISTINCT.
-经常浏览系统的慢查询日志
-Slow Query Log
-.
-避免在 WHERE … , LIMIT … , ORDER BY … 等语句中使用表达式和函数计算公式等。
-使用
-EXPLAIN …
-对你的 SQL 查询进行分析，以便确认是否最优查询
-不要使用
-SELECT * …
-，只 SELECT 你想要的字段（这点挺麻烦，在 ORM 世界里更是这样）
-尽可能合并小查询为一个大查询
-【存储引擎】
-了解各种存储引擎的特点，并根据实际情况进行选择，选择之前在测试平台上做充分测试
-Archive old data such as logs in ARCHIVE tables or MERGE tables.
-BLACKHOLE 引擎非常快速，特别适用一些繁忙的事务，例如日志
-【配置my.cnf】
-提供默认的主键缓冲区大小:
-key_buffer = 128M
-提高默认的打开表的缓存个数:
+
+-- 避免 LIKE 前缀匹配
+WHERE name LIKE '%pattern'
+
+-- 避免在WHERE、LIMIT、ORDER BY中使用表达式和函数
+WHERE age > YEAR(NOW()) - 18
+
+-- 避免在大表中使用大偏移LIMIT
+LIMIT 100000, 10
+```
+
+### 推荐的查询方式
+
+1. **使用 INSERT ... ON DUPLICATE KEY UPDATE**
+
+当需要在唯一索引表中插入前检查数据是否存在时：
+
+```sql
+-- 避免
+SELECT * FROM table WHERE id = 1;
+IF exists THEN
+  UPDATE ...
+ELSE
+  INSERT ...
+
+-- 改为
+INSERT INTO table (...) VALUES (...)
+ON DUPLICATE KEY UPDATE field = VALUES(field);
+```
+
+2. **分页查询优化**
+
+```sql
+-- 避免大偏移
+LIMIT 100000, 10
+
+-- 改为，通过WHERE限制结果集
+SELECT * FROM table WHERE id > 100000 LIMIT 10;
+```
+
+3. **GROUP BY vs DISTINCT**
+
+优先使用 GROUP BY 而非 DISTINCT
+
+4. **SELECT 字段优化**
+
+```sql
+-- 避免
+SELECT * FROM table;
+
+-- 改为，只选择需要的字段
+SELECT id, name FROM table;
+```
+
+5. **小查询合并**
+
+尽可能将多个小查询合并为一个大查询，减少往返
+
+### 查询分析工具
+
+1. **EXPLAIN 分析**
+
+分析 SQL 查询是否最优：
+
+```sql
+EXPLAIN SELECT * FROM table WHERE id = 1;
+```
+
+2. **慢查询日志**
+
+定期浏览系统的慢查询日志（Slow Query Log）：
+
+```ini
+[mysqld]
+slow_query_log = 1
+long_query_time = 2
+```
+
+## 存储引擎选择
+
+- **InnoDB**：频繁写操作，支持事务
+- **MyISAM**：主要读操作，表级锁
+- **ARCHIVE**：归档日志等历史数据，压缩率高
+- **BLACKHOLE**：日志等一次性写操作，性能最快
+- **MERGE**：跨多个表的查询
+
+> 在测试平台充分测试后再在生产环境使用
+
+## my.cnf 配置优化
+
+```ini
+[mysqld]
+# 主键缓冲区大小
+key_buffer_size = 128M
+
+# 打开表的缓存个数
 table_cache = 128
-提供默认的排序缓冲区大小：
+
+# 排序缓冲区大小
 sort_buffer_size = 32M
 myisam_sort_buffer_size = 32M
-如果不做复制的话，禁用二进制日志：
-# log-bin=mysql-bin
+
+# 如果不做复制，禁用二进制日志
+# log-bin = mysql-bin
+
+# InnoDB 相关优化
+innodb_buffer_pool_size = 4G
+innodb_log_file_size = 512M
+```
+
+## 总体原则
+
+- **测试先行**：所有优化都应该在测试环境验证
+- **监控和分析**：定期检查慢查询日志和性能指标
+- **渐进式优化**：一次优化一个方面，观察影响
+- **避免过度优化**：不是所有优化都适用，需根据实际情况调整
+- **文档齐全**：记录优化决策和原因，便于后续维护

@@ -1,15 +1,11 @@
 ---
-title: linux系统优化
+title: Linux 系统优化
 date: '2014-03-14'
-description: >-
-  PS：在服务器硬件资源额定有限的情况下，最大的压榨服务器的性能，提高服务器的并发处理能力，是很多运维技术人员思考的问题。
-  要提高Linux系统下的负载能力，可以使用nginx等原生并发处理能力就很强的web服务器，如果使用Apache的可以启用其Worker模式，来提高其并发处理能力。
+description: Linux 系统性能优化，特别是通过调整 TCP 内核参数来处理大量 TIME_WAIT 连接的方法
 category: linux
 tags:
-  - nginx
-  - apache
-  - shell-scripting
-  - vim
+  - linux-admin
+  - systemd
 draft: false
 source: evernote-local-db
 lang: zh

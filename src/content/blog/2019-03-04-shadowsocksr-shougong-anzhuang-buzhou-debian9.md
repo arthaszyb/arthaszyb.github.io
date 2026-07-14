@@ -1,10 +1,7 @@
 ---
 title: shadowsocksR手工安装步骤（debian9）
 date: '2019-03-04'
-description: >-
-  方法一：物理机安装 下载ssR服务端wget
-  https://github.com/maxsky/shadowsocksr-manyuser/archive/master.zip
-  ，注意这里可能因各种原因404，需要找到合适可用的源即可 解压，进去，可以看README.md即可知道整个步骤了，这里简单说一下： 2.1.
+description: Shadowsocks R 在 Debian 9 上的手工安装步骤，包括物理机和 Docker 容器两种部署方式。
 category: network
 tags:
   - docker

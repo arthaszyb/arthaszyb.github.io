@@ -1,16 +1,15 @@
 ---
 title: Linux内核Socket参数调优
 date: '2016-05-18'
-description: >-
-  Linux内核Socket参数调优
-  可调优的内核变量存在两种主要接口：sysctl命令和/proc文件系统，proc中与进程无关的所有信息都被移植到sysfs中。
+description: '通过 sysctl 和 /proc 文件系统调优 TCP/IP 内核参数，包括缓冲区大小、连接管理、超时设置等，提升网络性能。'
 category: linux
-tags: []
+tags:
+  - 网络排查
+  - linux-admin
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-[Linux内核Socket参数调优](http://www.oschina.net/search?scope=blog&q=Linux%E5%86%85%E6%A0%B8Socket%E5%8F%82%E6%95%B0%E8%B0%83%E4%BC%98)
 
 可调优的内核变量存在两种主要接口：sysctl命令和/proc文件系统，proc中与进程无关的所有信息都被移植到sysfs中。IPV4协议栈的sysctl参数主要是sysctl.net.core、sysctl.net.ipv4，对应的/proc文件系统是/proc/sys/net/ipv4和/proc/sys/net/core。只有内核在编译时包含了特定的属性，该参数才会出现在内核中。
 

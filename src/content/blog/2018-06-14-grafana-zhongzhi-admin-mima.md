@@ -1,53 +1,38 @@
 ---
-title: Grafana 重置admin密码
+title: Grafana 重置 admin 密码
 date: '2018-06-14'
-description: >-
-  SA小科 关注 0 人评论 13376人阅读 2018-05-24 13:49:07 不小心忘记了grafana web界面的密码后，使用官网的方式重置密码
-  http://docs.grafana.org/administration/cli/#reset-admin-password 但是并没有成功。
+description: "忘记 Grafana Web 界面 admin 密码后的重置方法。通过直接操作 SQLite 数据库文件修改用户密码。"
 category: monitoring
 tags:
-  - 监控告警
+  - grafana
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-SA_小科
-关注
-0
-人评论
-13376人阅读
-2018-05-24 13:49:07
-不小心忘记了grafana web界面的密码后，使用官网的方式重置密码
-http://docs.grafana.org/administration/cli/#reset-admin-password
-但是并没有成功。 然后使用google到的另外一个方法重置成功了，现在记录下来：
-1.查找grafana.db文件
-find / -name
-"grafana.db"
-PS:一般默认文件为/
-var
-/lib/grafana/grafana.db
-2.使用sqlite3加载数据库文件
-sqlite3 /
-var
-/lib/grafana/grafana.db
-#.tables查看有那些表
+
+官网的重置方法（http://docs.grafana.org/administration/cli/#reset-admin-password）未成功，改用数据库直接修改的方法。
+
+## 步骤
+
+1. 查找 grafana.db 文件（默认位置 `/var/lib/grafana/grafana.db`）
+
+```bash
+find / -name "grafana.db"
+```
+
+2. 使用 sqlite3 修改密码
+
+```bash
+sqlite3 /var/lib/grafana/grafana.db
+```
+
+在 sqlite3 提示符下执行：
+
+```sql
 .tables
-#select查看表里面的内容
-select
-*
-from
-user;
-#使用update更新密码
-update user
-set
-password =
-'59acf18b94d7eb0694c61e60ce44c110c7a683ac6a8f09580d626f90f4a242000746579358d77dd9e570e83fa24faa88a8a6'
-, salt =
-'F3FAxVm33R'
-where
-login =
-'admin'
-;
-#修改完成后退出
+select * from user;
+update user set password = '59acf18b94d7eb0694c61e60ce44c110c7a683ac6a8f09580d626f90f4a242000746579358d77dd9e570e83fa24faa88a8a6', salt = 'F3FAxVm33R' where login = 'admin';
 .exit
-3.update之后，账号密码将为admin/admin
+```
+
+重启后密码为 `admin/admin`。

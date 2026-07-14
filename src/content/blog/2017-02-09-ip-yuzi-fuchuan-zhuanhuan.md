@@ -1,36 +1,30 @@
 ---
 title: IP与字符串转换
 date: '2017-02-09'
-description: >-
-  IP 与字符串转换 2017 年 2 月 9 日 11:48 IP 转换为字符串： import struct,socket;
-  struct.unpack("=I", socket.inetaton("203.205.179.171"))[0] 字符串转换为 ip ： import
-  struct,socket;
+description: IP 地址字符串与整数的双向转换，使用 Python struct 和 socket 模块。
 category: python
-tags: []
+tags:
+  - python
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-IP
-与字符串转换
-2017
-年
-2
-月
-9
-日
-11:48
-IP
-转换为字符串：
-import struct,socket;
+IP 地址字符串与整数的相互转换。
+
+## IP 字符串转整数
+
+```python
+import struct, socket
 struct.unpack("=I", socket.inet_aton("203.205.179.171"))[0]
-字符串转换为
-ip
-：
-import struct,socket;
+# 3398356427
+```
+
+## 整数转 IP 字符串
+
+```python
+import struct, socket
 socket.inet_ntoa(struct.pack("=I", 3398356427))
-另外还有
-sql
-中
-aton
-等函数可以转换，但是顺序有变
+# '203.205.179.171'
+```
+
+注：SQL 中的 `INET_ATON()` 等函数也可转换，但字节顺序可能不同。

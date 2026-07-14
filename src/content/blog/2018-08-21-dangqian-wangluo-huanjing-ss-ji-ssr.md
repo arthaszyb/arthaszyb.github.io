@@ -1,10 +1,7 @@
 ---
 title: 当前网络环境，SS及SSR该怎么配置协议混淆才是最佳？
 date: '2018-08-21'
-description: >-
-  本文不扯这2个的恩仇录，也不会给出谁比谁好的答案。  首先理解安全：
-  第一个是数据安全，SS及SSR只要不使用弱加密，那么有生之年你通过SS或SSR传输的数据都是安全的。 
-  第二个是我使用SS及SSR会不会被喝TEA，以目前的环境而言，只要你不是用于非法用途，没人会在意你利用SS或SSR多看了会汤博。
+description: Shadowsocks 和 Shadowsocks R 的加密、协议及混淆选择建议，以及在网络环境下的最佳配置方案。
 category: network
 tags:
   - ssl-tls

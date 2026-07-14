@@ -1,14 +1,11 @@
 ---
-title: sshfs挂载远程目录
+title: SSHFS 挂载远程目录
 date: '2013-12-31'
-description: >-
-  在Linux下，有很多挂载远程（别的机器）目录的方法，例如NFS。 
-  之前一直在用NFS，但是配置起来比较麻烦（需要N个C一个S），而且不太稳定（断网后无法卸载！
-  ），现在换sshfs，它基于Linux内置的ssh协议，只要又FUSE就能正常工作。
+description: 使用 SSHFS（基于 SSH 的文件系统）挂载远程目录，相比 NFS 配置更简单且更稳定
 category: linux
 tags:
   - ssh
-  - nfs
+  - linux-admin
 draft: false
 source: evernote-local-db
 lang: zh

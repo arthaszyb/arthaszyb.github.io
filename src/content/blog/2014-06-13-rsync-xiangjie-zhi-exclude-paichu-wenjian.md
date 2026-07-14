@@ -1,185 +1,177 @@
 ---
-title: rsync详解之exclude排除文件
+title: rsync 详解之 exclude 排除文件
 date: '2014-06-13'
-description: 问题：如何避开同步指定的文件夹？
+description: rsync 同步时使用 --exclude 排除指定文件和目录的方法；支持相对路径、通配符、文件列表等多种方式。
 category: linux
 tags:
-  - nginx
-  - mysql
-  - ssh
   - rsync
+  - ssh
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-**问题：如何避开同步指定的文件夹？ --exclude**
 
-**rsync --exclude files and folders**
+## 使用 --exclude 避开同步指定文件夹
 
-[http://articles.slicehost.com/2007/10/10/rsync-exclude-files-and-folders](http://articles.slicehost.com/2007/10/10/rsync-exclude-files-and-folders)
+参考：[rsync exclude files and folders](http://articles.slicehost.com/2007/10/10/rsync-exclude-files-and-folders)
 
-很常见的情况：我想同步/下的 /usr /boot/ ， 但是不想复制/proc /tmp 这些文件夹
+常见需求：同步 `/` 下的 `/usr` 和 `/boot/`，但不想复制 `/proc` 和 `/tmp` 这些文件夹。
 
-如果想避开某个路径 直接添加--exclude 即可
+### 基本用法
 
-比如--exclude “proc”
+添加 `--exclude` 参数来避开某个路径：
 
-\--exclude ‘sources’
+```bash
+rsync --exclude "proc" ...
+rsync --exclude 'sources' ...
+```
 
-Note: the directory path is relative to the folder you are backing up.
+**注意**：排除的路径必须是相对路径，不能是绝对路径。
 
-注意：这个路径必须是一个相对路径，不能是绝对路径
+### 例子：避开特定目录
 
-例子：源服务器/home/yjwan/bashshell有一个checkout文件夹
+源服务器 `/home/yjwan/bashshell` 有一个 `checkout` 文件夹：
 
-\[root@CentOS5-4 bashshell\]# ls -dl checkout
+```bash
+[root@CentOS5-4 bashshell]# ls -dl checkout
+drwxr-xr-x 2 root root 4096 Aug 21 09:14 checkout
+```
 
-drwxr-xr-x 2 root root 4096 Aug 21 09:14 checkou
+目标服务器执行同步，避免复制这个文件夹：
 
-现在想要完全避开复制这个文件夹内容怎么办？
+```bash
+rsync -av --exclude "checkout" yjwan@172.16.251.241:/home/yjwan/bashshell /tmp
+```
 
-目标服务器执行
+验证结果：
 
-rsync -av --exclude “checkout” [yjwan@172.16.251.241:/home/yjwan/bashshell](mailto:yjwan@172.16.251.241:/home/yjwan/bashshell) /tmp
-
-将不会复制这个文件夹
-
-\[root@free /tmp/bashshell\]# ls -d /tmp/bashshell/checkout
-
+```bash
+[root@free /tmp/bashshell]# ls -d /tmp/bashshell/checkout
 ls: /tmp/bashshell/checkout: No such file or directory
+```
 
-注意:
+### 注意事项
 
-1事实上，系统会把文件和文件夹一视同仁，如果checkout是一个文件，一样不会复制
+1. 系统会把文件和文件夹一视同仁。如果 `checkout` 是一个文件，一样不会复制。
 
-2 如果想避开复制checkout里面的内容，可以这么写--exclude “checkout/123”
+2. 如果只想避开文件夹内的某个子目录，可以这样写：
 
-3 切记不可写为 --exclude “/checkout”这样绝对路径
+   ```bash
+   rsync -av --exclude "checkout/123" ...
+   ```
 
-这样写 将不会避免checkout被复制
+3. **不可写绝对路径**。下面的写法是错误的：
 
-比如
+   ```bash
+   rsync -av --exclude "/checkout" yjwan@172.16.251.241:/home/yjwan/bashshell /tmp
+   ```
 
-\[root@free /tmp/bashshell\]# rsync -av --exclude “/checkout”[yjwan@172.16.251.241:/home/yjwan/bashshell](mailto:yjwan@172.16.251.241:/home/yjwan/bashshell) /tmp
+   这样写不会避免 `checkout` 被复制。输出示例：
 
-receiving file list … done
+   ```
+   receiving file list … done
+   bashshell/checkout/
+   ```
 
-bashshell/checkout/
+4. 可以使用通配符避开不想复制的内容：
 
-4可以使用通配符 避开不想复制的内容
+   ```bash
+   rsync -av --exclude "fire*" ...
+   ```
 
-比如--exclude “fire\*”
+   这样 `fire` 打头的文件或文件夹全部不会被复制。
 
-那么fire打头的文件或者文件夹全部不会被复制
+### 从文件读取排除列表
 
-5如果想要避开复制的文件过多，可以这么写
+如果排除的文件过多，可以写到一个文件中，使用 `--exclude-from`：
 
-\--exclude-from=/exclude.list
+```bash
+rsync -av --exclude-from="/exclude.list" yjwan@172.16.251.241:/home/yjwan/bashshell /tmp
+```
 
-exclude.list 是一个文件，放置的位置是绝对路径的/exclude.list ，为了避免出问题，最好设置为绝对路径。
+`exclude.list` 的位置是绝对路径，内容必须写为相对路径。例如，要避开 `checkout` 文件夹和 `fire` 打头的文件：
 
-里面的内容一定要写为相对路径
-
-比如 我想避开checkout文件夹和fire打头的文件
-
-那么/exclude.list 写为
-
+```
 checkout
+fire*
+```
 
-fire\*
+注意：用 `--exclude-from` 时不能用 `--exclude`。
 
-然后执行以下命令，注意写为--exclude-from或者--exclude-from=都可以
+## 验证同步结果
 
-但是不能为--exclude
+### 查看错误日志
 
-rsync -av --exclude-from=”/exclude.list” [yjwan@172.16.251.241:/home/yjwan/bashshell](mailto:yjwan@172.16.251.241:/home/yjwan/bashshell) /tmp
+在目标服务器检查是否复制出问题。
 
-检查结果：确实避开了checkout文件夹和fire打头的文件
+### 计算文件数量
 
-**问题：如何计算对比复制以后的文件数量是否正确呢？**
+在源服务器查看具体文件和文件夹的总个数：
 
-**1 查看错误日志，看是否复制时候出问题了**
+```bash
+ls -AlR|grep "^\[-d\]"|wc
+```
 
-2在源服务器执行可知道具体文件和文件夹的总个数
+在目标服务器计算一遍个数，对比是否一致。
 
-ls –AlR|grep “^\[-d\]”|wc
+### 使用 rsync 列表计数
 
-然后目标服务器在计算一遍个数
+如果使用了 `--exclude` 参数，可以先用不带目标地址的 rsync 命令列出应该被复制的文件：
 
-看看数字是不是能对的上就ok了
-
-对不上再研究怎么回事
-
-3现在的问题是：如果我使用了--exclude参数就麻烦了
-
-我怎么知道要复制几个文件？
-
-首先，前面命令时候提到过一种写法，就是只有源地址，没有目标地址的写法，这种写法可以用来列出所有应该被复制的文件
-
-那么用这个命令，可以计算出这个/root/bashshell下面文件和文件夹数量
-
-在服务器端执行
-
-\[root@CentOS5-4 bashshell\]# rsync -av /root/bashshell/ |grep “^\[-d\]” | wc
-
+```bash
+[root@CentOS5-4 bashshell]# rsync -av /root/bashshell/ |grep "^\[-d\]" | wc
 62 310 4249
+```
 
-和ls 得到的结果一致的
+与 `ls` 得到的结果对比：
 
-\[root@CentOS5-4 bashshell\]# ls -AlR |grep “^\[-d\]“|wc
-
+```bash
+[root@CentOS5-4 bashshell]# ls -AlR |grep "^\[-d\]"|wc
 62 558 3731
+```
 
-因此，比如说我不要fire 打头的文件，可以在服务器端先这样计算要复制的文件
+两者应该一致。
 
-\[root@CentOS5-4 bashshell\]# rsync -av --exclude “fire\*” /root/bashshell/ |grep “^\[-d\]” | wc
+应用 `--exclude` 后再计算：
 
+```bash
+[root@CentOS5-4 bashshell]# rsync -av --exclude "fire*" /root/bashshell/ |grep "^\[-d\]" | wc
 44 220 2695
+```
 
-然后复制过去
+然后实际同步并验证目标机器的文件数：
 
-看目标机器的文件和文件夹数量为
-
-\[root@free /tmp\]# ls -AlR /tmp/bashshell/ |grep “^\[-d\]“|wc
-
+```bash
+[root@free /tmp]# ls -AlR /tmp/bashshell/ |grep "^\[-d\]"|wc
 44 396 2554
+```
 
-可以知道2者是同步的
+两者应该同步。
 
-**问题：Rsync的其他几个常见参数**
+## rsync 的其他常见参数
 
-**1**
+**`-z` / `--compress`**
 
-\-z –compress compress file data during the transfer
+压缩文件数据进行传输。如果网络带宽不足，压缩会提高效率但消耗 CPU。在内网传输且文件数量不多时，此参数不是必需的。
 
-\--compress-level=NUM explicitly set compression level
+**`--compress-level=NUM`**
 
-\--skip-compress=LIST skip compressing files with suffix in LIST
+显式设置压缩级别。
 
-压缩传输，如果网络带宽不够，那么应该压缩以后传输，消耗的当然是机器资源，但是如果内网传输的话，文件数量不是很多的话，这个参数不必要的。
+**`--skip-compress=LIST`**
 
-2
+跳过特定后缀文件的压缩。
 
-\--password-file=FILE
+**`--password-file=FILE`**
 
-前面说过了，只有远端机器是rsync服务器，才能用这个参数
+仅当远端机器是 rsync 服务器时才能使用。注意：这是 rsync 服务的密码，不是 SSH 登陆密码。
 
-如果你以为个FILE写的是ssh 登陆的密码，那就大错特错了，不少人犯了这个错误。
+**`--stats`**
 
-3
+输出更详细的文件传输状态信息。
 
-–stats: Adds a little more output regarding the file transfer status.
+**`--progress`**
 
-4
+显示每个文件的传输进度。对于大文件传输很有用。
 
-–progress: shows the progress of each file transfer. Can be useful to know if you have large files being backup up.
-
-关于这个参数：
-
-I frequently find myself adding the -P option for large transfers. It preserves partial transfers in case of interuption, and gives a progress report on each file as it’s being uploaded.
-
-I move large media files back and forth on my servers, so knowing how long the transfer has remaining is very useful.
-
-•Previous Entry: nginx 每天定时切割Nginx日志的脚本
-
-•Next Entry: 如何开启MySQL的远程帐号
+使用 `-P` 选项的好处：保留中断的部分传输，同时显示每个文件的进度报告。对于传输大的媒体文件特别有用。

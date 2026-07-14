@@ -1,0 +1,15 @@
+{"file":"2014-11-14-qingbu-yaoyong-seconds-behind-master-laiheng.md","type":"normal","actions":["断行合并","时间戳删除","description-重写","结构化","sql-代码块化"],"flags":[],"before_bytes":7841,"after_bytes":3328}
+{"file":"2014-11-19-mysql-kaobei-biaode-jizhong-fangshi.md","type":"repost","actions":["condensed","description-重写","boilerplate-removed"],"flags":["condensed","repost-no-url"],"before_bytes":2414,"after_bytes":1732}
+{"file":"2015-01-20-mysql-zhucong-tongbu-duixian-you-db.md","type":"thin","actions":["explanation-added","结构化"],"flags":[],"before_bytes":1394,"after_bytes":1644}
+{"file":"2015-01-21-set-names-utf8-denei-buzhi-xingyuan.md","type":"repost","actions":["condensed","description-重写","origin_url-added"],"flags":["condensed"],"before_bytes":3344,"after_bytes":1934}
+{"file":"2015-02-02-wuge-100m-dewen-jian-rsync.md","type":"normal","actions":["drafted"],"flags":["drafted"],"before_bytes":231,"after_bytes":234}
+{"file":"2015-02-04-db-zhucong-fuzhi-bufen-yuju-weibei.md","type":"normal","actions":["断行合并","description-重写"],"flags":[],"before_bytes":1176,"after_bytes":1058}
+{"file":"2015-02-04-zhuan-weishen-me-mysql-de-binlog.md","type":"repost","actions":["condensed","description-重写","origin_url-added"],"flags":["condensed"],"before_bytes":5161,"after_bytes":1757}
+{"file":"2015-04-08-mysql-shuju-leixing.md","type":"normal","actions":["表格化","description-重写"],"flags":[],"before_bytes":3743,"after_bytes":2813}
+{"file":"2015-06-26-mysql-riqi-chaxun-sql-yuju-zongjie.md","type":"repost","actions":["condensed","description-重写"],"flags":["condensed","repost-no-url"],"before_bytes":3707,"after_bytes":2157}
+{"file":"2017-02-05-sql-yuju-hante-shufu-haode-chuli.md","type":"thin","actions":["explanation-added","code-block化"],"flags":[],"before_bytes":787,"after_bytes":999}
+{"file":"2017-05-24-mysql-zifu-chuanjie-quhan-shu-substring.md","type":"repost","actions":["condensed","description-重写","origin_url-added"],"flags":["condensed"],"before_bytes":4443,"after_bytes":2493}
+{"file":"2017-06-14-mysql-zifu-chuanhan-shu-zifu-chuanjie.md","type":"repost","actions":["condensed","description-重写","origin_url-added"],"flags":["condensed"],"before_bytes":13205,"after_bytes":4518}
+{"file":"2017-07-05-yixie-jiaonan-de-sql.md","type":"thin","actions":["explanation-added","code-block化"],"flags":[],"before_bytes":593,"after_bytes":745}
+{"file":"2017-09-15-mysql-ruhe-shiyong-load-data-infile.md","type":"repost","actions":["condensed","description-重写","origin_url-added"],"flags":["condensed"],"before_bytes":5858,"after_bytes":2875}
+{"file":"2018-01-22-redis-jiqun-dongtai-tianjia-zhujie-dianhe.md","type":"repost","actions":["condensed","description-重写","origin_url-added"],"flags":["condensed"],"before_bytes":3270,"after_bytes":2333}

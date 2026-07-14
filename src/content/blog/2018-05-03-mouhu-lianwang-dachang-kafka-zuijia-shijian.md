@@ -1,16 +1,10 @@
 ---
-title: 某互联网大厂kafka最佳实践
+title: Kafka 最佳实践
 date: '2018-05-03'
-description: >-
-  何处不可怜 关注 2016.05.14 11:30 字数 2375 阅读 6471 评论 3 喜欢 33 赞赏 1 前言：
-  上手kafka已有2年的时间，我们的数据处理量也从最初的300g/day发展到今天的T量级在这个过程中也踩了不少坑，在这里分享出来和大家共勉。
+description: "关于 Kafka 应用的最佳实践总结。包括配置优化、监控部署、故障排查等实战建议。"
 category: monitoring
 tags:
-  - raid
-  - 存储
-  - java
-  - 负载均衡
-  - 集群
+  - kafka
 draft: false
 source: evernote-local-db
 lang: zh

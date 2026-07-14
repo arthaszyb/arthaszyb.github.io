@@ -1,25 +1,16 @@
 ---
-title: Wireshark的简单使用小结
+title: 'Wireshark 的简单使用小结'
 date: '2017-07-13'
 description: >-
-  2017 年 7 月 13 日 11:51 Wireshark 的简单使用小结 Wireshark （前称 Ethereal ）是一个网络封包分析软件。
-  网络封包分析软件的功能是截取网络封包，并尽可能显示出最为详细的网络封包资料。
+  Wireshark 是开源网络封包分析工具。介绍基本操作：启动抓包、选择并分析数据包、理解 Packet List/Details/Bytes 三个面板的含义及交互；展示从协议栈到十六进制数据的多层视图。
 category: network
 tags:
   - 网络排查
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: http://www.cnblogs.com/RenQilei/archive/2012/02/26/2368849.html
 ---
-2017
-年
-7
-月
-13
-日
-11:51
-Wireshark
-的简单使用小结
 Wireshark
 （前称
 Ethereal
@@ -214,22 +205,4 @@ IP
 （
 113.89.208.228
 ）”是目标地址。
-这是我初步学习和使用
-Wireshark
-的总结。今后我会继续深入掌握其他的使用用途（合并、过滤、校验、重组等），并进一步完善日志内容。
-参考：
-Wireshark -
-维基百科
-（
-http://zh.wikipedia.org/wiki/Wireshark
-）
-Wireshark
-用户手册
-（
-http://man.lupaworld.com/content
-etwork/wireshark/index.html
-）
-来自
-<
-http://www.cnblogs.com/RenQilei/archive/2012/02/26/2368849.html
->
+这是初步学习和使用 Wireshark 的总结。

@@ -1,0 +1,15 @@
+{"file":"2014-05-16-php-wufa-xianshi-cuowu-rizhi-dewen.md","type":"thin","actions":["thin-formatted","desc-rewritten","补写说明"],"flags":[],"before_bytes":100,"after_bytes":250}
+{"file":"2014-07-08-dakai-nginx-tiaoshi.md","type":"repost","actions":["boilerplate-removed","condensed","desc-rewritten","tags-cleaned","origin_url-added"],"flags":["condensed"],"before_bytes":2300,"after_bytes":1300}
+{"file":"2014-07-08-nginx-daili-houduan-web-huoqu-yonghu.md","type":"thin","actions":["thin-formatted","desc-rewritten","补写说明"],"flags":[],"before_bytes":150,"after_bytes":250}
+{"file":"2014-07-08-request-time-upstream-response-time.md","type":"normal","actions":["boilerplate-removed","破碎行合并","结构化标题","desc-rewritten"],"flags":[],"before_bytes":1200,"after_bytes":600}
+{"file":"2014-10-09-nginx-chuxian-413-request-entity-too.md","type":"repost","actions":["boilerplate-removed","condensed","desc-rewritten"],"flags":["repost-no-url"],"before_bytes":1100,"after_bytes":450}
+{"file":"2014-10-20-nginx-kaiqi-mulu-liulan-xiazai-liukong.md","type":"repost","actions":["boilerplate-removed","condensed","desc-rewritten","tags-cleaned","origin_url-added"],"flags":["condensed"],"before_bytes":500,"after_bytes":350}
+{"file":"2014-11-14-apache-de-prefork-moshi-he-worker.md","type":"normal","actions":["boilerplate-removed","结构化章节","配置块标记","对比表格","desc-rewritten"],"flags":[],"before_bytes":3500,"after_bytes":2800}
+{"file":"2014-11-14-chakan-apache-bingfa-qingqiu-shuji-qi.md","type":"repost","actions":["boilerplate-removed","condensed","desc-rewritten","origin_url-added"],"flags":["repost-no-url","condensed"],"before_bytes":2000,"after_bytes":800}
+{"file":"2014-11-14-windows-apache2-x-php5-3-fcgid.md","type":"normal","actions":["boilerplate-removed","结构化步骤","配置块标记","参数表格","desc-rewritten"],"flags":[],"before_bytes":1600,"after_bytes":1100}
+{"file":"2014-11-19-2011-10.md","type":"normal","actions":["title-rewritten","boilerplate-removed","结构化章节","配置示例","优化建议","desc-rewritten"],"flags":[],"before_bytes":3800,"after_bytes":1800}
+{"file":"2014-12-21-apache-php-deji-zhongyun-xingfang-shi.md","type":"normal","actions":["boilerplate-removed","结构化章节","配置块标记","性能对比表","tags-cleaned","desc-rewritten"],"flags":[],"before_bytes":12000,"after_bytes":6000}
+{"file":"2015-01-05-nginx-apache-svn-qianyi-bushu.md","type":"thin","actions":["thin-formatted","desc-rewritten","结构化步骤","补写说明"],"flags":[],"before_bytes":200,"after_bytes":450}
+{"file":"2015-01-06-subversion-he-apache-apr-apr-util.md","type":"normal","actions":["boilerplate-removed","结构化章节","详细配置","命令块标记","参数说明","desc-rewritten"],"flags":[],"before_bytes":5000,"after_bytes":3500}
+{"file":"2015-01-29-xiugai-apache-zuida-lianjie-shu-apache.md","type":"normal","actions":["boilerplate-removed","结构化步骤","参数表格","监控方法","desc-rewritten"],"flags":[],"before_bytes":2200,"after_bytes":1800}
+{"file":"2015-07-13-congzhi-pinku-shangxia-zaian-zhuangbao-buwan.md","type":"thin","actions":["thin-formatted","desc-rewritten","问题分析","解决方案"],"flags":[],"before_bytes":150,"after_bytes":550}

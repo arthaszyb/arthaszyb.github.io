@@ -2,8 +2,7 @@
 title: Nginx虚拟主机根据不同的域名使用不同的root路径
 date: '2015-08-24'
 description: >-
-  [日期：2015-03-14] 来源：Linux社区 作者：john88wang [字体：大 中 小] 一 应用场景描述
-  应开发同事需求，需要在开发环境的Nginx能够根据不同的域名使用不同的root路径。
+  Nginx 虚拟主机根据不同域名使用不同root路径的配置方法。通过设置变量和 if 指令，动态指定不同子域名对应的文件根目录。
 category: web-infra
 tags:
   - nginx
@@ -12,10 +11,7 @@ draft: false
 source: evernote-local-db
 lang: zh
 ---
-[日期：2015-03-14]
-来源：Linux社区 作者：john88wang
-[字体：大 中 小]
-一 应用场景描述
+应用场景描述
 应开发同事需求，需要在开发环境的Nginx能够根据不同的域名使用不同的root路径。
 例如如果域名是linuxidc4.linuxidc.com,就使用root路径为/data/public/linuxidc4
 linuxidc5.linuxidc.com,就使用root路径为/data/public/linuxidc5
@@ -66,10 +62,7 @@ if ($host ~ "linuxidc-taiwan-5")
 {
 set $linuxidc_name linuxidc5;
 }
-if指令用于检查一个条件是否符合，如果条件符合，则执行大括号内的内容。if指令不支持嵌套，不支持多个
-&
-&
-或||
+if指令用于检查一个条件是否符合，如果条件符合，则执行大括号内的内容。if指令不支持嵌套，不支持多个 && 或 ||
 可以指定的条件为：
 1）变量名
 2）变量比较可以使用 =（等于）和!=（不等于）

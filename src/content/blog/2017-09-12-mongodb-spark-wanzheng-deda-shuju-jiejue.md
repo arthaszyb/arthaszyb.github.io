@@ -1,36 +1,18 @@
 ---
 title: 'MongoDB + Spark: 完整的大数据解决方案'
 date: '2017-09-12'
-description: >-
-  2017 年 9 月 12 日 11:54 MongoDB + Spark: 完整的大数据解决方案 九月 2, 2016 TJ的博客 、 博客
-  yingmin MongoDB上海的活动已经结束快1个月了，我们再来回顾一下TJ在大会上进行的精彩分享吧~ MongoDB + Spark：
-  完整的大数据计算解决方案。
+description: MongoDB 与 Spark 的完整大数据解决方案。包括 Spark 生态系统架构、MongoDB vs HDFS 对比、Spark-MongoDB 连接器、实时运价系统案例。
 category: bigdata
 tags:
   - apache
-  - python
   - mongodb
   - hadoop
-  - 存储
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: http://www.mongoing.com/tj/mongodb_shanghai_spark
 ---
-2017
-年
-9
-月
-12
-日
-11:54
-MongoDB + Spark: 完整的大数据解决方案
-九月 2, 2016
-TJ的博客
-、
-博客
-yingmin
-MongoDB上海的活动已经结束快1个月了，我们再来回顾一下TJ在大会上进行的精彩分享吧~ MongoDB + Spark： 完整的大数据计算解决方案。
-Spark介绍
+## Spark 介绍
 按照官方的定义，Spark 是一个通用，快速，适用于大规模数据的处理引擎。
 通用性：我们可以使用Spark SQL来执行常规分析， Spark Streaming 来流数据处理， 以及用Mlib来执行机器学习等。Java，python，scala及R语言的支持也是其通用性的表现之一。
 快速： 这个可能是Spark成功的最初原因之一，主要归功于其基于内存的运算方式。当需要处理的数据需要反复迭代时，Spark可以直接在内存中暂存数据，而无需像Map Reduce一样需要把数据写回磁盘。官方的数据表明：它可以比传统的Map Reduce快上100倍。
@@ -174,13 +156,3 @@ Total data size / chunksize = chunks = RDD partitions = spark tasks
 上面只是一些简单的演示，实际上Spark + MongoDB的使用可以通过Spark的很多种形式来使用。我们来总结一下Spark ＋ Mongo的应用场景。在座的同学可能很多人已经使用了MongoDB，也有些人已经使用了Hadoop。我们可以从两个角度来考虑这个事情：
 对那些已经使用MongoDB的用户，如果你希望在你的MongoDB驱动的应用上提供个性化功能，比如说像Yahoo一样为你找感兴趣的新闻，能够在你的MongoDB数据上利用到Spark强大的机器学习或者流处理，你就可以考虑在MongoDB集群上部署Spark来实现这些功能。
 如果你已经使用Hadoop而且数据已经在HDFS里面，你可以考虑使用Spark来实现更加实时更加快速的分析型需求，并且如果你的分析结果有数据量大、格式多变以及这些结果数据要及时提供给前台APP使用的需求，那么MongoDB可以用来作为你分析结果的一个存储方案。
-完整PPT下载地址：
-MongoDB + Spark ：完整的大数据解決方案 (3226)
-作者：TJ
-整理：yingmin
-注意：如果转载，请注明出处，谢谢。
-想要了解更多关于MongoDB最新的最佳实践，欢迎继续关注我们的中文社区及公众号。另外，也欢迎大家积极投稿，和其它用户一起分享使用MongoDB的各种经验。
-来自
-<
-http://www.mongoing.com/tj/mongodb_shanghai_spark
->

@@ -1,22 +1,16 @@
 ---
 title: 私有仓库
 date: '2015-06-23'
-description: >-
-  源文章url: http://dockerpool.com/static/books/dockerpractice/ 有时候使用 Docker Hub
-  这样的公共仓库可能不方便，用户可以创建一个本地仓库供私人使用。  本节介绍如何使用本地仓库。
+description: Docker 私有仓库搭建与使用。使用 docker-registry 工具在本地或云存储上构建私有镜像仓库，包括容器运行、本地安装、镜像上传下载、批量迁移。
 category: container-virt
 tags:
   - docker
-  - python
-  - ssl-tls
   - git
-  - 存储
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: http://dockerpool.com/static/books/docker_practice/
 ---
-源文章url:
-http://dockerpool.com/static/books/docker_practice/
 有时候使用 Docker Hub 这样的公共仓库可能不方便，用户可以创建一个本地仓库供私人使用。
 本节介绍如何使用本地仓库。
 docker-registry

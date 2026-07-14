@@ -1,115 +1,87 @@
 ---
-title: 'Centos环境下MySQL-python安装过程2012-06-05 11:43:43'
+title: CentOS 环境下 MySQL-python 安装过程
 date: '2014-07-22'
-description: >-
-  Centos环境下MySQL-python安装过程 2012-06-05 11:43:43 标签： python mysql centos
-  原创作品，允许转载，转载时请务必以超链接形式标明文章 原始出处 、作者信息和本声明。 否则将追究法律责任。
+description: CentOS 下编译安装 MySQL-python 驱动的完整步骤及常见问题解决。
 category: python
 tags:
   - mysql
-  - shell-scripting
   - python
-  - ssl-tls
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: http://lihuipeng.blog.51cto.com/3064864/887967
 ---
-Centos环境下MySQL-python安装过程
-2012-06-05 11:43:43
-标签：
-python
-mysql
-centos
-原创作品，允许转载，转载时请务必以超链接形式标明文章
-原始出处
-、作者信息和本声明。否则将追究法律责任。
-http://lihuipeng.blog.51cto.com/3064864/887967
-1.
-下载
-MySQL-python-1.2.3.tar.gz
-地址
-https://sourceforge.net/projects/mysql-python/
-2.
-安装
-MySQl-python
+
+## 下载与基本配置
+
+1. 下载 MySQL-python
+
 ```bash
+# 从 https://sourceforge.net/projects/mysql-python/ 下载
 tar xvf MySQL-python-1.2.3.tar.gz
 cd MySQL-python-1.2.3
 vi site.cfg
 ```
-把
+
+编辑 site.cfg，取消注释并配置 mysql_config 路径：
+
+```ini
 mysql_config = /usr/local/mysql/bin/mysql_config
-这一行前的
-#
-去掉，并且把
-mysql_config
-的路径设置正确。
-python setup.py build
-报错如下：
-解决方法：
-```bash
-yum install mysql-devel*
-yum install python-devel
 ```
-再运行python setup.py build报错如下：
-[root@localhost MySQL-python-1.2.3]# python setup.py install
-Traceback (most recent call last):
-File "setup.py", line 5, in ?
-from setuptools import setup, Extension
-ImportError: No module named setuptools
-解决方法：
-wget
-http://pypi.python.org/packages/source/s/setuptools/setuptools-0.6c11.tar.gz
+
+## 依赖安装
+
+首次运行 `python setup.py build` 通常会报缺失依赖错误。安装必要包：
+
 ```bash
-tar zxvf setuptools-0.6c11.tar.gz
-cd setuptools-0.6c11
-```
-python setup.py build
-python setup.py install
-继续安装：
-python setup.py build
-python setup.py install
-运行测试：
-[root@localhost MySQL-python-1.2.3]# python
-Python 2.4.3 (#1, Sep 3 2009, 15:37:37)
-[GCC 4.1.2 20080704 (Red Hat 4.1.2-46)] on linux2
-Type "help", "copyright", "credits" or "license" for more information.
->>> import MySQLdb
-/usr/lib64/python2.4/site-packages/MySQL_python-1.2.3-py2.4-linux-x86_64.egg/_mysql.py:3: UserWarning: Module _mysql was already imported from /usr/lib64/python2.4/site-packages/MySQL_python-1.2.3-py2.4-linux-x86_64.egg/_mysql.pyc, but /opt/python/MySQL-python-1.2.3 is being added to sys.path
->>>
-报出一大堆警告信息，解决办法：删除
-MySQL-python
-源目录，再测试一下：
-[root@localhost python]# python
-Python 2.4.3 (#1, Sep 3 2009, 15:37:37)
-[GCC 4.1.2 20080704 (Red Hat 4.1.2-46)] on linux2
-Type "help", "copyright", "credits" or "license" for more information.
-```bash
->>> import MySQLdb
->>>
-```
-Mysql模块终于正常了！
-注:python2链接数据库试用Mysql模块,3版本后使用mysql-connector-python,安装方法一样,都是三步:
-1.解压
-2.python3.4 setup.py build
-3.python3.4 setup.py install
-一键脚本
-#!/bin/bash
-cfpath=$(whereis mysql_config|awk '{print $2}')
-```bash
-echo "mysql_config = $cfpath" >> site.cfg
 yum install -y mysql-devel* python-devel
 ```
+
+## 处理 setuptools 缺失
+
+若报 `ImportError: No module named setuptools`，先装 setuptools：
+
+```bash
+wget http://pypi.python.org/packages/source/s/setuptools/setuptools-0.6c11.tar.gz
+tar zxvf setuptools-0.6c11.tar.gz
+cd setuptools-0.6c11
 python setup.py build
-&
-&
 python setup.py install
-if python -c "import MySQLdb"
-&
->/dev
-ull;then
-exit 0
+```
+
+返回 MySQL-python 目录继续安装。
+
+## 编译与安装
+
+```bash
+python setup.py build
+python setup.py install
+```
+
+## 验证
+
+```bash
+python -c "import MySQLdb"
+```
+
+若有重复导入警告，删除源目录再测试即可。
+
+## 快速脚本
+
+```bash
+#!/bin/bash
+cfpath=$(whereis mysql_config | awk '{print $2}')
+echo "mysql_config = $cfpath" >> site.cfg
+yum install -y mysql-devel* python-devel
+python setup.py build && python setup.py install
+if python -c "import MySQLdb" > /dev/null; then
+  exit 0
 else
-exit 1
+  exit 1
 fi
-##############END
+```
+
+## 版本差异
+
+- Python 2：使用 `MySQLdb` 模块
+- Python 3：使用 `mysql-connector-python`，安装方式相同（解压、build、install 三步）

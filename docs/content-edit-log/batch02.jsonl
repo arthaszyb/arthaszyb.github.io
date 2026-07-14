@@ -1,0 +1,15 @@
+{"file":"2017-07-25-jiqi-xuexi-changjian-suanfa-fenlei-huizong.md","type":"repost","actions":["boilerplate-removed","condensed","desc-rewritten","tags-fixed","origin-url-added"],"flags":["condensed"],"before_bytes":8200,"after_bytes":4100}
+{"file":"2017-08-10-pusu-beiye-si.md","type":"thin","actions":["migration-artifact-fixed","code-blocks-added","desc-rewritten","tags-added"],"flags":[],"before_bytes":1800,"after_bytes":2100}
+{"file":"2017-09-25-pusu-beiye-sifen-leiqi-deying-yong.md","type":"repost","actions":["migration-artifact-removed","condensed","desc-rewritten","origin-url-added"],"flags":["condensed"],"before_bytes":7500,"after_bytes":2800}
+{"file":"2018-05-22-gpu-cuda-cudnn-deli-jie.md","type":"normal","actions":["garbage-removed","desc-rewritten","tags-fixed"],"flags":[],"before_bytes":3200,"after_bytes":2800}
+{"file":"2018-06-22-nvidia-qudong-anzhuang.md","type":"thin","actions":["garbage-removed","desc-rewritten","code-blocks-added","supplement-added","tags-fixed"],"flags":[],"before_bytes":380,"after_bytes":900}
+{"file":"2018-07-23-cuda-zhi-nvidia-smi-mingling-xiangjie.md","type":"normal","actions":["garbage-removed","desc-rewritten","structure-improved","tags-fixed"],"flags":[],"before_bytes":6800,"after_bytes":4200}
+{"file":"2019-01-07-fenbu-shixi-tongde-cap-lilun.md","type":"normal","actions":["garbage-removed","desc-rewritten","tags-fixed"],"flags":[],"before_bytes":9100,"after_bytes":9000}
+{"file":"2019-02-13-intel-he-amd-yu-x86-arm.md","type":"repost","actions":["condensed","desc-rewritten","tags-fixed","origin-url-added"],"flags":["condensed"],"before_bytes":2600,"after_bytes":1800}
+{"file":"2017-05-25-hive-chaxun-renwu-chuxian-no-reduce.md","type":"thin","actions":["garbage-removed","desc-rewritten","code-blocks-added","supplement-added"],"flags":[],"before_bytes":900,"after_bytes":1200}
+{"file":"2017-06-16-hive-zhongyu-sql-buyi-zhide-hanshu.md","type":"drafted","actions":["draft-set","content-empty"],"flags":["drafted"],"before_bytes":350,"after_bytes":250}
+{"file":"2017-06-23-gongchang-renwu-cuowu-dechu-lifang-faji.md","type":"normal","actions":["garbage-removed","desc-rewritten","structure-improved"],"flags":[],"before_bytes":2000,"after_bytes":2300}
+{"file":"2017-06-27-left-jion-on-duoge-tiaojian-csdn.md","type":"drafted","actions":["draft-set","title-cleaned","origin-url-added"],"flags":["drafted"],"before_bytes":280,"after_bytes":220}
+{"file":"2017-06-27-sql-zhong-left-join-yu-right.md","type":"repost","actions":["boilerplate-removed","condensed","desc-rewritten","title-cleaned","origin-url-added"],"flags":["condensed"],"before_bytes":2800,"after_bytes":1200}
+{"file":"2017-06-28-show-zhongchuang-jianyi-gedong-tai-sql.md","type":"drafted","actions":["draft-set","content-empty"],"flags":["drafted"],"before_bytes":320,"after_bytes":220}
+{"file":"2017-07-18-yuan-sql-yuju-zhong-join-on.md","type":"repost","actions":["condensed","desc-rewritten","garbage-removed","origin-url-added"],"flags":["condensed"],"before_bytes":4100,"after_bytes":2100}

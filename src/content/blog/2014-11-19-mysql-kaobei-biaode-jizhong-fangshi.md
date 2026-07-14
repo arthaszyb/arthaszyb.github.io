@@ -1,9 +1,7 @@
 ---
 title: mysql拷贝表的几种方式
 date: '2014-11-19'
-description: >-
-  2010-11-24 09:56 佚名 互联网 字号： T | T
-  在使用mysql数据库的过程中，拷贝表使我们经常要用到的操作，下文就为您介绍几种mysql拷贝表的方式，供您参考学习。
+description: "MySQL 表拷贝方法总结，包括仅复制结构、复制数据、完整复制、跨库复制、选择字段、字段改名、条件拷贝等8种方式。"
 category: database
 tags:
   - mysql
@@ -11,74 +9,86 @@ draft: false
 source: evernote-local-db
 lang: zh
 ---
-2010-11-24 09:56 佚名 互联网 字号：
-T
-|
-T
-在使用mysql数据库的过程中，拷贝表使我们经常要用到的操作，下文就为您介绍几种mysql拷贝表的方式，供您参考学习。
-AD：
-2014WOT全球软件技术峰会北京站 课程视频发布
-mysql拷贝表操作我们会常常用到，下面就为您详细介绍几种
-mysql
-拷贝表的方式，希望对您学习mysql拷贝表方面能够有所帮助。
-假如我们有以下这样一个表：
-id username password
------------------------------------
-1 admin *************
-2 sameer *************
-3 stewart *************
+
+MySQL 拷贝表常用操作方法总结。假设有一个表结构如下：
+
+```sql
 CREATE TABLE IF NOT EXISTS `admin` (
-`id` int(6) unsigned NOT NULL auto_increment,
-`username` varchar(50) NOT NULL default '',
-`password` varchar(100) default NULL,
-PRIMARY KEY (`id`)
+  `id` int(6) unsigned NOT NULL auto_increment,
+  `username` varchar(50) NOT NULL default '',
+  `password` varchar(100) default NULL,
+  PRIMARY KEY (`id`)
 )
-ENGINE
-=
-MyISAM
-DEFAULT
-CHARSET
-=
-latin1
-AUTO_INCREMENT
-=
-4
-;
-1. 下面这个语句会拷贝表结构到新表newadmin中。 （不会拷贝表中的数据）
-CREATE TABLE newadmin LIKE admin
-2. 下面这个语句会拷贝数据到新表中。 注意：这个语句其实只是把select语句的结果建一个表。所以newadmin这个表不会有主键，索引。
+ENGINE = MyISAM
+DEFAULT CHARSET = latin1
+AUTO_INCREMENT = 4;
+```
+
+**方法 1：仅复制结构**（不拷贝数据）
+
+```sql
+CREATE TABLE newadmin LIKE admin;
+```
+
+**方法 2：复制数据但不保留主键和索引**
+
+```sql
 CREATE TABLE newadmin AS
 (
-SELECT *
-FROM admin
-)
-3. 如果你要真正的复制一个表。可以用下面的语句。
+  SELECT * FROM admin
+);
+```
+
+**方法 3：完整复制（包含结构、数据、主键、索引）**
+
+```sql
 CREATE TABLE newadmin LIKE admin;
 INSERT INTO newadmin SELECT * FROM admin;
-4. 我们可以操作不同的数据库。
+```
+
+**方法 4：跨库复制**
+
+```sql
 CREATE TABLE newadmin LIKE shop.admin;
 CREATE TABLE newshop.newadmin LIKE shop.admin;
-5. 我们也可以拷贝一个表中其中的一些字段。
+```
+
+**方法 5：仅拷贝部分字段**
+
+```sql
 CREATE TABLE newadmin AS
 (
-SELECT username, password FROM admin
-)
-6. 我们也可以讲新建的表的字段改名。
+  SELECT username, password FROM admin
+);
+```
+
+**方法 6：拷贝时改名字段**
+
+```sql
 CREATE TABLE newadmin AS
 (
-SELECT id, username AS uname, password AS pass FROM admin
-)
-7. 我们也可以拷贝一部分数据。
+  SELECT id, username AS uname, password AS pass FROM admin
+);
+```
+
+**方法 7：拷贝满足条件的行**
+
+```sql
 CREATE TABLE newadmin AS
 (
-SELECT * FROM admin WHERE LEFT(username,1) = 's'
-)
-8. 我们也可以在创建表的同时定义表中的字段信息。
+  SELECT * FROM admin WHERE LEFT(username,1) = 's'
+);
+```
+
+**方法 8：创建表同时定义字段信息**
+
+```sql
 CREATE TABLE newadmin
 (
-id INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY
+  id INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY
 )
 AS
 (
-SELECT * FROM admin
-)
+  SELECT * FROM admin
+);
+```

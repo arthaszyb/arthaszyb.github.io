@@ -1,102 +1,92 @@
 ---
-title: python多进程文件操作的一些理解
+title: Python 多进程文件操作理解
 date: '2017-09-29'
-description: >-
-  2017 年 9 月 29 日 17:05 python多进程文件操作的一些理解 作者 有点d伤 关注 2017.01.13 15:35 字数 52 阅读
-  239评论 0喜欢 0 如果多进程都对同一个文件进行写入，那么就会出现多个进程争夺资源的问题。 会使写入的文件内容错乱。
+description: 多进程同时写入文件会导致内容错乱。原因是操作系统的执行单元粒度导致进程切换无序。解决方案包括加锁和使用 multiprocessing.Pool 的回调函数。
 category: python
 tags:
   - python
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: http://www.jianshu.com/p/dc3cb5315ded
 ---
-2017
-年
-9
-月
-29
-日
-17:05
-python多进程文件操作的一些理解
-作者
-有点d伤
-关注
-2017.01.13 15:35 字数 52 阅读 239评论 0喜欢 0
-如果多进程都对同一个文件进行写入，那么就会出现多个进程争夺资源的问题。会使写入的文件内容错乱。
-1. 写入文件: 同一时间，只能有一个进程，对文件进行写入操作。这是操作系统的设定
-2. 多进程写入文件: 由操作系统随机决定哪个进程来写入操作。
-因为这种决策是随机，完全无序的。所以写入文件时，会造成文件顺序的错乱。
-一个进程执行多长时间是由操作系统决定的。而且程序的执行单元是原子型的，
-也就是说一行汇编代码才是一个执行单元，并不是Python中的一行代码才是一个执行单元。
-3. 执行单元:最小的原子型的不可分割的一个执行动作。
-比如:一共十个进程，每个进程写十个字，写十个字算是一个完整的操作。一个字全是一个执行单元。
-那么一个进程可能写完十个字，也就是一个完整的操作后，由系统决定切换到另外一个进程。
-也可能一个进程1写三个字，系统就切换另外一个进程3来进行操作。进程3写了二个字，系统切换到进程5，继续写入。
-这样就造成了文件内容的错乱。一行内有进程1的三个字，进程3的两个字，进程5的字。
-解决办法:
-1. 对写入操作 进行加锁
-就是说:对当前进行写入操作的进程锁定，直到该进程写完十个字，也就是一个完成的操作，后解除该进程的锁定，放它离开。切换到另外一个进程来操作。
-因为一次只能一个进程执行写入操作，而且必须执行完成完整的操作，才允许切换。所以不会造成文件内容的混乱。
-但是加锁一般会完造成程序的执行效率下降。而且，如果写入操作分散在整个代码的多处，
-总不能把整个代码都锁起来吧，这样岂不是又成单进程了么？
-所以:把写入操作抽象出来为单独的一个函数，这样对单独的一个函数加群，这样问题就不大了。
-更优雅的方法:使用multiprocessing的回调函数。
-1。把写入操作抽象为单独的一个函数
-2。把进程需要写入的内容，作为返回值返回
-3。使用回调函数写入进程返回内容。
-def myCallBack(x):
-文件操作，写入x到文件
+
+## 问题
+
+多进程都对同一文件进行写入时，会因资源争夺导致文件内容错乱。
+
+## 原因
+
+1. **操作系统的写入权限**：同一时间只能有一个进程写入文件
+2. **随机调度**：操作系统随机决定哪个进程执行，顺序无序
+3. **执行单元粒度**：最小执行单元是原子级别（一行汇编代码），不是 Python 源代码行。一个进程可能写入几个字后就被切换到另一个进程
+
+例如：10 个进程各写 10 个字。进程 1 写 3 个字就被切换，进程 3 写 2 个字又被切换到进程 5，最终文件内容混乱。
+
+## 解决方案
+
+### 方案 1：加锁
+
+对写入操作加锁，保证一次只有一个进程完成完整的写入操作：
+
+```python
+from multiprocessing import Lock
+
+lock = Lock()
+def write_file(lock, data):
+    with lock:
+        # 完整的写入操作
+        f = open('file.txt', 'a')
+        f.write(data)
+        f.close()
+```
+
+缺点：程序执行效率下降，且若写入操作分散在代码多处难以控制。
+
+### 方案 2：回调函数（推荐）
+
+将写入操作与计算逻辑分离，使用 multiprocessing.Pool 的回调函数：
+
+```python
+import multiprocessing
+
+def myCallback(x):
+    # 文件操作，写入 x 到文件
+    with open('file.txt', 'a') as f:
+        f.write(str(x) + '\n')
+
 def getInfo(num):
-返回需要写入的内容
-return num
+    # 返回需要写入的内容
+    return num * 2
+
 pool = multiprocessing.Pool()
 for i in range(10):
-pool.apply_async(getInfo，(i,)，callback=myCallBack)
+    pool.apply_async(getInfo, (i,), callback=myCallback)
 pool.close()
 pool.join()
-apply_async用于传递不定参数，同python中的apply函数一致。但他是非阻塞的且支持结果返回后进行回调。
-close() 关闭pool，使其不再接受新的任务
-join()
-主进程阻塞等待子进程的退出， join方法要在close后使用。
-来自
-<
-http://www.jianshu.com/p/dc3cb5315ded
->
-Pool是一个进程池，可以指定若干个 worker进程来做事情，也分为sync和async的版本，同时可以获得返回值来做一些同步。需要注意的是，在调用pool.close()之后，pool就结束了，如果不小心把pool.close()放在了一个for循环里，或者在apply()之前调用了，比如
-def func(msg):
-for i in xrange(3):
-print "func:"+msg
-time.sleep(1)
-return "hello func %s" % msg
-if __name__ == "__main__":
+```
+
+### apply_async 用法
+
+- `apply_async(func, args, callback=...)`：传递不定参数，非阻塞，支持结果返回后回调
+- `close()`：关闭 pool，使其不再接受新任务
+- `join()`：主进程阻塞等待子进程退出（必须在 close 后调用）
+
+### 注意事项
+
+`pool.close()` 必须在所有 `apply_async` 之后，不能放在循环内或 apply 前调用。错误示例会导致 `AssertionError: assert self._state == RUN`。
+
+正确顺序：
+
+```python
 pool = multiprocessing.Pool(processes=2)
 result = []
-for i in xrange(3):
-msg = "hello %d" %(i)
-result.append(pool.apply_async(func, [msg]))
-pool.close()
-<
---- done.="" es="" for="" in="" obj.get="" obj="" pool.join="" pre="" print="" result:="" tab="" timeout="1)" ub-process="">
-会得到一个断言异常：AssertionError: assert self._state == RUN
-正确写法是：
-def func(msg):
-for i in xrange(3):
-print "func:"+msg
-time.sleep(1)
-return "hello func %s" % msg
-if __name__ == "__main__":
-pool = multiprocessing.Pool(processes=2)
-result = []
-for i in xrange(3):
-msg = "hello %d" %(i)
-result.append(pool.apply_async(func, [msg]))
+for i in range(3):
+    msg = "hello %d" % i
+    result.append(pool.apply_async(func, [msg]))
 pool.close()
 pool.join()
 print "Sub-process(es) done."
 for obj in result:
-print obj.get(timeout=1)
-来自
-<
-http://xuan-google.blogspot.com/2013/10/thread-in-python.html
->
+    print obj.get(timeout=1)
+```

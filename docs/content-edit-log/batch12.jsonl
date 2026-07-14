@@ -1,0 +1,15 @@
+{"file":"2015-12-11-linux-ruhe-jiangming-ling-top-suode.md","type":"normal","actions":["boilerplate-removed","html-table-to-code","desc-rewritten","tags-added"],"flags":[],"after_bytes":730}
+{"file":"2016-01-27-zongjie-linux-de-chattr-yu-lsattr.md","type":"repost","actions":["boilerplate-removed","condensed","desc-rewritten","table-formatted","origin_url-added"],"flags":["condensed"],"before_bytes":2700,"after_bytes":2219}
+{"file":"2016-05-06-wsd-chushi-hua-iptables.md","type":"thin","actions":["content-emptied"],"flags":["drafted"],"after_bytes":153}
+{"file":"2016-05-12-xiancheng-jiankong.md","type":"thin","actions":["structured","desc-rewritten","code-formatted"],"flags":[],"after_bytes":510}
+{"file":"2016-05-18-linux-neihe-socket-canshu-tiaoyou.md","type":"normal","actions":["external-link-removed","desc-rewritten","tags-added"],"flags":[],"after_bytes":8465}
+{"file":"2016-06-07-chakan-meige-wangka-deliu-liangqing-kuang.md","type":"thin","actions":["structured","desc-rewritten","code-formatted"],"flags":[],"after_bytes":448}
+{"file":"2016-07-13-aws.md","type":"thin","actions":["content-emptied"],"flags":["drafted"],"after_bytes":126}
+{"file":"2016-07-14-amazon-aws-mianfei-dewu-canbu-haochi.md","type":"normal","actions":["toc-links-removed","html-table-to-markdown","desc-rewritten","tags-cleaned","structure-improved"],"flags":[],"after_bytes":12414}
+{"file":"2016-07-22-shiyong-zsh-tihuan-bash.md","type":"thin","actions":["english-text-removed","structured","desc-rewritten","code-formatted"],"flags":[],"after_bytes":514}
+{"file":"2017-09-28-linux-fuwu-qiru-hecha-kanzi-jide.md","type":"repost","actions":["boilerplate-removed","condensed","desc-rewritten","code-formatted","origin_url-added"],"flags":["condensed"],"before_bytes":4800,"after_bytes":1834}
+{"file":"2017-10-19-tc-yinqi-dewen-tipai-cha.md","type":"thin","actions":["timestamp-removed","structured","desc-rewritten"],"flags":[],"after_bytes":392}
+{"file":"2017-11-16-genghuan-denglu-fangshi-houwu-fadeng-lude.md","type":"normal","actions":["timestamp-removed","structured","error-message-formatted","desc-rewritten","solution-enhanced"],"flags":[],"after_bytes":1528}
+{"file":"2017-11-21-linux-biji-2017-11-21.md","type":"thin","actions":["content-emptied"],"flags":["drafted"],"after_bytes":145}
+{"file":"2017-11-21-yum-anzhuang-chuxian-segmentation-fault-cuowu.md","type":"repost","actions":["timestamp-removed","boilerplate-removed","condensed","desc-rewritten","code-formatted","origin_url-added"],"flags":["condensed"],"before_bytes":860,"after_bytes":638}
+{"file":"2017-11-21-yum-anzhuang-chuxian-segmentation-fault-cuowu-2.md","type":"thin","actions":["content-emptied"],"flags":["drafted","note: duplicate of yum-anzhuang-chuxian-segmentation-fault-cuowu.md"],"after_bytes":174}

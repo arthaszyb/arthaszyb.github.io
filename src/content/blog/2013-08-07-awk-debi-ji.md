@@ -1,9 +1,7 @@
 ---
-title: awk的笔记
+title: AWK 笔记
 date: '2013-08-07'
-description: >-
-  关于RS/ORS,FS/OFS的解释和区别 [root@r25 zy]# cat 7.txt 1234 323123 4321 321321
-  66661234 124213 [root@r25 zy]# awk 'BEGIN{RS=2}{print $0}' 7.txt #记录分隔符,默认为
+description: AWK 的分隔符和内建变量使用。包括 RS/ORS（记录分隔符）、FS/OFS（字段分隔符）、NR/FNR/NF 等变量的详解和实例。
 category: shell
 tags:
   - shell-scripting
@@ -11,12 +9,25 @@ draft: false
 source: evernote-local-db
 lang: zh
 ---
-关于RS/ORS,FS/OFS的解释和区别
-[root@r25 zy]# cat 7.txt
+
+## 记录和字段分隔符
+
+### RS/ORS（记录分隔符）
+
+`RS` 是记录分隔符，默认为 `\n`（换行）。`ORS` 是输出记录分隔符。
+
+示例文件：
+
+```text
 1234 323123
 4321 321321
 66661234 124213
-[root@r25 zy]# awk 'BEGIN{RS=2}{print $0}' 7.txt #记录分隔符,默认为\n,这句意思是定义2为分隔符,即遇到2就执行\n(换行)操作
+```
+
+使用 `2` 作为记录分隔符：
+
+```bash
+$ awk 'BEGIN{RS="2"}{print $0}' 7.txt
 1
 34 3
 31
@@ -29,73 +40,111 @@ lang: zh
 34 1
 4
 13
-[root@r25 zy]# awk 'BEGIN{ORS="--"}{print $0}' 7.txt #输出分隔符,默认为\n,可理解为RS的反过程.这句意思是将\n的操作更改为---
-1234 323123--4321 321321--66661234 124213--[root@r25 zy]#
-[root@r25 zy]# awk 'BEGIN{FS="2"}{print $1,$2,$3}' 7.txt #指定列分隔符,默认为\t.这个剧意思是制定2为列分隔符
+```
+
+修改输出分隔符为 `--`：
+
+```bash
+$ awk 'BEGIN{ORS="--"}{print $0}' 7.txt
+1234 323123--4321 321321--66661234 124213--
+```
+
+### FS/OFS（字段分隔符）
+
+`FS` 是字段分隔符（列分隔符），默认为制表符。`OFS` 是输出字段分隔符。
+
+使用 `2` 作为字段分隔符：
+
+```bash
+$ awk 'BEGIN{FS="2"}{print $1,$2,$3}' 7.txt
 1 34 3 31
 43 1 3 13
 66661 34 1 4
-[root@r25 zy]# awk 'BEGIN{OFS="--"}{print $1,$2,$3}' 7.txt #列输出分隔符,默认为\t.这个意思是将输出默认\t分隔符替换为--
+```
+
+修改输出字段分隔符为 `--`：
+
+```bash
+$ awk 'BEGIN{OFS="--"}{print $1,$2,$3}' 7.txt
 1234--323123--
 4321--321321--
 66661234--124213--
-```bash
-[root@r25 zy]#
-#########################
-awk内建变量示例详解之NR、FNR、NF
-##########################
-##########################
-##########################
-##########
 ```
-NR
-表示从
-awk
-开始执行后，按照记录分隔符读取的数据次数，默认的记录分隔符为换行符，因此默认的就是读取的数据行数，NR可以理解为Number of Record的缩写。
-在awk处理多个输入文件的时候，在处理完第一个文件后，NR并不会从1开始，而是继续累加，因此就出现了
-FNR
-，每当处理一个新文件的时候，FNR就从1开始计数，FNR可以理解为File Number of Record。
-NF
-表示目前的记录被分割的字段的数目，NF可以理解为Number of Field。
-下面以示例程序来进行说明，首先准备两个输入文件class1和class2，记录了两个班级的成绩信息，内容分别如下所示：
-CodingAnts@ubuntu:~/awk$ cat class1
+
+## 内建变量：NR、FNR、NF
+
+### 定义
+
+- **NR**：Number of Record，从 AWK 开始执行后，按照记录分隔符读取的数据次数。在处理多个文件时累加。
+- **FNR**：File Number of Record，处理新文件时从 1 开始计数。
+- **NF**：Number of Field，当前记录被分割的字段数。
+
+### 示例文件
+
+class1：
+```text
 zhaoyun 85 87
 guanyu 87 88
 liubei 90 86
-CodingAnts@ubuntu:~/awk$ cat class2
+```
+
+class2：
+```text
 caocao 92 87 90
 guojia 99 96 92
-现在要查看两个班级的所有成绩信息，并在每条信息前加上行号，则可以使用下面的awk指令；
-CodingAnts@ubuntu:~/awk$ awk '{print
-NR
-,$0}' class1 class2
+```
+
+### 使用 NR（全局行号）
+
+```bash
+$ awk '{print NR,$0}' class1 class2
 1 zhaoyun 85 87
 2 guanyu 87 88
 3 liubei 90 86
 4 caocao 92 87 90
 5 guojia 99 96 92
-这里的行号就是通过NR来实现的，awk每读取一条记录，NR的值便加一。如果要求每个班级的行号从头开始变化，则需要使用FNR来实现，如下：
-CodingAnts@ubuntu:~/awk$ awk '{print
-FNR
-,$0}' class1 class2
+```
+
+### 使用 FNR（文件内行号）
+
+```bash
+$ awk '{print FNR,$0}' class1 class2
 1 zhaoyun 85 87
 2 guanyu 87 88
 3 liubei 90 86
 1 caocao 92 87 90
 2 guojia 99 96 92
-下面的示例结合awk内建变量FILENAME，显示出来的两个班级的成绩信息可以进行更好的区分;
-CodingAnts@ubuntu:~/awk$ awk '{print FILENAME,"NR="NR,"FNR="FNR,"$"NF"="$NF}' class1 class2
+```
+
+### 结合 FILENAME 和 NF
+
+```bash
+$ awk '{print FILENAME,"NR="NR,"FNR="FNR,"$"NF"="$NF}' class1 class2
 class1 NR=1 FNR=1 $3=87
 class1 NR=2 FNR=2 $3=88
 class1 NR=3 FNR=3 $3=86
 class2 NR=4 FNR=1 $4=90
 class2 NR=5 FNR=2 $4=92
-除了NR和FNR外，上面的示例中还演示了NF的使用，class1中每行有3个字段，而class2中有4个字段，通过$NF就可以很方便的获取最后一个字段了。
+```
+
+class1 有 3 个字段，class2 有 4 个字段。`$NF` 获取最后一个字段。
+
+## 实用命令
+
+### 复制文件（不覆盖已存在文件）
+
 ```bash
-cp一个目录下的文件到另一个目录,如果文件重复,则不覆盖:
 awk 'BEGIN { cmd="cp -i A/* B/"; print "n" |cmd; }'
 ```
-取除第一列之外的所有列
+
+### 获取除第一列外的所有列
+
+```bash
 awk '{$1="";print}'
-查看当前TCP各状态的连接数
+```
+
+### 查看 TCP 各状态的连接数
+
+```bash
 netstat -n | awk '/^tcp/ {++S[$NF]} END {for(a in S) print a, S[a]}'
+```

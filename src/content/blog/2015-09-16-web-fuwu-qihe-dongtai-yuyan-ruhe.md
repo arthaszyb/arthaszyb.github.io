@@ -1,28 +1,17 @@
 ---
-title: Web服务器和动态语言如何交互--CGI&amp;FastCGI&amp;FPM浅谈
+title: Web 服务器和动态语言交互原理 —— CGI、FastCGI、FPM
 date: '2015-09-16'
-description: >-
-  Web服务器和动态语言如何交互--CGI&FastCGI&FPM浅谈 Wednesday, September 16, 2015 3:56 PM
-  Web服务器和动态语言如何交互\--CGI&FastCGI&FPM浅谈 一个用户的Request是如何经过Web服务器（Apache，Nginx，IIS
+description: Web 服务器与后端动态语言（如 PHP）的交互方式，包括 CGI、FastCGI、php-fpm 三种模式的原理和配置。
 category: php
 tags:
-  - nginx
   - apache
-  - mysql
-  - dns
+  - nginx
   - php
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: http://www.cnblogs.com/hfutwyy/p/4293273.html
 ---
-# Web服务器和动态语言如何交互--CGI&FastCGI&FPM浅谈
-Web服务器和动态语言如何交互--CGI&FastCGI&FPM浅谈
-
-Wednesday, September 16, 2015
-
-3:56 PM
-
-[Web](http://www.cnblogs.com/hfutwyy/p/4293273.html)[服务器和动态语言如何交互](http://www.cnblogs.com/hfutwyy/p/4293273.html)[\--CGI&FastCGI&FPM](http://www.cnblogs.com/hfutwyy/p/4293273.html)[浅谈](http://www.cnblogs.com/hfutwyy/p/4293273.html)
 
 一个用户的Request是如何经过Web服务器（Apache，Nginx，IIS，Light）与后端的动态语言（如PHP等）进行交互并将结果返回给用户的呢？
 

@@ -1,16 +1,10 @@
 ---
-title: Kafka主要参数详解
+title: Kafka 主要参数详解
 date: '2018-05-02'
-description: >-
-  2014年12月7日 by debugo · 14 Comments 原文档地址：
-  http://kafka.apache.org/documentation.html 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
-  16 17 18 19 20 21 22 23 24 25 26 27 28
+description: "Kafka 配置参数详解。涵盖 broker、producer、consumer 等重要参数的含义和调优方法。"
 category: monitoring
 tags:
-  - apache
-  - 存储
-  - 高可用
-  - 集群
+  - kafka
 draft: false
 source: evernote-local-db
 lang: zh

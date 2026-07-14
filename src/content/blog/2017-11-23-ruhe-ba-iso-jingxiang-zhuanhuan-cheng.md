@@ -1,20 +1,15 @@
 ---
 title: 如何把ISO镜像转换成Docker镜像
 date: '2017-11-23'
-description: >-
-  最近开始研究docker，如果想要自己创建个镜像，必须从Docker
-  Hub上面获取一个基础镜像来创建；对于我们公司是定制的ISO，我就在想有没有办法把ISO转换成Docker格式，然后上传到Docker
-  Hub上作为基础镜像使用。
+description: ISO 镜像转换为 Docker 镜像的方法。通过 tar 打包系统根目录（排除系统文件），导入 Docker 得到可用的镜像。
 category: container-virt
 tags:
   - docker
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: http://yangfannie.com/1267.html
 ---
-最近开始研究docker，如果想要自己创建个镜像，必须从Docker Hub上面获取一个基础镜像来创建；对于我们公司是定制的ISO，我就在想有没有办法把ISO转换成Docker格式，然后上传到Docker Hub上作为基础镜像使用。
-参考文章：
-http://www.aboutdebian.com/tar-backup.htm
 0x01 准备阶段
 首先，在一台虚拟机中安装好需要转换的ISO镜像，本文以CentOS 7.1为例；
 其次，进入装好的系统，到根目录下面我们可以看到如下文件夹
@@ -33,7 +28,3 @@ tar文件导入到docker方法很多，下面两种办法测试了都可以
 # docker run -t -i centos:7.1 /bin/bash
 Author：yangfannie.com
 镜像做好之后就可以push到docker hub上了，不过我发现做好的镜像还是挺大的有1.4G，这样push的时候就会很慢很慢。
-来自
-<
-http://yangfannie.com/1267.html
->

@@ -11,6 +11,7 @@ const blog = defineCollection({
     tags: z.array(z.string()).default([]),
     draft: z.boolean().default(false),
     source: z.string().optional(), // 保留 "evernote-local-db" 溯源标记
+    origin_url: z.string().optional(), // 摘录/转载笔记的原文链接，文章页会渲染出处提示
     lang: z.enum(['zh', 'en']).default('zh'),
     // 由 blogLoader（src/lib/blog-loader.ts）在同步阶段计算注入，非作者手写字段。
     minutesRead: z.number().optional(),

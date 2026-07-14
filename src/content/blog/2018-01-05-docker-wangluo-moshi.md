@@ -1,31 +1,16 @@
 ---
-title: Docker网络模式
+title: Docker网络模式详解
 date: '2018-01-05'
-description: >-
-  2018 年 1 月 5 日 15:09 Docker网络模式 【编者的话】
-  本文是《Docker网络及服务发现》一书的一个章节，介绍了搭建Docker单主机网络的基础内容。
-  关于Docker网络的更多内容，包括多主机的网络，请参考该书的其他章节。
+description: Docker 单主机网络四种模式（bridge、host、container、none）原理与对比。包括网络隔离、端口映射、安全配置、IP 地址分配策略。
 category: container-virt
 tags:
-  - nginx
-  - apache
-  - iptables
   - docker
-  - kubernetes
+  - iptables
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: http://dockone.io/article/1261
 ---
-2018
-年
-1
-月
-5
-日
-15:09
-Docker网络模式
-【编者的话】 本文是《Docker网络及服务发现》一书的一个章节，介绍了搭建Docker单主机网络的基础内容。关于Docker网络的更多内容，包括多主机的网络，请参考该书的其他章节。
-@Container容器技术大会将于6月4日在上海光大会展中心国际大酒店举办，来自Rancher、携程、PPTV、蚂蚁金服、京东、浙江移动、海尔电器、唯品会、eBay、道富银行、麻袋理财、土豆网、阿里百川、腾讯游戏、数人云、点融网、华为、轻元科技、中兴通讯等公司的技术负责人将带来实践经验分享，5月7日之前购票只需438元，欢迎感兴趣的同学抢购。
 当你开始大规模使用Docker时，你会发现需要了解很多关于网络的知识。作为Docker网络的一篇介绍，我们将从头开始，然后开始讨论如何管理容器间的连接。Docker容器需要运行在一台宿主机上，可以是一台物理机（on-premise数据中心中的裸金属服务器），也可以是on-prem或云上的一台虚拟机。就像下图中描述的那样，宿主机上运行了Docker的daemon进程和客户端，一方面可以与Docker registry交互，另一方面可以启动、关闭和审查容器。
 图1 简单的Docker架构（单主机）
 宿主机和容器的关系是
@@ -158,7 +143,3 @@ NACI
 为了对部署在生产环境中的Docker容器进行安全检查，我强烈建议使用
 The Docker Bench for Security
 。
-来自
-<
-http://dockone.io/article/1261
->

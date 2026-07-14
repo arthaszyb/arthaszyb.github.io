@@ -1,71 +1,93 @@
 ---
-title: 自学笔记
+title: Docker学习笔记：基本命令和操作
 date: '2015-06-22'
-description: >-
-  环境：centos7 安装docker：yum install docker-io docker目录：/var/lib/docker
-  containers目录下是创建的所有容器 graph目录貌似是镜像目录 查看docker容器 docker ps -a 创建一个容器 docker run
-  --name
+description: Docker 基础操作快速参考。包括容器查看/创建/启动/停止、镜像管理、卷挂载、端口映射、守护进程容器配置等命令。
 category: container-virt
 tags:
-  - nginx
   - docker
-  - ssl-tls
 draft: false
 source: evernote-local-db
 lang: zh
 ---
-环境：centos7
-安装docker：yum install docker-io
-docker目录：/var/lib/docker
-containers目录下是创建的所有容器
-graph目录貌似是镜像目录
-查看docker容器
+
+## 环境与安装
+
+CentOS 7 环境下 Docker 的基本安装与目录结构：
+
+```bash
+yum install docker-io
+```
+
+Docker 目录结构：
+- `/var/lib/docker` - Docker 主目录
+- `containers` - 容器目录
+- `graph` - 镜像目录
+
+## 容器基本操作
+
+查看容器：
+
+```bash
 docker ps -a
-创建一个容器
-docker run --name
-stoic_darwin
-（容器名称）
--i -t ubuntu
-（镜像文件）
-/bin/bash
-这种启动方式会在交互窗口关闭后停止
-重新启动这个容器
+```
+
+创建与运行容器：
+
+```bash
+docker run --name stoic_darwin -i -t ubuntu /bin/bash
+```
+
+启动、停止、进入容器：
+
+```bash
 docker start stoic_darwin
-重新附着到容器会话
 docker attach stoic_darwin
-创建一个有守护进程的容器
-docker run --restart=always --name daemon_dave -d ubuntu /
-bin/sh
--c
-"while true; do echo hello world; sleep 1; done"
-restart参数解释：
-表示设定容器自动重启。
-on-failure：5表示只有非零推出状态时才重启，且最多重启5次
-always表示总是重启
-进入该容器：
-docker exec -i -t test_01 /bin/bash
-关闭该容器
 docker stop test_01
-从默认源
-https://hub.docker.com
-上下载镜像
+docker exec -i -t test_01 /bin/bash
+```
+
+## 守护式容器
+
+创建自动重启的后台容器：
+
+```bash
+docker run --restart=always --name daemon_dave -d ubuntu /bin/sh -c "while true; do echo hello world; sleep 1; done"
+```
+
+`restart` 参数选项：
+- `always` - 总是重启
+- `on-failure:5` - 非零退出时重启，最多 5 次
+
+## 镜像管理
+
+从 Docker Hub 下载镜像：
+
+```bash
 docker pull centos:6.6
-查看本地镜像
-Docker images
-加载本地镜像
-Docker import
-xxx
-创建一个容器
-docker run --name nginx_dist -v /tmp/docker:/usr/share
-ginx/html:ro \
-> -p 80:80 -d nginx:1.7.6
--v
-前半部是宿主机路径，后半部是容器路径，表示将宿主机的一个路径映射到容器的一个路径上
--
-p前半部是宿主机端口，后半部是容器端口，也是映射关系
--
-d
-后面是使用的镜像名
-加上
--I -t
-可以在生成容器后进入一个伪终端。
+```
+
+查看本地镜像：
+
+```bash
+docker images
+```
+
+加载本地镜像：
+
+```bash
+docker import xxx
+```
+
+## 卷挂载与端口映射
+
+创建带卷挂载和端口映射的容器：
+
+```bash
+docker run --name nginx_dist -v /tmp/docker:/usr/share/nginx/html:ro -p 80:80 -d nginx:1.7.6
+```
+
+参数说明：
+- `-v` - 前半部分为宿主机路径，后半部分为容器路径，实现路径映射
+- `-p` - 前半部分为宿主机端口，后半部分为容器端口
+- `-d` - 指定使用的镜像名
+- `-i -t` - 生成容器后进入伪终端

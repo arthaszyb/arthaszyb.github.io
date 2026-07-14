@@ -1,29 +1,15 @@
 ---
-title: Docker的Windows容器初体验
+title: Docker在Windows Server 2016上的容器支持初体验
 date: '2017-02-10'
-description: >-
-  来源: 360圈 发布时间：2016-10-27 10:23:18 | 浏览次数：2317 | 关键词：容器,Windows,Docker,我们 热门标签：
-  情感社区 角色扮演 策略战棋 360浏览器 交友网站 同城交友 最近微软发布了 Windows Server
+description: Windows Server 2016 支持 Docker 容器。包括容器类型（Server 容器与 Hyper-V 容器）、Docker for Windows 安装配置、模式切换、示例应用构建与部署。
 category: container-virt
 tags:
   - docker
-  - dns
-  - ssl-tls
-  - git
 draft: false
 source: evernote-local-db
 lang: zh
+origin_url: http://www.360quan.com/windows10/24145.html
 ---
-来源:
-360圈
-发布时间：2016-10-27 10:23:18 | 浏览次数：2317 | 关键词：容器,Windows,Docker,我们
-热门标签：
-情感社区
-角色扮演
-策略战棋
-360浏览器
-交友网站
-同城交友
 最近微软发布了
 Windows
 Server 2016,其中最让广大开发者和运维同学期待的就是Docker对
@@ -137,7 +123,3 @@ http:///BlogEngine
 总结
 Windows容器的出现大大简化了Windows应用交付和运维的复杂性,对于微软的技术生态有着及其重要的意义。Docker在简化用户体验上做足了文章,现有工具链可以对Windows和Linux容器环境提供接近一致的能力。
 同时Windows和Linux容器底层的实现机制还有很多不同,比如容器网络,基础镜像选择都有特别之处。未来我们会逐渐介绍。阿里云容器服务也会在未来的版本中提供对Windows容器的支持
-来自
-<
-http://www.360quan.com/windows10/24145.html
->
