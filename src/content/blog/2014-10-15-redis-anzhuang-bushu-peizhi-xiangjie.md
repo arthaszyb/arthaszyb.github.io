@@ -10,24 +10,7 @@ draft: false
 source: evernote-local-db
 lang: zh
 ---
-分类：
-linux
-&
-&
-unix
-2013-11-07 14:49
-1700人阅读
-评论
-(0)
-收藏
-举报
-memcached
-内存分配
-服务器
-存储
-面试
-1.
-概要
+## 概要
 Redis
 服务器环境的安装。指导系统部署和维护使用，
 以64
