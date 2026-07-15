@@ -2,7 +2,7 @@
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import { site } from '../data/site';
-import theme from '../data/theme.json';
+import themeData from '../data/theme.json';
 import '../styles/global.css';
 
 interface Props {
@@ -28,7 +28,14 @@ const pageTitle = title ? `${title} - ${site.title}` : site.title;
 const canonicalURL = new URL(Astro.url.pathname, site.url).toString();
 
 /* 主题覆写（src/data/theme.json，可在 Pages CMS「主题与统计」里编辑）：
-   留空的项不输出任何 CSS，站点保持 global.css 的默认「暖纸面」设计。 */
+   留空的项不输出任何 CSS，站点保持 global.css 的默认「暖纸面」设计。
+   Pages CMS 保存时会丢弃空字段，所以这里不能依赖 JSON 的字面量类型。 */
+const theme = themeData as {
+  background?: { image?: string; colorLight?: string; colorDark?: string };
+  accent?: { light?: string; dark?: string };
+  analytics?: { goatcounter?: string };
+};
+
 const themeCss = [
   theme.accent?.light && `:root{--accent:${theme.accent.light};}`,
   theme.accent?.dark && `:root[data-theme='dark']{--accent:${theme.accent.dark};}`,

@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import PostLayout from '../../../layouts/PostLayout.astro';
 import { slugFromId, getPublishedPosts, relatedPosts } from '../../../lib/posts';
+import theme from '../../../data/theme.json';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ data }) => !data.draft);
@@ -12,11 +13,39 @@ export async function getStaticPaths() {
 }
 
 const { entry } = Astro.props;
-const { Content, headings } = await render(entry);
-const allPosts = await getPublishedPosts();
-const related = relatedPosts(entry, allPosts);
+
+/* HTML 直发的完整文档整页原样输出（保留其自带的 <head> 样式脚本），
+   不套站点版式；只追加两处：GoatCounter 统计脚本、Pagefind 索引标记。
+   开头的 doctype 去掉，由 Astro 统一补，避免重复。 */
+const standalone = entry.data.standalone === true;
+
+let standaloneDoc = '';
+if (standalone) {
+  const goatcounter = (
+    theme as { analytics?: { goatcounter?: string } }
+  ).analytics?.goatcounter?.trim();
+  const gcSnippet = goatcounter
+    ? `<script data-goatcounter="https://${goatcounter}.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>`
+    : '';
+  standaloneDoc = (entry.body ?? '')
+    .replace(/^\s*<!doctype[^>]*>/i, '')
+    .replace(/<body([^>]*)>/i, '<body$1 data-pagefind-body>')
+    .replace(/<\/body>/i, `${gcSnippet}</body>`);
+}
+
+const rendered = standalone ? null : await render(entry);
+const Content = rendered?.Content;
+const headings = rendered?.headings ?? [];
+const allPosts = standalone ? [] : await getPublishedPosts();
+const related = standalone ? [] : relatedPosts(entry, allPosts);
 ---
 
-<PostLayout entry={entry} headings={headings} related={related}>
-  <Content />
-</PostLayout>
+{
+  standalone || !Content ? (
+    <Fragment set:html={standaloneDoc} />
+  ) : (
+    <PostLayout entry={entry} headings={headings} related={related}>
+      <Content />
+    </PostLayout>
+  )
+}

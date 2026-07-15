@@ -16,6 +16,10 @@ const blog = defineCollection({
     // Pages CMS 新建文章时用于生成文件名（.pages.yml 的 filename 模板），
     // 路由 slug 实际取自文件名（见 src/lib/posts.ts），此字段仅存档。
     slug: z.string().optional(),
+    // HTML 直发文章：true 时整页原样输出（不套站点版式）。默认由
+    // html-loader 自动判断——上传完整 HTML 文档（含 <html>/<head>）时
+    // 为 true，HTML 片段为 false；frontmatter 里显式写可覆盖判断。
+    standalone: z.boolean().optional(),
     // 由 blogLoader（src/lib/blog-loader.ts）在同步阶段计算注入，非作者手写字段。
     minutesRead: z.number().optional(),
   }),
