@@ -31,7 +31,7 @@ const canonicalURL = new URL(Astro.url.pathname, site.url).toString();
    留空的项不输出任何 CSS，站点保持 global.css 的默认「暖纸面」设计。
    Pages CMS 保存时会丢弃空字段，所以这里不能依赖 JSON 的字面量类型。 */
 const theme = themeData as {
-  background?: { image?: string; colorLight?: string; colorDark?: string };
+  banner?: { image?: string };
   accent?: { light?: string; dark?: string };
   analytics?: { goatcounter?: string };
 };
@@ -39,13 +39,11 @@ const theme = themeData as {
 const themeCss = [
   theme.accent?.light && `:root{--accent:${theme.accent.light};}`,
   theme.accent?.dark && `:root[data-theme='dark']{--accent:${theme.accent.dark};}`,
-  theme.background?.colorLight && `:root{--bg:${theme.background.colorLight};}`,
-  theme.background?.colorDark && `:root[data-theme='dark']{--bg:${theme.background.colorDark};}`,
-  theme.background?.image &&
-    `body{background-image:url('${theme.background.image}');background-size:cover;background-position:center;background-attachment:fixed;}`,
 ]
   .filter(Boolean)
   .join('');
+
+const bannerImage = theme.banner?.image?.trim();
 
 const goatcounter = theme.analytics?.goatcounter?.trim();
 
@@ -135,6 +133,14 @@ const jsonLd =
     {themeCss && <style set:html={themeCss} />}
   </head>
   <body>
+    {
+      /* 顶部横幅：贯穿整页宽度的固定高度色带，位于每个页面最顶端，
+         随页面正常滚动（不遮挡内容）。theme.json 里 banner.image 留空
+         则完全不渲染。 */
+      bannerImage && (
+        <div class="site-banner" style={`background-image:url('${bannerImage}')`} />
+      )
+    }
     <SiteHeader />
     <main data-pagefind-body>
       <slot />

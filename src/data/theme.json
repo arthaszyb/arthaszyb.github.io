@@ -1,6 +1,10 @@
 {
-  "background": {
+  "banner": {
     "image": "/images/bg-clover.webp"
+  },
+  "accent": {
+    "light": "",
+    "dark": ""
   },
   "analytics": {
     "goatcounter": "arthaszyb"

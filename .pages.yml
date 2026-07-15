@@ -184,22 +184,14 @@ content:
     path: src/data/theme.json
     format: json
     fields:
-      - name: background
-        label: 背景
+      - name: banner
+        label: 顶部横幅
         type: object
         fields:
           - name: image
-            label: 背景图
-            description: 留空使用默认纯色背景；建议上传较大分辨率图片
+            label: 横幅图片
+            description: 显示在每个页面最顶端、贯穿全宽的固定高度色带（不是整页背景），留空则不显示。建议横向构图的图片，竖直方向内容会被裁切居中。
             type: image
-          - name: colorLight
-            label: 浅色模式背景色
-            description: 例如 "#faf6ef"，留空用默认值
-            type: string
-          - name: colorDark
-            label: 深色模式背景色
-            description: 例如 "#211e19"，留空用默认值
-            type: string
       - name: accent
         label: 点缀色
         type: object
