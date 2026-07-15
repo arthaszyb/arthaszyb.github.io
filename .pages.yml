@@ -1,0 +1,222 @@
+# Pages CMS 管理台配置（https://pagescms.org）
+#
+# 使用方式：用 GitHub 账号登录 https://app.pagescms.org，授权本仓库后
+# 即可获得网页管理台：写文章（Markdown / HTML 直发）、上传图片、
+# 修改背景与主题色、配置访问统计。保存 = git commit，随后
+# GitHub Actions 自动构建部署（见 .github/workflows/pages.yml）。
+#
+# 详细说明见 docs/admin-guide.md。
+
+media:
+  input: public/images
+  output: /images
+
+content:
+  # ---- Markdown 文章 ----
+  - name: posts
+    label: 文章（Markdown）
+    icon: notebook-pen
+    type: collection
+    path: src/content/blog
+    extension: md
+    format: yaml-frontmatter
+    filename: '{year}-{month}-{day}-{fields.slug}.md'
+    view:
+      fields: [title, date, category, draft]
+      primary: title
+      sort: [date, title]
+      default:
+        sort: date
+        order: desc
+    fields:
+      - name: title
+        label: 标题
+        type: string
+        required: true
+      - name: slug
+        label: URL 别名
+        description: 仅用于生成文件名 / 链接，小写英文或拼音，用连字符分隔，例如 nginx-anzhuang-biji
+        type: string
+        required: true
+        pattern:
+          regex: '^[a-z0-9]+(-[a-z0-9]+)*$'
+          message: 只能包含小写字母、数字和连字符
+      - name: date
+        label: 日期
+        type: date
+        required: true
+        default: '{{now}}'
+      - name: description
+        label: 摘要
+        description: 列表页与 RSS 中展示的一两句话简介
+        type: text
+      - name: category
+        label: 主题分类
+        type: select
+        required: true
+        default: misc
+        options:
+          values:
+            - { value: linux, label: Linux }
+            - { value: shell, label: Shell }
+            - { value: python, label: Python }
+            - { value: database, label: 数据库 }
+            - { value: monitoring, label: 监控与可观测性 }
+            - { value: container-virt, label: 容器与虚拟化 }
+            - { value: network, label: 网络 }
+            - { value: web-infra, label: Web 基础设施 }
+            - { value: php, label: PHP }
+            - { value: bigdata, label: 大数据 }
+            - { value: ai, label: AI 与机器学习 }
+            - { value: misc, label: 杂记 }
+      - name: tags
+        label: 标签
+        type: string
+        list: true
+      - name: draft
+        label: 草稿
+        description: 勾选后不会发布到线上
+        type: boolean
+        default: false
+      - name: origin_url
+        label: 原文链接
+        description: 摘录 / 转载笔记填写来源，文章页会渲染出处提示
+        type: string
+      - name: lang
+        label: 语言
+        type: select
+        default: zh
+        options:
+          values:
+            - { value: zh, label: 中文 }
+            - { value: en, label: English }
+      - name: body
+        label: 正文
+        type: rich-text
+
+  # ---- HTML 直发文章：正文原样渲染，不转换 Markdown ----
+  - name: html-posts
+    label: 文章（HTML 直发）
+    icon: code
+    type: collection
+    path: src/content/blog
+    extension: html
+    format: yaml-frontmatter
+    filename: '{year}-{month}-{day}-{fields.slug}.html'
+    view:
+      fields: [title, date, category, draft]
+      primary: title
+      sort: [date, title]
+      default:
+        sort: date
+        order: desc
+    fields:
+      - name: title
+        label: 标题
+        type: string
+        required: true
+      - name: slug
+        label: URL 别名
+        description: 仅用于生成文件名 / 链接，小写英文或拼音，用连字符分隔
+        type: string
+        required: true
+        pattern:
+          regex: '^[a-z0-9]+(-[a-z0-9]+)*$'
+          message: 只能包含小写字母、数字和连字符
+      - name: date
+        label: 日期
+        type: date
+        required: true
+        default: '{{now}}'
+      - name: description
+        label: 摘要
+        type: text
+      - name: category
+        label: 主题分类
+        type: select
+        required: true
+        default: misc
+        options:
+          values:
+            - { value: linux, label: Linux }
+            - { value: shell, label: Shell }
+            - { value: python, label: Python }
+            - { value: database, label: 数据库 }
+            - { value: monitoring, label: 监控与可观测性 }
+            - { value: container-virt, label: 容器与虚拟化 }
+            - { value: network, label: 网络 }
+            - { value: web-infra, label: Web 基础设施 }
+            - { value: php, label: PHP }
+            - { value: bigdata, label: 大数据 }
+            - { value: ai, label: AI 与机器学习 }
+            - { value: misc, label: 杂记 }
+      - name: tags
+        label: 标签
+        type: string
+        list: true
+      - name: draft
+        label: 草稿
+        type: boolean
+        default: false
+      - name: origin_url
+        label: 原文链接
+        type: string
+      - name: lang
+        label: 语言
+        type: select
+        default: zh
+        options:
+          values:
+            - { value: zh, label: 中文 }
+            - { value: en, label: English }
+      - name: body
+        label: HTML 正文
+        description: 粘贴 HTML 片段或完整文档（完整文档只保留 <body> 内容），构建时原样渲染
+        type: code
+        options:
+          language: html
+
+  # ---- 主题与统计设置 ----
+  - name: theme
+    label: 主题与统计
+    icon: palette
+    type: file
+    path: src/data/theme.json
+    format: json
+    fields:
+      - name: background
+        label: 背景
+        type: object
+        fields:
+          - name: image
+            label: 背景图
+            description: 留空使用默认纯色背景；建议上传较大分辨率图片
+            type: image
+          - name: colorLight
+            label: 浅色模式背景色
+            description: 例如 "#faf6ef"，留空用默认值
+            type: string
+          - name: colorDark
+            label: 深色模式背景色
+            description: 例如 "#211e19"，留空用默认值
+            type: string
+      - name: accent
+        label: 点缀色
+        type: object
+        fields:
+          - name: light
+            label: 浅色模式点缀色
+            description: 链接 / 强调色，例如 "#46705c"，留空用默认值
+            type: string
+          - name: dark
+            label: 深色模式点缀色
+            description: 例如 "#96c2ab"，留空用默认值
+            type: string
+      - name: analytics
+        label: 访问统计
+        type: object
+        fields:
+          - name: goatcounter
+            label: GoatCounter 站点代码
+            description: 在 https://www.goatcounter.com 注册后填入站点代码（如 arthaszyb），留空则不启用统计
+            type: string
