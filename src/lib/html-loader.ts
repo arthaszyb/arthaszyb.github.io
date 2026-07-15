@@ -21,10 +21,12 @@ export interface HtmlHeading {
  * `render(entry)`，因此列表、标签、RSS、相关文章、Pagefind 搜索等
  * 全部与 markdown 文章一致。
  *
- * 额外处理两件事：
- * 1. 若上传的是完整 HTML 文档（含 <html>/<head>/<body>），只取
- *    <body> 内的内容，避免破坏站点页面结构；
- * 2. 给缺少 id 的 h2/h3 注入 id 并收集为 headings，供目录（Toc）使用。
+ * 两种渲染模式（data.standalone，可在 frontmatter 显式覆盖）：
+ * - HTML 片段 → standalone=false，嵌入站点版式（PostLayout），并给
+ *   缺少 id 的 h2/h3 注入 id、收集 headings 供目录（Toc）使用；
+ * - 完整 HTML 文档（含 <html>/<head>）→ standalone=true，文章页整页
+ *   原样输出原始文档（保留其 <head> 内的样式脚本），不套站点版式，
+ *   渲染逻辑见 src/pages/posts/[slug]/index.astro。
  */
 export async function loadHtmlPosts(context: LoaderContext, blogDir: string): Promise<void> {
   const dir = fileURLToPath(new URL(blogDir, context.config.root));
@@ -41,6 +43,7 @@ export async function loadHtmlPosts(context: LoaderContext, blogDir: string): Pr
     const raw = await fs.readFile(absPath, 'utf-8');
     const { data, content } = matter(raw);
 
+    const isFullDocument = /<html[\s>]|<head[\s>]/i.test(content);
     const bodyHtml = extractBody(content);
     const { html, headings } = ensureHeadingIds(bodyHtml);
 
@@ -55,7 +58,7 @@ export async function loadHtmlPosts(context: LoaderContext, blogDir: string): Pr
 
     const parsed = await context.parseData({
       id,
-      data: { ...data, minutesRead },
+      data: { ...data, minutesRead, standalone: data.standalone ?? isFullDocument },
       filePath,
     });
 

@@ -32,11 +32,15 @@ HTML 文件**不会被转换为 Markdown**，正文构建时原样渲染。规�
 - 文件放在 `src/content/blog/`，命名 `YYYY-MM-DD-slug.html`；
 - 顶部写一段与 Markdown 相同的 YAML frontmatter（title / date / category
   必填，schema 见 `src/content.config.ts`）；
-- frontmatter 之后就是 HTML 正文，可包含内联样式和 `<script>`（交互 demo 可用）；
-- 上传完整 HTML 文档也可以：构建时只保留 `<body>` 内的内容，`<head>` 会被丢弃
-  （站点自己的 head / 导航 / 页脚仍然生效）；
-- h2 / h3 自动生成目录锚点；列表、标签、RSS、相关文章、Pagefind 搜索全部与
-  Markdown 文章一致。
+- frontmatter 之后是 HTML 正文，按内容形态自动选择两种渲染模式：
+  - **HTML 片段**（无 `<html>`/`<head>`）→ 嵌入站点版式（带导航、目录、
+    相关文章），h2 / h3 自动生成目录锚点；可包含内联样式和 `<script>`；
+  - **完整 HTML 文档**（含 `<html>`/`<head>`）→ 文章页**整页原样输出**，
+    自带的样式、表格、表单、图表脚本全部保留，不套站点版式（自包含的
+    报告 / 仪表盘类页面适用）；构建时只追加 GoatCounter 统计脚本和
+    Pagefind 搜索索引标记；
+  - 想强制指定模式，在 frontmatter 写 `standalone: true / false` 覆盖自动判断；
+- 两种模式下列表、标签、RSS、站内搜索都与 Markdown 文章一致。
 
 示例见 `src/content/blog/2026-07-14-html-zhifa-shili.html`（草稿状态，
 把 `draft` 改为 `false` 即可上线预览效果）。
