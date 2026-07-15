@@ -14,21 +14,23 @@ source: evernote-local-db
 lang: zh
 ---
 shell 脚本分析 nginx 日志访问次数最多及最耗时的页面（慢查询）
+
 当服务器压力较大时，我们经常需要做站点页面优化，找到那些访问次数高且耗时长的页面，进行相关优化。下面是这样一个常用的 shell 脚本，用于统计网页的慢访问页面（slowpage），类似于 mysql 的 slowquery。
 
-nginx 配置
+## nginx 配置
+
+```nginx
 log_format main '$remote_addr - $remote_user [$time_local] $request '
 '"$status" $body_bytes_sent "$http_referer" '
 '"$http_user_agent" "$http_x_forwarded_for" $request_time';
 access_log /var/log/nginx/access.log main buffer=32k;
-从上面配置可以看到：ip 在第一列，页面耗时在最后一列，中间用空格分隔。因此在 awk 中，分别可以用：
-```bash
-$1 和 $NF
 ```
 
-读取到当前值。其中 NF 是常量，代表整个列数。
+从上面配置可以看到：ip 在第一列，页面耗时在最后一列，中间用空格分隔。因此在 awk 中，分别可以用 `$1` 和 `$NF` 读取到当前值。其中 NF 是常量，代表整个列数。
 
-下面是分析代码的 shell 文件，可以存为 slow.sh：
+下面是分析代码的 shell 文件，可以存为 `slow.sh`：
+
+```bash
 #!/bin/sh
 export PATH=/usr/bin:/bin:/usr/local/bin:/usr/X11R6/bin;
 export LANG=zh_CN.GB2312;
@@ -46,12 +48,10 @@ end=2;
 msg="";
 [[ $2 == '1' ]] && field=1 && end=2 && msg="总访问次数统计";
 [[ $2 == '2' ]] && field=3 && end=4 && msg="平均访问时间统计";
-```bash
 echo -e "\r\n\r\n";
 echo -n "$msg";
 seq -s '#' 30 | sed -e 's/[0-9]*//g';
 awk '{split($7,bbb,"?");arr[bbb[1]]=arr[bbb[1]]+$NF; arr2[bbb[1]]=arr2[bbb[1]]+1; } END{for ( i in arr ) { print i":"arr2[i]":"arr[i]":"arr[i]/arr2[i]}}' $1 | sort -t: +$field -$end -rn |grep "pages" |head -30 | sed 's/:/\t/g'
-```
 }
 ```
 
@@ -73,11 +73,13 @@ slow.sh <日志文件> <选项>
 - `2` - 查询访问最耗时的30个页面
 
 执行结果示例：
+
 ```bash
 chmod +x slow.sh
 ./slow.sh /var/log/nginx/access.log 2
 ```
-```
+
+```text
 平均访问时间统计
 #############################
 /pages/########1.php 4 120.456 30.114
