@@ -44,7 +44,10 @@ html {
 
 body {
   margin: 0;
-  background: var(--bg);
+  /* background-color 而非 background 简写：后者会把 background-image 等
+     子属性重置为初始值，无论样式表加载顺序如何，都会吃掉 BaseLayout
+     注入的自定义背景图（见 src/layouts/BaseLayout.astro 的 themeCss）。 */
+  background-color: var(--bg);
   color: var(--fg);
   font-family: var(--font-sans);
   font-size: 1.02rem;
