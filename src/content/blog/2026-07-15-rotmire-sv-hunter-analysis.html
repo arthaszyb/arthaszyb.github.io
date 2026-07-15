@@ -1,0 +1,793 @@
+---
+title: rotmire-sv-hunter-analysis
+slug: rotmire-sv-hunter-analysis
+date: 2026-05-01
+description: AI WOW评分大师
+category: misc
+tags:
+  - wow
+  - game
+draft: false
+lang: zh
+---
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rotmire · 生存猎对比分析 — Siery vs Mandalorer</title>
+<style>
+  :root {
+    --bg: #0d0f14;
+    --card: #11141f;
+    --card2: #161a28;
+    --border: #1e2438;
+    --teal: #4fd1c5;
+    --gold: #e8c96f;
+    --red: #e05252;
+    --orange: #f0a500;
+    --green: #4caf50;
+    --blue: #64b5f6;
+    --text: #c8d0e7;
+    --muted: #6b7a9e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif; font-size: 14px; line-height: 1.5; }
+
+  /* HEADER */
+  .hero { background: linear-gradient(135deg, #0d1a2e 0%, #0d0f14 60%); border-bottom: 2px solid var(--teal); padding: 32px 40px; }
+  .hero-top { display: flex; align-items: center; gap: 16px; margin-bottom: 8px; }
+  .hero h1 { font-size: 26px; font-weight: 700; color: #fff; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+  .badge-timed { background: rgba(79,209,197,.18); color: var(--teal); border: 1px solid var(--teal); }
+  .badge-raid { background: rgba(100,181,246,.15); color: var(--blue); border: 1px solid var(--blue); }
+  .hero-sub { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+  .hero-metrics { display: flex; gap: 32px; flex-wrap: wrap; }
+  .metric { }
+  .metric-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+  .metric-val { font-size: 22px; font-weight: 700; color: #fff; }
+  .metric-val.red { color: var(--red); }
+  .metric-val.green { color: var(--green); }
+  .metric-val.gold { color: var(--gold); }
+
+  /* LAYOUT */
+  .container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+  .section-title { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--teal); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .section { margin-bottom: 36px; }
+
+  /* KPI GRID */
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 36px; }
+  .kpi-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 20px; }
+  .kpi-card.bad { border-color: rgba(224,82,82,.5); }
+  .kpi-card.warn { border-color: rgba(240,165,0,.5); }
+  .kpi-card.good { border-color: rgba(76,175,80,.5); }
+  .kpi-label { font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
+  .kpi-val { font-size: 28px; font-weight: 800; margin-bottom: 4px; }
+  .kpi-val.red { color: var(--red); }
+  .kpi-val.orange { color: var(--orange); }
+  .kpi-val.green { color: var(--green); }
+  .kpi-val.blue { color: var(--blue); }
+  .kpi-note { font-size: 12px; color: var(--muted); }
+  .kpi-note b { color: var(--text); }
+
+  /* PLAYER TABLE */
+  table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 8px; overflow: hidden; }
+  th { background: var(--card2); color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+  td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,.02); }
+  .player-name { font-weight: 700; color: #fff; font-size: 15px; }
+  .player-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .parse { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 12px; font-weight: 600; }
+  .p-poor { background: rgba(157,157,157,.18); color: #9d9d9d; }
+  .p-uncommon { background: rgba(30,255,0,.14); color: #1eff00; }
+  .p-rare { background: rgba(0,112,221,.18); color: #0070dd; }
+  .p-epic { background: rgba(197,112,240,.18); color: #c570f0; }
+  .p-legend { background: rgba(255,128,0,.18); color: #ff8000; }
+  .p-gold { background: rgba(232,201,111,.20); color: #e8c96f; }
+
+  /* DMG BAR */
+  .bar-wrap { background: rgba(255,255,255,.06); border-radius: 3px; height: 6px; margin-top: 4px; }
+  .bar-fill { height: 6px; border-radius: 3px; background: var(--teal); }
+  .bar-fill.orange { background: var(--orange); }
+  .bar-fill.red { background: var(--red); }
+  .bar-fill.blue { background: var(--blue); }
+
+  /* ABILITY TABLE */
+  .ability-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .ability-row:last-child { border-bottom: none; }
+  .ability-name { flex: 1; font-size: 13px; }
+  .ability-stat { font-size: 12px; color: var(--muted); min-width: 80px; text-align: right; }
+  .ability-stat b { color: var(--text); }
+  .diff-positive { color: var(--green); }
+  .diff-negative { color: var(--red); }
+
+  /* COMPARISON PANEL */
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 768px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-panel { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 20px; }
+  .compare-panel.highlight { border-color: rgba(79,209,197,.3); }
+  .compare-panel h3 { font-size: 14px; margin-bottom: 16px; color: #fff; }
+  .compare-panel h3 span { font-size: 11px; color: var(--muted); margin-left: 8px; font-weight: 400; }
+
+  /* STAT ROWS */
+  .stat-row { display: flex; align-items: center; margin-bottom: 10px; }
+  .stat-label { width: 140px; font-size: 12px; color: var(--muted); flex-shrink: 0; }
+  .stat-bar-wrap { flex: 1; background: rgba(255,255,255,.06); border-radius: 3px; height: 8px; margin: 0 10px; }
+  .stat-bar { height: 8px; border-radius: 3px; background: var(--teal); }
+  .stat-val { width: 60px; text-align: right; font-size: 13px; font-weight: 600; }
+
+  /* PLAYER CARDS */
+  .player-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+  @media (max-width: 768px) { .player-cards { grid-template-columns: 1fr; } }
+  .player-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .player-card-header { background: var(--card2); padding: 16px 20px; border-bottom: 1px solid var(--border); }
+  .player-card-header h3 { font-size: 16px; font-weight: 700; color: #fff; }
+  .player-card-body { padding: 20px; }
+  .improvement-item { display: flex; gap: 10px; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+  .improvement-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .imp-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .imp-title { font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 3px; }
+  .imp-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .imp-desc b { color: var(--orange); }
+  .imp-desc .good { color: var(--green); }
+
+  /* ACTION TABLE */
+  .action-table { width: 100%; border-collapse: collapse; }
+  .action-table th { background: var(--card2); }
+  .action-table td.priority-1 { color: var(--red); font-weight: 700; }
+  .action-table td.priority-2 { color: var(--orange); font-weight: 700; }
+  .action-table td.priority-3 { color: var(--blue); font-weight: 600; }
+  .tag { display: inline-block; padding: 2px 7px; border-radius: 3px; font-size: 11px; font-weight: 600; }
+  .tag-easy { background: rgba(76,175,80,.15); color: var(--green); }
+  .tag-medium { background: rgba(240,165,0,.15); color: var(--orange); }
+  .tag-hard { background: rgba(224,82,82,.15); color: var(--red); }
+
+  /* VERDICT */
+  .verdict { background: var(--card); border: 1px solid var(--border); border-left: 4px solid var(--teal); border-radius: 8px; padding: 24px; margin-top: 8px; }
+  .verdict p { color: var(--text); line-height: 1.8; margin-bottom: 12px; }
+  .verdict p:last-child { margin-bottom: 0; }
+  .verdict .chain { color: var(--teal); font-style: italic; }
+  .verdict strong { color: #fff; }
+
+  details summary { cursor: pointer; user-select: none; }
+  details summary::-webkit-details-marker { display: none; }
+</style>
+</head>
+<body>
+
+<!-- HERO HEADER -->
+<div class="hero">
+  <div class="hero-top">
+    <h1>Rotmire · 孢子坠落</h1>
+    <span class="badge badge-raid">团本 BOSS</span>
+    <span class="badge badge-timed">生存猎 对比分析</span>
+  </div>
+  <div class="hero-sub">Siery vs Mandalorer · 相同 BOSS 不同场次 · 均装 ~290</div>
+  <div class="hero-metrics">
+    <div class="metric"><div class="metric-label">Siery DPS</div><div class="metric-val red">123,974</div></div>
+    <div class="metric"><div class="metric-label">Mandalorer DPS</div><div class="metric-val green">160,148</div></div>
+    <div class="metric"><div class="metric-label">DPS 差距</div><div class="metric-val gold">+36,174 (+29%)</div></div>
+    <div class="metric"><div class="metric-label">Siery Overall%</div><div class="metric-val red">12%</div></div>
+    <div class="metric"><div class="metric-label">Mandalorer Overall%</div><div class="metric-val green">74%</div></div>
+    <div class="metric"><div class="metric-label">战斗时长</div><div class="metric-val" style="color:var(--text)">479s vs 507s</div></div>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- KPI CARDS -->
+<div class="section">
+  <div class="section-title">核心问题 KPI</div>
+  <div class="kpi-grid">
+    <div class="kpi-card bad">
+      <div class="kpi-label">Takedown 差距倍数</div>
+      <div class="kpi-val red">3.5×</div>
+      <div class="kpi-note"><b>Siery 2.4M</b> vs Mandalorer 8.5M<br>最大单项异常，技能+天赋差距</div>
+    </div>
+    <div class="kpi-card bad">
+      <div class="kpi-label">宠物总 DPS 差距</div>
+      <div class="kpi-val red">−7,424</div>
+      <div class="kpi-note">Siery 宠物 34,516 dps<br>Mandalorer 41,940 dps（+22%）</div>
+    </div>
+    <div class="kpi-card warn">
+      <div class="kpi-label">野火炸弹频率</div>
+      <div class="kpi-val orange">5.1 vs 6.3/min</div>
+      <div class="kpi-note">Siery 少 <b>22%</b> WFB 每分钟<br>41 次 vs 53 次（更长场次）</div>
+    </div>
+    <div class="kpi-card warn">
+      <div class="kpi-label">爆炸霰弹枪命中/次</div>
+      <div class="kpi-val orange">12.6 vs 19.4</div>
+      <div class="kpi-note">Siery 151命中/12次 vs Mandalorer 272命中/14次<br>AoE 定位差距</div>
+    </div>
+    <div class="kpi-card warn">
+      <div class="kpi-label">顶端矛尖覆盖率</div>
+      <div class="kpi-val orange">75% vs 85%</div>
+      <div class="kpi-note">Siery 118次 vs Mandalorer 162次<br>KC→RS 循环效率差距</div>
+    </div>
+    <div class="kpi-card good">
+      <div class="kpi-label">战斗药水使用</div>
+      <div class="kpi-val green">Siery 优</div>
+      <div class="kpi-note">Siery 使用 <b>2× 鲁莽药水</b><br>Mandalorer 使用的是治疗药水</div>
+    </div>
+  </div>
+</div>
+
+<!-- PLAYER COMPARISON TABLE -->
+<div class="section">
+  <div class="section-title">玩家总览对比</div>
+  <table>
+    <thead>
+      <tr>
+        <th>玩家</th>
+        <th>DPS</th>
+        <th>总伤害</th>
+        <th>Overall%</th>
+        <th>Bracket%</th>
+        <th>战斗时长</th>
+        <th>敏捷</th>
+        <th>急速</th>
+        <th>暴击</th>
+        <th>精通</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <div class="player-name">Siery</div>
+          <div class="player-sub">生存猎 · 罗宁 · ilvl 291</div>
+        </td>
+        <td><b>123,974</b><br><div class="bar-wrap"><div class="bar-fill red" style="width:77%"></div></div></td>
+        <td>59,383,576</td>
+        <td><span class="parse p-poor">12%</span></td>
+        <td><span class="parse p-poor">7%</span></td>
+        <td>479s</td>
+        <td>2175</td>
+        <td style="color:var(--red)"><b>458</b></td>
+        <td>982</td>
+        <td>1373</td>
+      </tr>
+      <tr>
+        <td>
+          <div class="player-name">Mandalorer</div>
+          <div class="player-sub">生存猎 · 燃烧之刃 · ilvl 290</div>
+        </td>
+        <td><b>160,148</b><br><div class="bar-wrap"><div class="bar-fill" style="width:100%"></div></div></td>
+        <td>81,195,024</td>
+        <td><span class="parse p-epic">74%</span></td>
+        <td><span class="parse p-epic">68%</span></td>
+        <td>507s</td>
+        <td>2164</td>
+        <td style="color:var(--green)"><b>598</b></td>
+        <td>852</td>
+        <td>1242</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- DAMAGE BREAKDOWN COMPARISON -->
+<div class="section">
+  <div class="section-title">技能伤害拆解对比</div>
+  <div class="compare-grid">
+    <!-- Siery -->
+    <div class="compare-panel">
+      <h3>Siery <span>总 DPS 123,974</span></h3>
+      <div class="ability-row">
+        <div class="ability-name">🗡 迅猛打击 (Raptor Strike)</div>
+        <div class="ability-stat"><b>11,899,495</b><br>20.0% · 193命中</div>
+      </div>
+      <div class="ability-row">
+        <div class="ability-name">🔫 爆炸霰弹枪 (Boomstick)</div>
+        <div class="ability-stat"><b>10,174,776</b><br>17.1% · 151命中</div>
+      </div>
+      <div class="ability-row" style="background:rgba(79,209,197,.04); border-radius:4px;">
+        <div class="ability-name">🐾 一击同心 [跃行者] (Strike As One)</div>
+        <div class="ability-stat"><b>9,985,423</b><br>16.8% · <b>390</b>命中</div>
+      </div>
+      <div class="ability-row">
+        <div class="ability-name">⚔️ 近战攻击 (Melee)</div>
+        <div class="ability-stat"><b>7,145,828</b><br>12.0% · 1092命中</div>
+      </div>
+      <div class="ability-row">
+        <div class="ability-name">💣 野火炸弹 (Wildfire Bomb)</div>
+        <div class="ability-stat"><b>4,814,737</b><br>8.1% · 41次</div>
+      </div>
+      <div class="ability-row">
+        <div class="ability-name">🐗 野猪冲锋 (Boar Charge)</div>
+        <div class="ability-stat"><b>4,741,540</b><br>8.0% · 22命中</div>
+      </div>
+      <div class="ability-row">
+        <div class="ability-name">🐾 杀戮命令 (Kill Command)</div>
+        <div class="ability-stat"><b>2,699,951</b><br>4.5% · 102次</div>
+      </div>
+      <div class="ability-row">
+        <div class="ability-name">🐻 熊召唤 (Bear Summon)</div>
+        <div class="ability-stat"><b>1,931,722</b><br>3.3% · 341命中</div>
+      </div>
+      <div class="ability-row" style="background:rgba(224,82,82,.04); border-radius:4px;">
+        <div class="ability-name">❌ Takedown (宠物)</div>
+        <div class="ability-stat"><b>1,465,141</b><br>2.5% · <b style="color:var(--red)">8</b>命中</div>
+      </div>
+    </div>
+
+    <!-- Mandalorer -->
+    <div class="compare-panel highlight">
+      <h3>Mandalorer <span>总 DPS 160,148</span></h3>
+      <div class="ability-row" style="background:rgba(79,209,197,.04); border-radius:4px;">
+        <div class="ability-name">🐾 鳞甲类宠物全部技能</div>
+        <div class="ability-stat"><b style="color:var(--teal)">21,263,569</b><br>26.2% · 1880命中</div>
+      </div>
+      <div class="ability-row" style="padding-left:16px; font-size:12px;">
+        <div class="ability-name" style="color:var(--muted)">└ 一击同心 (Strike As One)</div>
+        <div class="ability-stat" style="font-size:11px;"><b>12,657,803</b> · <b>524</b>命中</div>
+      </div>
+      <div class="ability-row" style="padding-left:16px; font-size:12px;">
+        <div class="ability-name" style="color:var(--orange)">└ Takedown (宠物) ⚠</div>
+        <div class="ability-stat" style="font-size:11px;"><b>4,967,908</b> · <b style="color:var(--orange)">19</b>命中</div>
+      </div>
+      <div class="ability-row">
+        <div class="ability-name">🔫 爆炸霰弹枪 (Boomstick)</div>
+        <div class="ability-stat"><b>16,588,475</b><br>20.4% · 272命中</div>
+      </div>
+      <div class="ability-row">
+        <div class="ability-name">🗡 迅猛打击 (Raptor Strike)</div>
+        <div class="ability-stat"><b>12,639,594</b><br>15.6% · 212命中</div>
+      </div>
+      <div class="ability-row">
+        <div class="ability-name">💣 野火炸弹 (Wildfire Bomb)</div>
+        <div class="ability-stat"><b>7,697,891</b><br>9.5% · <b style="color:var(--green)">53</b>次</div>
+      </div>
+      <div class="ability-row">
+        <div class="ability-name">⚔️ 近战攻击 (Melee)</div>
+        <div class="ability-stat"><b>6,708,885</b><br>8.3% · 724命中</div>
+      </div>
+      <div class="ability-row">
+        <div class="ability-name">🐗 野猪冲锋 (Boar Charge)</div>
+        <div class="ability-stat"><b>6,503,938</b><br>8.0% · 31命中</div>
+      </div>
+      <div class="ability-row">
+        <div class="ability-name">🐾 杀戮命令 (Kill Command)</div>
+        <div class="ability-stat"><b>2,724,717</b><br>3.4% · 111次</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS COMPARISON -->
+<div class="section">
+  <div class="section-title">属性对比（急速是核心差异）</div>
+  <div class="compare-grid">
+    <div class="compare-panel">
+      <h3>关键属性对比</h3>
+
+      <div class="stat-row">
+        <div class="stat-label">敏捷 Agility</div>
+        <div class="stat-bar-wrap"><div class="stat-bar" style="width:100%"></div></div>
+        <div class="stat-val">Siery <b>2175</b></div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-label"></div>
+        <div class="stat-bar-wrap"><div class="stat-bar" style="width:99%"></div></div>
+        <div class="stat-val">Mand <b>2164</b></div>
+      </div>
+
+      <div class="stat-row" style="margin-top:12px;">
+        <div class="stat-label" style="color:var(--red)">急速 Haste ⚠</div>
+        <div class="stat-bar-wrap"><div class="stat-bar orange" style="width:76%"></div></div>
+        <div class="stat-val" style="color:var(--red)">Siery <b>458</b></div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-label"></div>
+        <div class="stat-bar-wrap"><div class="stat-bar" style="width:100%"></div></div>
+        <div class="stat-val" style="color:var(--green)">Mand <b>598</b></div>
+      </div>
+
+      <div class="stat-row" style="margin-top:12px;">
+        <div class="stat-label">暴击 Crit</div>
+        <div class="stat-bar-wrap"><div class="stat-bar" style="width:100%"></div></div>
+        <div class="stat-val">Siery <b>982</b></div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-label"></div>
+        <div class="stat-bar-wrap"><div class="stat-bar" style="width:87%"></div></div>
+        <div class="stat-val">Mand <b>852</b></div>
+      </div>
+
+      <div class="stat-row" style="margin-top:12px;">
+        <div class="stat-label">精通 Mastery</div>
+        <div class="stat-bar-wrap"><div class="stat-bar" style="width:100%"></div></div>
+        <div class="stat-val">Siery <b>1373</b></div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-label"></div>
+        <div class="stat-bar-wrap"><div class="stat-bar" style="width:90%"></div></div>
+        <div class="stat-val">Mand <b>1242</b></div>
+      </div>
+    </div>
+
+    <div class="compare-panel">
+      <h3>施法频率对比（CPM）</h3>
+      <table style="background:transparent;">
+        <thead>
+          <tr>
+            <th style="background:transparent;">技能</th>
+            <th style="background:transparent; color:var(--red);">Siery CPM</th>
+            <th style="background:transparent; color:var(--teal);">Mand CPM</th>
+            <th style="background:transparent;">差异</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>杀戮命令</td>
+            <td style="color:var(--red);">12.8</td>
+            <td style="color:var(--teal);">13.3</td>
+            <td class="diff-positive">+0.5</td>
+          </tr>
+          <tr>
+            <td>迅猛打击</td>
+            <td style="color:var(--red);">8.6</td>
+            <td style="color:var(--teal);">8.2</td>
+            <td class="diff-negative">−0.4</td>
+          </tr>
+          <tr>
+            <td style="color:var(--orange);">野火炸弹 ⚠</td>
+            <td style="color:var(--red);"><b>5.1</b></td>
+            <td style="color:var(--teal);"><b>6.3</b></td>
+            <td class="diff-positive">+1.2</td>
+          </tr>
+          <tr>
+            <td>爆炸霰弹枪</td>
+            <td style="color:var(--red);">1.5</td>
+            <td style="color:var(--teal);">1.7</td>
+            <td class="diff-positive">+0.2</td>
+          </tr>
+          <tr>
+            <td style="color:var(--orange);">Takedown（次数）</td>
+            <td style="color:var(--red);"><b>7次</b></td>
+            <td style="color:var(--teal);"><b>8次</b></td>
+            <td class="diff-positive">+1</td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="margin-top:16px; padding:12px; background:rgba(240,165,0,.08); border-radius:6px; border:1px solid rgba(240,165,0,.3);">
+        <div style="font-size:12px; color:var(--orange); font-weight:600;">急速 458 vs 598 的影响</div>
+        <div style="font-size:12px; color:var(--muted); margin-top:4px;">
+          急速影响杀戮命令冷却缩减 → 更多 KC 触发宠物"一击同心" → 宠物 DPS 更高。<br>
+          也直接导致 WFB 冷却更短，Mandalorer 每分钟多 1.2 颗野火炸弹。
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BUFF COMPARISON -->
+<div class="section">
+  <div class="section-title">关键 Buff 覆盖率对比</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Buff / 技能</th>
+        <th>Siery</th>
+        <th>Mandalorer</th>
+        <th>差异说明</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><b>顶端矛尖 (Tip of the Spear)</b></td>
+        <td><span style="color:var(--orange);">75.2%</span> / 118次</td>
+        <td><span style="color:var(--green);">85.0%</span> / 162次</td>
+        <td>Mandalorer 在 ToS 窗口内打出更多 RS，循环更紧密</td>
+      </tr>
+      <tr>
+        <td><b>獴怒 (Mongoose Fury)</b></td>
+        <td><span style="color:var(--green);">97.0%</span> / 312次</td>
+        <td><span style="color:var(--green);">95.2%</span> / 319次</td>
+        <td>两人均优秀，差距可忽略</td>
+      </tr>
+      <tr>
+        <td><b>嗜血者 (Bloodseeker)</b></td>
+        <td>95.3% / 64次</td>
+        <td>99.3% / 74次</td>
+        <td>Mandalorer 略高</td>
+      </tr>
+      <tr>
+        <td><b>渥伊温哭泣 (Wyvern's Cry)</b></td>
+        <td>41.0% / 107次</td>
+        <td>49.0% / 121次</td>
+        <td>Mandalorer 覆盖更高</td>
+      </tr>
+      <tr>
+        <td><b>迅猛打击! (Raptor Swipe!)</b></td>
+        <td>40.6% / 69次</td>
+        <td><span style="color:var(--teal);">56.1%</span> / 70次</td>
+        <td>Mandalorer 触发更频繁，宠物额外攻击次数更多</td>
+      </tr>
+      <tr>
+        <td><b>血性狂怒 (Blood Fury)</b></td>
+        <td><span style="color:var(--red);">无</span></td>
+        <td><span style="color:var(--green);">11.5%</span> / 4次</td>
+        <td>兽人种族技，+20% AP 15秒，2min CD。Siery 无法使用（种族限制）</td>
+      </tr>
+      <tr>
+        <td><b>消耗品：DPS 药水</b></td>
+        <td><span style="color:var(--green);">2× 鲁莽药水</span></td>
+        <td><span style="color:var(--red);">使用治疗药水</span></td>
+        <td>此项 Siery 优于 Mandalorer</td>
+      </tr>
+      <tr>
+        <td><b>消耗品：烹饪食物</b></td>
+        <td><span class="parse p-gold">100%</span> 精心烹饪</td>
+        <td><span class="parse p-gold">100%</span> 精心烹饪</td>
+        <td>均使用顶级食物，无差距</td>
+      </tr>
+      <tr>
+        <td><b>消耗品：炼金药水</b></td>
+        <td><span class="parse p-gold">100%</span> 智者炼金瓶</td>
+        <td><span class="parse p-gold">100%</span> 智者炼金瓶</td>
+        <td>均使用，无差距</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- TAKEDOWN DEEP DIVE -->
+<div class="section">
+  <div class="section-title">Takedown 深度分析 — 最大异常点</div>
+  <div class="compare-grid">
+    <div class="compare-panel">
+      <h3 style="color:var(--red);">⚠ Siery Takedown 数据</h3>
+      <table style="background:transparent;">
+        <tbody>
+          <tr><td style="color:var(--muted)">玩家 Takedown（7次施放）</td><td><b>955,576</b> · 8命中</td></tr>
+          <tr><td style="color:var(--muted)">宠物 Takedown（连带）</td><td><b>1,465,141</b> · 8命中</td></tr>
+          <tr><td style="color:var(--muted)">每次施放平均总伤</td><td style="color:var(--red);"><b>345,817</b></td></tr>
+          <tr><td style="color:var(--muted)">宠物每命中平均</td><td style="color:var(--red);"><b>183,143</b></td></tr>
+          <tr><td style="color:var(--muted)">合计</td><td style="color:var(--red);"><b>2,420,717</b></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="compare-panel highlight">
+      <h3 style="color:var(--teal);">Mandalorer Takedown 数据</h3>
+      <table style="background:transparent;">
+        <tbody>
+          <tr><td style="color:var(--muted)">玩家 Takedown（8次施放）</td><td><b>3,567,658</b> · 20命中</td></tr>
+          <tr><td style="color:var(--muted)">宠物 Takedown（连带）</td><td><b>4,967,908</b> · 19命中</td></tr>
+          <tr><td style="color:var(--muted)">每次施放平均总伤</td><td style="color:var(--teal);"><b>1,066,946</b></td></tr>
+          <tr><td style="color:var(--muted)">宠物每命中平均</td><td style="color:var(--teal);"><b>261,469</b></td></tr>
+          <tr><td style="color:var(--muted)">合计</td><td style="color:var(--teal);"><b>8,535,566</b></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="verdict" style="margin-top:16px; border-left-color: var(--red);">
+    <p>
+      <strong>单次 Takedown 施放差距：3.08×</strong>（1,066,946 vs 345,817），属性差异（仅约 ±10%）无法解释这个量级。
+      宠物命中差距（8次 vs 19次）表明 Mandalorer 的 Takedown 拥有额外触发机制——可能来自：
+    </p>
+    <p>
+      1. <strong>天赋节点</strong>：某些增强 Takedown 的天赋（如"残忍打击"类）可使 Takedown 触发额外宠物连击，或在特定条件下多次生效<br>
+      2. <strong>协调突袭（CA）窗口叠加</strong>：如果 Mandalorer 集中在 CA 期间使用 Takedown，而该期间有伤害加成 buff 生效<br>
+      3. <strong>套装效果</strong>：特定团本套装可能强化 Takedown 的触发/伤害
+    </p>
+    <p style="color:var(--orange);">
+      <strong>行动建议：Siery 需立刻对比天赋树</strong>，找出 Mandalorer 在 Takedown 路径上投入了哪些节点。这是 DPS 差距最大的单一来源。
+    </p>
+  </div>
+</div>
+
+<!-- AoE/CLEAVE ANALYSIS -->
+<div class="section">
+  <div class="section-title">AoE 定位分析 — 爆炸霰弹枪 & 野火炸弹</div>
+  <div class="compare-grid">
+    <div class="compare-panel">
+      <h3>爆炸霰弹枪 (Boomstick) 命中效率</h3>
+      <div style="margin-bottom:12px;">
+        <div class="stat-row">
+          <div class="stat-label">Siery 命中/次</div>
+          <div class="stat-bar-wrap"><div class="stat-bar red" style="width:65%"></div></div>
+          <div class="stat-val" style="color:var(--red)">12.6</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-label">Mandalorer 命中/次</div>
+          <div class="stat-bar-wrap"><div class="stat-bar" style="width:100%"></div></div>
+          <div class="stat-val" style="color:var(--green)">19.4</div>
+        </div>
+      </div>
+      <div style="padding:10px; background:rgba(100,181,246,.08); border-radius:6px; border:1px solid rgba(100,181,246,.2); font-size:12px; color:var(--muted);">
+        Rotmire 战场有 Fungling、Shroomling、Sporecap、Bursting Shroom 多种小怪。霰弹枪每颗子弹可命中不同目标。
+        Mandalorer 每次施放命中更多目标，说明其在小怪密集时更好地利用了站位和时机。
+        <br><br>Siery 每命中平均伤害反而更高（67,382 vs 61,002），证明属性配置没问题——纯粹是<b style="color:var(--orange)">命中目标数少</b>。
+      </div>
+    </div>
+    <div class="compare-panel">
+      <h3>野火炸弹 (Wildfire Bomb) 效率</h3>
+      <div class="stat-row">
+        <div class="stat-label">Siery 总命中</div>
+        <div class="stat-bar-wrap"><div class="stat-bar red" style="width:58%"></div></div>
+        <div class="stat-val" style="color:var(--red)">364</div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-label">Mandalorer 总命中</div>
+        <div class="stat-bar-wrap"><div class="stat-bar" style="width:100%"></div></div>
+        <div class="stat-val" style="color:var(--green)">627</div>
+      </div>
+      <div style="margin-top:12px; font-size:12px; color:var(--muted);">
+        <b>每次施放命中：</b><br>
+        Siery：364 / 41 = <b style="color:var(--red)">8.9</b> 目标/次<br>
+        Mandalorer：627 / 53 = <b style="color:var(--teal)">11.8</b> 目标/次<br><br>
+        两个差距叠加（<b>次数少 22%</b> + <b>每次命中少 25%</b>），WFB 总输出差了近 60%（4.8M vs 7.7M）。
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SIERY IMPROVEMENT POINTS -->
+<div class="section">
+  <div class="section-title">Siery 提升点详细说明</div>
+  <div class="player-card" style="max-width:100%;">
+    <div class="player-card-header" style="border-left:4px solid var(--teal);">
+      <h3>Siery — 生存猎 · 优先改进项</h3>
+    </div>
+    <div class="player-card-body">
+
+      <div class="improvement-item">
+        <div class="imp-icon">🔥</div>
+        <div>
+          <div class="imp-title">P1 【紧急】对比 Mandalorer 天赋树，找到 Takedown 强化节点</div>
+          <div class="imp-desc">
+            你的单次 Takedown 平均 <b>345,817</b> 伤害，Mandalorer 是 <b>1,066,946</b>，差距 3.08×。这不是属性问题，是天赋或套装导致的机制差距。
+            Mandalorer 的宠物 Takedown 命中了 <b>19</b> 次（你只有 8 次），说明有天赋让 Takedown 触发额外宠物攻击或多段命中。
+            <br>立刻行动：去 WCL 查看 Mandalorer 的天赋截图，对比你自己的天赋树，找出 Takedown 路径上缺失的节点。这一项修正预计能带来 <b class="good">+5,000~10,000 DPS</b>。
+          </div>
+        </div>
+      </div>
+
+      <div class="improvement-item">
+        <div class="imp-icon">⚡</div>
+        <div>
+          <div class="imp-title">P2 【重要】考虑增加急速属性（458 → 目标 550+）</div>
+          <div class="imp-desc">
+            急速差距：你 <b>458</b> vs Mandalorer <b>598</b>（+31%）。急速直接影响：
+            (1) 杀戮命令冷却缩减 → 每分钟多触发宠物一击同心；
+            (2) 野火炸弹冷却缩减 → 你每分钟 5.1 颗，Mandalorer 6.3 颗；
+            (3) 宠物攻击速度加快。
+            <br>可以考虑将部分暴击（当前 982，较高）或精通属性换到急速上，生存猎的急速价值通常高于暴击。<b>预计增益 +3,000~6,000 DPS</b>。
+          </div>
+        </div>
+      </div>
+
+      <div class="improvement-item">
+        <div class="imp-icon">💣</div>
+        <div>
+          <div class="imp-title">P3 【重要】在小怪密集时主动对准小怪群用野火炸弹和霰弹枪</div>
+          <div class="imp-desc">
+            Rotmire 战场有 Fungling / Shroomling / Sporecap / Bursting Shroom 多种小怪。
+            你的 WFB 每次命中 8.9 个目标，Mandalorer 11.8 个（+32%）；
+            霰弹枪每次命中 12.6 个，Mandalorer 19.4 个（+54%）。
+            <br>改进方法：小怪出现时，优先走位到小怪群聚集处再扔炸弹/打霰弹枪，确保每次 AoE 命中尽量多的目标。
+            <b>预计增益 +3,000~5,000 DPS</b>（取决于小怪频率）。
+          </div>
+        </div>
+      </div>
+
+      <div class="improvement-item">
+        <div class="imp-icon">🗡</div>
+        <div>
+          <div class="imp-title">P4 【中等】提升顶端矛尖覆盖率：75% → 85%</div>
+          <div class="imp-desc">
+            顶端矛尖 (Tip of the Spear) 是生存猎最重要的 Buff 之一，在叠到 3 层时使迅猛打击伤害大幅提升。
+            你覆盖率 75.2%（118 次），Mandalorer 85%（162 次）。
+            <br>核心是保持 KC → RS → KC → RS 的节奏不断档，不要在 ToS 叠层时插入不必要的等待。在移动时优先补 KC 保持 GCD 利用率。
+            <b>预计增益 +1,000~2,000 DPS</b>。
+          </div>
+        </div>
+      </div>
+
+      <div class="improvement-item">
+        <div class="imp-icon">✅</div>
+        <div>
+          <div class="imp-title">做得好的地方（保持！）</div>
+          <div class="imp-desc">
+            <span class="good">• 使用了 2× 鲁莽药水</span>（Mandalorer 用的是治疗药水，这里你赢了）<br>
+            <span class="good">• 獴怒覆盖率 97%</span>，接近满分<br>
+            <span class="good">• 顶级烹饪食物 + 智者炼金瓶</span>，消耗品合格<br>
+            <span class="good">• 杀戮命令 CPM 12.8</span>，与 Mandalorer 13.3 差距不大
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- PRIORITIZED ACTION PLAN -->
+<div class="section">
+  <div class="section-title">优先行动计划</div>
+  <table class="action-table">
+    <thead>
+      <tr>
+        <th>优先级</th>
+        <th>问题</th>
+        <th>具体行动</th>
+        <th>预计 DPS 增益</th>
+        <th>难度</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="priority-1">P1</td>
+        <td>Takedown 伤害仅为对比者的 29%</td>
+        <td>对比天赋树，补齐 Takedown 强化天赋节点（Mandalorer 每次施放多 3× 伤害）</td>
+        <td style="color:var(--red);"><b>+5,000~10,000</b></td>
+        <td><span class="tag tag-easy">极易</span></td>
+      </tr>
+      <tr>
+        <td class="priority-2">P2</td>
+        <td>急速过低（458 vs 598）</td>
+        <td>优化配件/附魔将急速提升到 550+，可牺牲部分暴击评分</td>
+        <td style="color:var(--orange);"><b>+3,000~6,000</b></td>
+        <td><span class="tag tag-easy">极易</span></td>
+      </tr>
+      <tr>
+        <td class="priority-2">P3</td>
+        <td>AoE 定位差（WFB/霰弹枪命中目标少 25~54%）</td>
+        <td>小怪密集时主动站位到小怪群内，优先 AoE 技能</td>
+        <td style="color:var(--orange);"><b>+2,000~5,000</b></td>
+        <td><span class="tag tag-medium">需意识</span></td>
+      </tr>
+      <tr>
+        <td class="priority-3">P4</td>
+        <td>WFB 频率低 22%（5.1 vs 6.3/min）</td>
+        <td>急速提升后自然改善；同时确保 WFB 不被打断/延误</td>
+        <td style="color:var(--blue);"><b>+1,000~2,000</b></td>
+        <td><span class="tag tag-easy">随属性改善</span></td>
+      </tr>
+      <tr>
+        <td class="priority-3">P5</td>
+        <td>顶端矛尖覆盖率 75% vs 85%</td>
+        <td>保持 KC→RS 交替节奏，移动时优先 KC 保持 GCD 利用</td>
+        <td style="color:var(--blue);"><b>+500~1,500</b></td>
+        <td><span class="tag tag-medium">需练习</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- VERDICT -->
+<div class="section">
+  <div class="section-title">结论</div>
+  <div class="verdict">
+    <p>
+      <strong>DPS 差距 36,174 (+29%) 的根因分析：</strong>
+    </p>
+    <p class="chain">
+      Takedown 天赋缺失 → 单次 TD 伤害仅 29% → 宠物/玩家 Takedown 合计少 6.1M
+      → 急速过低（458 vs 598）→ 每分钟少 1.2 颗 WFB + 宠物 Strike As One 频率低 27%
+      → AoE 站位不优 → 霰弹枪/炸弹命中目标少 25~54%
+      → 综合 DPS 差距 36k
+    </p>
+    <p>
+      最紧急且最容易修复的是 <strong>天赋树 Takedown 节点</strong>——这完全不涉及游戏操作水平，只是一次天赋重置即可获得最高收益。
+      其次是 <strong>属性调整（增加急速）</strong>，通过重新附魔或换配件即可实现。
+      AoE 定位意识是需要时间培养的实战习惯，但对类似多小怪 Boss 的提升效果很可观。
+    </p>
+    <p>
+      值得一提：Siery 的 <strong>DPS 药水使用比 Mandalorer 更好</strong>（2 颗 vs 治疗药水），
+      消耗品底层也做得合格，说明基础准备工作没问题。
+      核心问题是机制/天赋理解和属性取向，通过上述 P1~P3 修正，预计可将 DPS 提升 <strong>10,000~20,000</strong>，
+      将 Overall Parse 从 12% 提升至 40~60% 区间。
+    </p>
+  </div>
+</div>
+
+<div style="text-align:center; padding:20px 0 40px; color:var(--muted); font-size:11px;">
+  数据来源：<a href="https://cn.warcraftlogs.com/reports/XRm3t9a1yFL78JCG" style="color:var(--teal);">Siery 战报</a> &amp;
+  <a href="https://cn.warcraftlogs.com/reports/FpYcJjyqP7CtxfKR" style="color:var(--teal);">Mandalorer 战报</a> · WCL v2 API
+</div>
+
+</div>
+</body>
+</html>
