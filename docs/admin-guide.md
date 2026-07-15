@@ -6,7 +6,7 @@
 | 能力 | 方案 | 入口 |
 | --- | --- | --- |
 | 写文章（Markdown / HTML 直发）、传图、改主题 | [Pages CMS](https://pagescms.org) | <https://app.pagescms.org> |
-| 背景 / 主题色 / 统计开关 | `src/data/theme.json`（CMS 内可视化编辑） | CMS「主题与统计」 |
+| 顶部横幅 / 主题色 / 统计开关 | `src/data/theme.json`（CMS 内可视化编辑） | CMS「主题与统计」 |
 | 浏览数据分析 | [GoatCounter](https://www.goatcounter.com) | `https://<站点代码>.goatcounter.com` |
 
 发布流程：管理台点「保存」= 提交一个 commit 到 master → GitHub Actions
@@ -22,7 +22,7 @@
 
 - **文章（Markdown）** — 富文本编辑器写作，保存为 `src/content/blog/*.md`；
 - **文章（HTML 直发）** — 代码编辑器粘贴 HTML，保存为 `src/content/blog/*.html`；
-- **主题与统计** — 编辑 `src/data/theme.json`（背景图、配色、统计代码）；
+- **主题与统计** — 编辑 `src/data/theme.json`（顶部横幅图、配色、统计代码）；
 - **媒体** — 图片上传到 `public/images/`，文章内以 `/images/...` 引用。
 
 ## 二、HTML 直发文章
@@ -49,21 +49,20 @@ HTML 文件**不会被转换为 Markdown**，正文构建时原样渲染。规�
 注意：本地 `npm run dev` 时新增 / 修改 `.html` 文章需要重启 dev server
 才会生效（内容层 loader 只在启动时同步）；线上走 Actions 全量构建，无此问题。
 
-## 三、背景更换与主题定制
+## 三、顶部横幅与主题定制
 
 编辑 CMS 的「主题与统计」（即 `src/data/theme.json`）：
 
 | 字段 | 作用 |
 | --- | --- |
-| `background.image` | 全站背景图（上传后自动填入路径），留空为纯色背景 |
-| `background.colorLight` / `colorDark` | 浅色 / 深色模式背景色，如 `#faf6ef` |
+| `banner.image` | 顶部横幅图（上传后自动填入路径）。是页面最顶端一条贯穿全宽、固定高度（约 90–200px，随视口宽度自适应）的色带，随页面正常滚动，**不是全屏背景**，不会遮挡或影响下方任何内容。留空则不显示。建议横向构图的图片，竖直方向内容会被居中裁切 |
 | `accent.light` / `accent.dark` | 链接与强调色，如 `#46705c` |
 | `analytics.goatcounter` | GoatCounter 站点代码，留空不加载统计脚本 |
 
 所有字段留空 = 保持 `src/styles/global.css` 的默认「暖纸面」设计；
-只有填了值的字段会生成覆写 CSS（注入逻辑见 `src/layouts/BaseLayout.astro`）。
-更大范围的排版调整（字体、宽度、列表样式等）直接改 `src/styles/global.css`
-顶部的 CSS 变量。
+横幅样式在 `.site-banner`（`src/styles/global.css`），注入逻辑见
+`src/layouts/BaseLayout.astro`。更大范围的排版调整（字体、宽度、列表
+样式等）直接改 `src/styles/global.css` 顶部的 CSS 变量。
 
 ## 四、浏览数据分析（GoatCounter）
 
