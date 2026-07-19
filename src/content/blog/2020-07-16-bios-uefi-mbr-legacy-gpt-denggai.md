@@ -100,7 +100,7 @@ UEFI中的兼容性支持模块（Compatible Support Module）提供了引导UEF
 
 GUID Partition Table，是EFI标准的一部分，用于替代MBR分区表，相较起来有分区更大，数量更多（没有4个主分区的限制）等优势，GPT格式的硬盘结构如下，可以看到首部MBR的位置有个保护MBR（用于防止不识别GPT的硬盘工具错误识别并破坏硬盘中的数据），这个MBR中只有一个类型为0xEE的分区。GPT结构如下：
 
-![](https://pic3.zhimg.com/80/v2-0f9d14100058feff6e180da5623c3aca_720w.jpg)
+<!-- image unavailable (dead hotlink): https://pic3.zhimg.com/80/v2-0f9d14100058feff6e180da5623c3aca_720w.jpg 原为 GPT 结构示意图 -->
 
 ## 分区
 

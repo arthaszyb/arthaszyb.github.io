@@ -7,17 +7,17 @@
 
 以下 `.md` 文章正文里残留 `<table>/<div>/<span>` 等 HTML，需转成规范 Markdown（表格转 md 表格、div/span 去壳保留文本）。**先逐篇确认 HTML 是否在 ```` ```html ```` 代码块内**——若是文章正文展示的源码（如 oncall 的 Vue 前端代码），属合法内容，保留不动。
 
-- [ ] `2018-08-23-luyou-xiugai-route.md`（3 处）
-- [ ] `2018-03-08-grafana-mysql-shuju-yuan.md`（1 处）
-- [ ] `2018-11-01-linux-huanjing-bianliang-dejia-zaishun-xu.md`（2 处）
-- [ ] `2013-12-31-sshfs-guazai-yuancheng-mulu.md`（1 处）
-- [ ] `2018-02-06-oncall-xiaogong-juqian-duandai-majie-du.md`（10 处——极可能是代码块内合法 HTML，核对后多半跳过）
+- [x] `2018-08-23-luyou-xiugai-route.md`（3 处）
+- [x] `2018-03-08-grafana-mysql-shuju-yuan.md`（1 处）
+- [x] `2018-11-01-linux-huanjing-bianliang-dejia-zaishun-xu.md`（2 处）
+- [x] `2013-12-31-sshfs-guazai-yuancheng-mulu.md`（1 处）
+- [x] `2018-02-06-oncall-xiaogong-juqian-duandai-majie-du.md`（10 处——极可能是代码块内合法 HTML，核对后多半跳过）
 
 > 两个 `.html` 文件（`2026-07-14-html-zhifa-shili.html`、`2026-07-15-rotmire-sv-hunter-analysis.html`）是 HTML 直发文，**跳过**。
 
 ## B. 死外链图片（1 篇）
 
-- [ ] `2020-07-16-bios-uefi-mbr-legacy-gpt-denggai.md`：正文有指向已失效图床（zhimg 防盗链）的 Markdown 图片。处理：确认图片不可达后，替换为 `<!-- image unavailable: 原URL -->` 注释（不删周围文字），或若图无关紧要直接删该图行。
+- [x] `2020-07-16-bios-uefi-mbr-legacy-gpt-denggai.md`：正文有指向已失效图床（zhimg 防盗链）的 Markdown 图片。处理：确认图片不可达后，替换为 `<!-- image unavailable: 原URL -->` 注释（不删周围文字），或若图无关紧要直接删该图行。
 
 ## C. 标签体系收敛（114 → 目标 ~50）
 
