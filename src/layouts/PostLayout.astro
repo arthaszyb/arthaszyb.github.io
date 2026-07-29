@@ -18,7 +18,14 @@ const { title, description, date, category, tags, minutesRead, origin_url } = en
 const dateStr = date.toISOString().slice(0, 10);
 ---
 
-<BaseLayout title={title} description={description} type="article" publishedTime={date} tags={tags}>
+<BaseLayout
+  title={title}
+  description={description}
+  type="article"
+  publishedTime={date}
+  tags={tags}
+  category={category}
+>
   <div class="post-shell">
     <article>
       <h1>{title}</h1>

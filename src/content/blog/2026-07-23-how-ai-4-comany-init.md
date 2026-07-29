@@ -1,18 +1,19 @@
 ---
-title: 如何给公司做AI赋能--目标拆解与协作
+title: 如何给公司做 AI 赋能：目标拆解与协作（spec-first 与阶段执行）
 slug: how-ai-4-comany-org-target
 date: 2026-07-15
+description: 给公司做 AI 赋能时，怎么给 AI agent 和人类工程师混编的团队拆任务？记录一次由 agent 团队完成主体代码的实战：先写规格再写计划、把验收标准写到「一条命令加一个期望输出」的粒度、用接缝契约和职责矩阵定边界、按波次排并行与串行执行，以及用偏差登记簿控制范围蔓延。
 category: ai
 tags:
   - LLM
   - AI
   - Agent
+  - AI赋能
 draft: false
 lang: zh
 ---
-# 任务拆解与协作篇:spec-first 与阶段执行——当团队里既有人、也有 agent
 
-*《给公司做 AI 赋能》系列第 3 篇*
+*《给公司做 AI 赋能》系列第 3 篇：任务拆解与协作——当团队里既有人、也有 agent。*
 
 ## 一个新问题:怎么给"不知疲倦但没有上下文"的队友派活
 

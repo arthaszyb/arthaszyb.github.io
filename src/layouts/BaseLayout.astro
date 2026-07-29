@@ -2,6 +2,7 @@
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import { site } from '../data/site';
+import { categoryDisplayName } from '../data/categories';
 import themeData from '../data/theme.json';
 import '../styles/global.css';
 
@@ -13,6 +14,8 @@ interface Props {
   publishedTime?: Date;
   tags?: string[];
   robots?: string;
+  /** Post category slug — emitted as schema.org `articleSection`. */
+  category?: string;
 }
 
 const {
@@ -22,9 +25,12 @@ const {
   publishedTime,
   tags = [],
   robots = 'index,follow,max-image-preview:large',
+  category,
 } = Astro.props;
 
-const pageTitle = title ? `${title} - ${site.title}` : site.title;
+/* 首页（无 title）过去只输出 "Sean Jho"——一个没有任何主题词的标题，
+   搜索引擎无从判断这站是讲什么的。补上 tagline。 */
+const pageTitle = title ? `${title} - ${site.title}` : `${site.title} - ${site.tagline}`;
 const canonicalURL = new URL(Astro.url.pathname, site.url).toString();
 
 /* 主题覆写（src/data/theme.json，可在 Pages CMS「主题与统计」里编辑）：
@@ -34,7 +40,18 @@ const theme = themeData as {
   banner?: { image?: string };
   accent?: { light?: string; dark?: string };
   analytics?: { goatcounter?: string };
+  verification?: { google?: string; bing?: string; baidu?: string };
 };
+
+/* 搜索引擎站点验证：在 Google Search Console / Bing / 百度站长平台选
+   「HTML 标记」方式，把它给的 content 值填进 theme.json（Pages CMS 的
+   「主题与统计」里也能填），留空则不输出任何标签。
+   这一步不做，站点就永远不会被主动提交 sitemap。 */
+const verifications = [
+  ['google-site-verification', theme.verification?.google],
+  ['msvalidate.01', theme.verification?.bing],
+  ['baidu-site-verification', theme.verification?.baidu],
+].filter(([, value]) => value?.trim()) as [string, string][];
 
 const themeCss = [
   theme.accent?.light && `:root{--accent:${theme.accent.light};}`,
@@ -47,6 +64,8 @@ const bannerImage = theme.banner?.image?.trim();
 
 const goatcounter = theme.analytics?.goatcounter?.trim();
 
+const author = { '@type': 'Person', name: site.author, url: site.github };
+
 const jsonLd =
   type === 'article'
     ? {
@@ -54,21 +73,26 @@ const jsonLd =
         '@type': 'BlogPosting',
         headline: title ?? site.title,
         description,
+        url: canonicalURL,
         datePublished: publishedTime?.toISOString(),
         dateModified: publishedTime?.toISOString(),
-        mainEntityOfPage: canonicalURL,
+        mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalURL },
         inLanguage: 'zh-CN',
+        ...(category ? { articleSection: categoryDisplayName(category) } : {}),
         ...(tags.length > 0 ? { keywords: tags.join(', ') } : {}),
-        author: { '@type': 'Person', name: site.author, url: site.github },
+        author,
         publisher: { '@type': 'Person', name: site.author },
+        isPartOf: { '@type': 'Blog', name: site.title, url: site.url },
       }
     : {
         '@context': 'https://schema.org',
         '@type': 'WebSite',
         name: site.title,
+        alternateName: site.tagline,
         url: site.url,
         description: site.description,
         inLanguage: 'zh-CN',
+        author,
         publisher: { '@type': 'Person', name: site.author },
       };
 ---
@@ -103,6 +127,7 @@ const jsonLd =
     <meta name="author" content={site.author} />
     <meta name="robots" content={robots} />
     <meta name="generator" content={Astro.generator} />
+    {verifications.map(([name, content]) => <meta name={name} content={content.trim()} />)}
 
     <title>{pageTitle}</title>
 

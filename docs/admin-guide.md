@@ -76,8 +76,28 @@ GoatCounter 无 Cookie、不追踪个人信息，脚本约 3.5 KB，对加载速
 若之后想换 Google Analytics / Cloudflare Web Analytics，把对应脚本加进
 `src/layouts/BaseLayout.astro` 即可。
 
+## 五、搜索引擎收录（SEO / GEO）
+
+文章要能被 Google 搜到，光把站建好不够——**必须主动去各站长平台验证站点并提交
+sitemap**，否则新站可能几个月都不会被收录。
+
+1. 到 <https://search.google.com/search-console> 添加资源 →「网址前缀」→
+   填 `https://arthaszyb.github.io`；
+2. 验证方式选「HTML 标记」，复制它给的 `content="..."` 里那串值；
+3. 在 CMS「主题与统计」→「搜索引擎站点验证」→「Google Search Console」填入并保存；
+4. 等部署完成（1–2 分钟）后，回 Search Console 点「验证」；
+5. 验证通过后到「站点地图」提交 `sitemap-index.xml`；
+6. 发了重点文章想快点收录，用「网址检查」输入完整 URL →「请求编入索引」。
+
+Bing（<https://www.bing.com/webmasters>）和百度（<https://ziyuan.baidu.com>）流程相同，
+对应 CMS 里的另外两个格子。Bing 的索引会被部分 AI 搜索产品使用，值得一并做。
+
+完整体检结论和待办见 [docs/seo-geo-checklist.md](./seo-geo-checklist.md)。
+
 ## 常见问题
 
+- **发的文章 Google 搜不到？** 先确认第五节的验证 + sitemap 提交做了没有。
+  没做的话搜不到是必然的；做了之后新文章通常还要几天到两周才会出现。
 - **保存后多久生效？** Actions 构建约 1–2 分钟，可在仓库 Actions 页看进度。
 - **CMS 里看不到某篇文章？** 检查文件是否在 `src/content/blog/` 且扩展名为
   `.md` / `.html`。

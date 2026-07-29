@@ -212,3 +212,20 @@ content:
             label: GoatCounter 站点代码
             description: 在 https://www.goatcounter.com 注册后填入站点代码（如 arthaszyb），留空则不启用统计
             type: string
+      - name: verification
+        label: 搜索引擎站点验证
+        description: 验证后才能在各站长平台提交 sitemap、查看收录情况。各平台选「HTML 标记 / meta 标签」方式，把 content="..." 里的那串值填到下面对应格子（只填值，不要填整个标签）。留空则不输出。
+        type: object
+        fields:
+          - name: google
+            label: Google Search Console
+            description: https://search.google.com/search-console 添加资源 → 网址前缀 https://arthaszyb.github.io → 选「HTML 标记」，复制 content 的值
+            type: string
+          - name: bing
+            label: Bing 网站管理员工具
+            description: https://www.bing.com/webmasters 的 msvalidate.01 值
+            type: string
+          - name: baidu
+            label: 百度搜索资源平台
+            description: https://ziyuan.baidu.com 的 baidu-site-verification 值
+            type: string

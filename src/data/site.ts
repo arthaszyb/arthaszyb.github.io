@@ -1,7 +1,12 @@
 export const site = {
   title: 'Sean Jho',
+  /** 首页 <title> 用 `${title} - ${tagline}`，避免站点首页只有一个没有主题信号的人名。 */
+  tagline: '技术笔记 · Linux、基础设施、数据库与 AI 工程实践',
+  /* 站点默认描述。正文是中文、<html lang="zh-CN">，描述也必须是中文——
+     语言不一致会让中文搜索词匹配不到本站。单篇文章请在 frontmatter 里写
+     自己的 description，不要退回到这一条。 */
   description:
-    'Technical notes on systems, infrastructure, AI tooling, and engineering practice.',
+    'Sean Jho 的个人技术笔记：Linux 运维、基础设施与网络排查、数据库调优、容器与监控，以及 AI/LLM 工程与 agent 协作实践。自 2013 年持续更新。',
   url: 'https://arthaszyb.github.io',
   author: 'Sean Jho',
   email: 'arthaszyb@gmail.com',
