@@ -92,6 +92,15 @@ sitemap**，否则新站可能几个月都不会被收录。
 Bing（<https://www.bing.com/webmasters>）和百度（<https://ziyuan.baidu.com>）流程相同，
 对应 CMS 里的另外两个格子。Bing 的索引会被部分 AI 搜索产品使用，值得一并做。
 
+**两个容易踩的坑：**
+
+- **资源类型必须选「网址前缀」，不能选「网域」。** 「网域」资源只支持 DNS TXT 记录验证，
+  而 `github.io` 是 GitHub 的域名，你没有它的 DNS 控制权，那条路永远走不通。
+- **验证文件要放进 `public/`，不是仓库根目录。** 如果用「HTML 文件」验证方式，下载到的
+  `googlexxxx.html` 必须放在 `public/` 下——Astro 只把 `public/` 的内容复制到站点根目录，
+  放在仓库根目录的文件构建时会被直接忽略，线上访问就是 404。同理适用于任何需要放在
+  站点根目录的文件（`BingSiteAuth.xml` 等）。
+
 完整体检结论和待办见 [docs/seo-geo-checklist.md](./seo-geo-checklist.md)。
 
 ## 常见问题
